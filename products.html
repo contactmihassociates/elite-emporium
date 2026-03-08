@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Products – Elite Emporium</title>
+  <meta name="description" content="Browse all products at Elite Emporium – Electronics, Clothing, Home & Kitchen, Footwear, Bags and Toys." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ── HEADER ─────────────────────────────── -->
+<header>
+  <div class="header-top">
+    🎉 Free Delivery on orders above ₹499 &nbsp;|&nbsp; GST: 33DWGPN3169G1ZF &nbsp;|&nbsp; WhatsApp Orders: +91 7358650774
+  </div>
+  <div class="header-main">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">👑</div>
+      <div class="logo-text">
+        <h1>Elite Emporium</h1>
+        <span>Premium Online Store</span>
+      </div>
+    </a>
+
+    <div class="header-search">
+      <form id="headerSearchForm">
+        <input type="text" id="headerSearchInput" placeholder="Search products…" autocomplete="off" />
+        <button type="submit">🔍</button>
+      </form>
+    </div>
+
+    <div class="header-actions">
+      <a href="cart.html" class="cart-btn">
+        🛒 Cart
+        <span class="cart-count">0</span>
+      </a>
+    </div>
+  </div>
+  <nav>
+    <a href="index.html">🏠 Home</a>
+    <a href="products.html" class="active">🛍️ All Products</a>
+    <a href="products.html?category=Electronics">📱 Electronics</a>
+    <a href="products.html?category=Clothing">👗 Clothing</a>
+    <a href="products.html?category=Home & Kitchen">🏠 Home & Kitchen</a>
+    <a href="products.html?category=Footwear">👟 Footwear</a>
+    <a href="products.html?category=Bags">👜 Bags</a>
+    <a href="products.html?category=Toys & Games">🎮 Toys & Games</a>
+    <a href="index.html#about">ℹ️ About Us</a>
+  </nav>
+</header>
+
+<!-- ── PAGE HEADER ────────────────────────── -->
+<div class="page-header">
+  <h1>🛍️ Our Products</h1>
+  <p class="breadcrumb"><a href="index.html">Home</a> › All Products</p>
+</div>
+
+<!-- ── PRODUCTS LAYOUT ────────────────────── -->
+<div class="products-layout">
+
+  <!-- Sidebar Filters -->
+  <aside class="filters-sidebar">
+    <div class="filter-title">🔧 Filter Products</div>
+
+    <div class="filter-group">
+      <div class="search-bar" style="margin-bottom:8px;">
+        <span>🔍</span>
+        <input type="text" id="productSearchInput" placeholder="Search…" />
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <h4>Category</h4>
+
+      <div class="filter-option active">
+        <input type="radio" name="category" id="catAll" value="All" checked />
+        <label for="catAll">All Products</label>
+      </div>
+      <div class="filter-option">
+        <input type="radio" name="category" id="catElec" value="Electronics" />
+        <label for="catElec">📱 Electronics</label>
+      </div>
+      <div class="filter-option">
+        <input type="radio" name="category" id="catCloth" value="Clothing" />
+        <label for="catCloth">👗 Clothing</label>
+      </div>
+      <div class="filter-option">
+        <input type="radio" name="category" id="catHome" value="Home & Kitchen" />
+        <label for="catHome">🏠 Home & Kitchen</label>
+      </div>
+      <div class="filter-option">
+        <input type="radio" name="category" id="catFoot" value="Footwear" />
+        <label for="catFoot">👟 Footwear</label>
+      </div>
+      <div class="filter-option">
+        <input type="radio" name="category" id="catBags" value="Bags" />
+        <label for="catBags">👜 Bags</label>
+      </div>
+      <div class="filter-option">
+        <input type="radio" name="category" id="catToys" value="Toys & Games" />
+        <label for="catToys">🎮 Toys & Games</label>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <h4>Sort By</h4>
+      <select id="sortSelect" class="form-select" style="width:100%;">
+        <option value="default">Default</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+        <option value="rating">Top Rated</option>
+        <option value="popular">Most Popular</option>
+      </select>
+    </div>
+
+    <div style="background:var(--gold-light);border:1px solid var(--gold);border-radius:10px;padding:14px;text-align:center;font-size:12px;color:var(--primary-dark);">
+      <div style="font-size:22px;margin-bottom:6px;">💬</div>
+      <strong>Need help choosing?</strong><br />
+      Chat with us on WhatsApp!
+      <br />
+      <a href="https://wa.me/917358650774" target="_blank" rel="noopener"
+         style="display:inline-block;margin-top:10px;background:#25D366;color:white;padding:7px 16px;border-radius:20px;font-weight:700;font-size:12px;text-decoration:none;">
+        Chat Now
+      </a>
+    </div>
+  </aside>
+
+  <!-- Products Main -->
+  <main>
+    <div class="products-header">
+      <span id="productsCount" class="products-count">Loading products…</span>
+      <select id="sortSelectMobile" class="sort-select" style="display:none;">
+        <option value="default">Sort: Default</option>
+        <option value="price-asc">Price: Low → High</option>
+        <option value="price-desc">Price: High → Low</option>
+        <option value="rating">Top Rated</option>
+        <option value="popular">Most Popular</option>
+      </select>
+    </div>
+
+    <div class="products-grid" id="productsGrid">
+      <!-- Populated by script.js -->
+    </div>
+  </main>
+</div>
+
+<!-- ── FOOTER ─────────────────────────────── -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo" style="margin-bottom:12px;">
+        <div class="logo-icon" style="width:42px;height:42px;font-size:20px;">👑</div>
+        <div class="logo-text"><h1 style="font-family:'Playfair Display',serif;">Elite Emporium</h1></div>
+      </div>
+      <p>Your trusted local online store for quality products. GST registered &amp; Udyam certified micro enterprise.</p>
+      <div class="gst-box">
+        🏛️ GST: 33DWGPN3169G1ZF<br />
+        🏭 Udyam: UDYAM-TN-26-0090343
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="index.html">🏠 Home</a></li>
+        <li><a href="products.html">🛍️ All Products</a></li>
+        <li><a href="cart.html">🛒 My Cart</a></li>
+        <li><a href="index.html#about">ℹ️ About Us</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Categories</h4>
+      <ul>
+        <li><a href="products.html?category=Electronics">📱 Electronics</a></li>
+        <li><a href="products.html?category=Clothing">👗 Clothing</a></li>
+        <li><a href="products.html?category=Home & Kitchen">🏠 Home & Kitchen</a></li>
+        <li><a href="products.html?category=Footwear">👟 Footwear</a></li>
+        <li><a href="products.html?category=Bags">👜 Bags</a></li>
+        <li><a href="products.html?category=Toys & Games">🎮 Toys</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Contact Us</h4>
+      <div class="contact-item">
+        <span class="contact-icon">📍</span>
+        <span>183b, Sadukai Street, Kayalpattinam, Thoothukudi – 628204</span>
+      </div>
+      <div class="contact-item">
+        <span class="contact-icon">📞</span>
+        <span>+91 8072173467</span>
+      </div>
+      <div class="contact-item">
+        <span class="contact-icon">💬</span>
+        <span>+91 7358650774 (WhatsApp Orders)</span>
+      </div>
+      <div class="contact-item">
+        <span class="contact-icon">📧</span>
+        <span>smnabu36@gmail.com</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© 2026 Elite Emporium. All rights reserved. | GST: 33DWGPN3169G1ZF</span>
+    <span>Made with ❤️ in Kayalpattinam, Tamil Nadu</span>
+  </div>
+</footer>
+
+<a href="https://wa.me/917358650774" class="whatsapp-float" target="_blank" rel="noopener" title="Chat on WhatsApp">💬</a>
+
+<script src="script.js"></script>
+</body>
+</html>

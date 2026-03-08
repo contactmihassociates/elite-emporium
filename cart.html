@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cart & Checkout – Elite Emporium</title>
+  <meta name="description" content="Review your cart and place your order via WhatsApp at Elite Emporium." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ── HEADER ─────────────────────────────── -->
+<header>
+  <div class="header-top">
+    💬 Place your order via WhatsApp — Fast & Easy! &nbsp;|&nbsp; +91 7358650774
+  </div>
+  <div class="header-main">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">👑</div>
+      <div class="logo-text">
+        <h1>Elite Emporium</h1>
+        <span>Premium Online Store</span>
+      </div>
+    </a>
+
+    <div class="header-search">
+      <form id="headerSearchForm">
+        <input type="text" id="headerSearchInput" placeholder="Search products…" autocomplete="off" />
+        <button type="submit">🔍</button>
+      </form>
+    </div>
+
+    <div class="header-actions">
+      <a href="cart.html" class="cart-btn">
+        🛒 Cart
+        <span class="cart-count">0</span>
+      </a>
+    </div>
+  </div>
+  <nav>
+    <a href="index.html">🏠 Home</a>
+    <a href="products.html">🛍️ All Products</a>
+    <a href="products.html?category=Electronics">📱 Electronics</a>
+    <a href="products.html?category=Clothing">👗 Clothing</a>
+    <a href="products.html?category=Home & Kitchen">🏠 Home & Kitchen</a>
+    <a href="products.html?category=Footwear">👟 Footwear</a>
+    <a href="products.html?category=Bags">👜 Bags</a>
+    <a href="products.html?category=Toys & Games">🎮 Toys & Games</a>
+    <a href="index.html#about">ℹ️ About Us</a>
+  </nav>
+</header>
+
+<!-- ── PAGE HEADER ────────────────────────── -->
+<div class="page-header">
+  <h1>🛒 Your Cart & Checkout</h1>
+  <p class="breadcrumb"><a href="index.html">Home</a> › <a href="products.html">Products</a> › Cart</p>
+</div>
+
+<!-- ── HOW IT WORKS ───────────────────────── -->
+<div style="background:white;padding:20px 5%;border-bottom:1px solid #eee;">
+  <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;text-align:center;font-size:13px;color:var(--gray);">
+    <span style="background:var(--primary);color:white;border-radius:50%;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">1</span>
+    <span style="font-weight:600;color:var(--primary);">Add Products to Cart</span>
+    <span style="color:#ddd;font-size:20px;">→</span>
+    <span style="background:var(--primary);color:white;border-radius:50%;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">2</span>
+    <span style="font-weight:600;color:var(--primary);">Fill Delivery Details</span>
+    <span style="color:#ddd;font-size:20px;">→</span>
+    <span style="background:var(--primary);color:white;border-radius:50%;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">3</span>
+    <span style="font-weight:600;color:var(--primary);">Click "Place Order via WhatsApp"</span>
+    <span style="color:#ddd;font-size:20px;">→</span>
+    <span style="background:#25D366;color:white;border-radius:50%;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">4</span>
+    <span style="font-weight:600;color:#25D366;">Order Sent! 🎉</span>
+  </div>
+</div>
+
+<!-- ── CART LAYOUT ────────────────────────── -->
+<div class="cart-layout">
+
+  <!-- Left: Cart Items -->
+  <div>
+    <!-- Cart Items -->
+    <div class="cart-items-section">
+      <div class="section-title">🛒 Your Cart Items</div>
+      <div id="cartItems">
+        <!-- Populated by script.js -->
+      </div>
+    </div>
+
+    <!-- Delivery Details Form -->
+    <div class="checkout-form" id="checkoutFormSection" style="margin-top:24px;">
+      <div class="section-title">📝 Delivery Details</div>
+      <div class="form-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="custName">Full Name <span class="req">*</span></label>
+            <input type="text" id="custName" class="form-input" placeholder="Enter your full name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="custPhone">Phone Number <span class="req">*</span></label>
+            <input type="tel" id="custPhone" class="form-input" placeholder="10-digit mobile number" maxlength="10" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="custAddress">Delivery Address <span class="req">*</span></label>
+          <textarea id="custAddress" class="form-input" rows="2" placeholder="House No., Street Name, Area, Landmark…"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="custCity">City / Town <span class="req">*</span></label>
+            <input type="text" id="custCity" class="form-input" placeholder="City or Town" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="custState">State <span class="req">*</span></label>
+            <select id="custState" class="form-input form-select">
+              <option value="">-- Select State --</option>
+              <option value="Tamil Nadu" selected>Tamil Nadu</option>
+              <option value="Andhra Pradesh">Andhra Pradesh</option>
+              <option value="Karnataka">Karnataka</option>
+              <option value="Kerala">Kerala</option>
+              <option value="Telangana">Telangana</option>
+              <option value="Maharashtra">Maharashtra</option>
+              <option value="Delhi">Delhi</option>
+              <option value="Uttar Pradesh">Uttar Pradesh</option>
+              <option value="West Bengal">West Bengal</option>
+              <option value="Rajasthan">Rajasthan</option>
+              <option value="Gujarat">Gujarat</option>
+              <option value="Madhya Pradesh">Madhya Pradesh</option>
+              <option value="Bihar">Bihar</option>
+              <option value="Punjab">Punjab</option>
+              <option value="Haryana">Haryana</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="custPincode">PIN Code <span class="req">*</span></label>
+            <input type="text" id="custPincode" class="form-input" placeholder="6-digit PIN code" maxlength="6" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="custNotes">Order Notes <small style="font-weight:400;text-transform:none;">(optional)</small></label>
+            <input type="text" id="custNotes" class="form-input" placeholder="Any special instructions…" />
+          </div>
+        </div>
+
+        <button class="whatsapp-order-btn" onclick="placeOrder()">
+          <span style="font-size:24px;">💬</span>
+          Place Order via WhatsApp
+        </button>
+        <div class="order-note">
+          ✅ Clicking the button will open WhatsApp with your complete order details.<br />
+          Simply <strong>send the message</strong> to confirm your order with Elite Emporium.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Order Summary -->
+  <div>
+    <div class="order-summary">
+      <div class="section-title">📊 Order Summary</div>
+      <div class="summary-body">
+        <div class="summary-row">
+          <span>Items</span>
+          <strong id="summaryItems">0 item(s)</strong>
+        </div>
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <strong id="summarySubtotal">₹0</strong>
+        </div>
+        <div class="summary-row" id="deliveryRow">
+          <span>Delivery</span>
+          <strong id="summaryDelivery">—</strong>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span id="summaryTotal">₹0</span>
+        </div>
+
+        <div style="background:var(--gold-light);border:1px solid var(--gold);border-radius:10px;padding:12px;margin-top:16px;font-size:12px;color:var(--primary-dark);text-align:center;">
+          🚚 <strong>Free Delivery</strong> on orders above ₹499!
+        </div>
+
+        <a href="products.html" style="display:block;text-align:center;margin-top:16px;font-size:13px;color:var(--primary);font-weight:600;">
+          ← Continue Shopping
+        </a>
+      </div>
+    </div>
+
+    <!-- Business Info Card -->
+    <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-top:20px;">
+      <div class="section-title">🏪 Order From</div>
+      <div style="padding:20px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:15px;">
+          <div style="width:48px;height:48px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;">👑</div>
+          <div>
+            <div style="font-weight:700;color:var(--primary);font-family:'Playfair Display',serif;font-size:16px;">Elite Emporium</div>
+            <div style="font-size:11px;color:var(--gray);">GST Registered Business</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--gray);line-height:2;">
+          📍 183b, Sadukai Street, Kayalpattinam<br />
+          📞 +91 8072173467<br />
+          💬 WhatsApp: +91 7358650774<br />
+          📧 smnabu36@gmail.com
+        </div>
+        <div style="margin-top:12px;background:var(--gold-light);border-radius:8px;padding:10px;font-size:11px;color:var(--primary-dark);">
+          🏛️ GST: 33DWGPN3169G1ZF<br />
+          🏭 Udyam: UDYAM-TN-26-0090343
+        </div>
+        <a href="https://wa.me/917358650774" target="_blank" rel="noopener"
+           style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;background:#25D366;color:white;padding:10px;border-radius:10px;font-weight:700;font-size:13px;text-decoration:none;transition:opacity 0.2s;"
+           onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          💬 Chat on WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FOOTER ─────────────────────────────── -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo" style="margin-bottom:12px;">
+        <div class="logo-icon" style="width:42px;height:42px;font-size:20px;">👑</div>
+        <div class="logo-text"><h1 style="font-family:'Playfair Display',serif;">Elite Emporium</h1></div>
+      </div>
+      <p>Your trusted local online store. GST registered &amp; Udyam certified micro enterprise serving Kayalpattinam and beyond.</p>
+      <div class="gst-box">
+        🏛️ GST: 33DWGPN3169G1ZF<br />
+        🏭 Udyam: UDYAM-TN-26-0090343
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="index.html">🏠 Home</a></li>
+        <li><a href="products.html">🛍️ All Products</a></li>
+        <li><a href="cart.html">🛒 My Cart</a></li>
+        <li><a href="index.html#about">ℹ️ About Us</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Categories</h4>
+      <ul>
+        <li><a href="products.html?category=Electronics">📱 Electronics</a></li>
+        <li><a href="products.html?category=Clothing">👗 Clothing</a></li>
+        <li><a href="products.html?category=Home & Kitchen">🏠 Home & Kitchen</a></li>
+        <li><a href="products.html?category=Footwear">👟 Footwear</a></li>
+        <li><a href="products.html?category=Bags">👜 Bags</a></li>
+        <li><a href="products.html?category=Toys & Games">🎮 Toys</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Contact Us</h4>
+      <div class="contact-item">
+        <span class="contact-icon">📍</span>
+        <span>183b, Sadukai Street, Kayalpattinam, Thoothukudi – 628204</span>
+      </div>
+      <div class="contact-item">
+        <span class="contact-icon">📞</span>
+        <span>+91 8072173467</span>
+      </div>
+      <div class="contact-item">
+        <span class="contact-icon">💬</span>
+        <span>+91 7358650774 (WhatsApp Orders)</span>
+      </div>
+      <div class="contact-item">
+        <span class="contact-icon">📧</span>
+        <span>smnabu36@gmail.com</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© 2026 Elite Emporium. All rights reserved. | GST: 33DWGPN3169G1ZF</span>
+    <span>Made with ❤️ in Kayalpattinam, Tamil Nadu</span>
+  </div>
+</footer>
+
+<a href="https://wa.me/917358650774" class="whatsapp-float" target="_blank" rel="noopener" title="Chat on WhatsApp">💬</a>
+
+<script src="script.js"></script>
+</body>
+</html>
