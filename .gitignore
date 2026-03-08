@@ -12,3 +12,9 @@ registration certificate.pdf
 Udyam Registration Certificate.pdf
 GST_Registration_Guide.docx
 WhatsApp Image*
+
+# Allow product images in the images/ folder
+!images/
+!images/**
+!images/**/*.jpg
+!images/**/*.jpeg

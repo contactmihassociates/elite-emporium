@@ -461,6 +461,22 @@ section { padding: 60px 5%; }
   font-size: 68px;
 }
 
+.product-image-photo {
+  overflow: hidden;
+  background: #f8f8f8;
+}
+
+.product-image-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.product-card:hover .product-image-photo img {
+  transform: scale(1.06);
+}
+
 .product-info {
   padding: 16px;
   flex: 1;
@@ -868,6 +884,18 @@ footer {
   justify-content: center;
   font-size: 34px;
   flex-shrink: 0;
+}
+
+.cart-item-image-photo {
+  overflow: hidden;
+  background: #f8f8f8;
+}
+
+.cart-item-image-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
 }
 
 .cart-item-details { flex: 1; }

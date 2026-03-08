@@ -18,38 +18,24 @@ const CONFIG = {
 
 // ── PRODUCT CATALOG ──────────────────────────
 const products = [
-  // Electronics
-  { id: 1,  name: "Wireless Bluetooth Earbuds",        category: "Electronics",   price: 1499, emoji: "🎧", bg: "linear-gradient(135deg,#1a237e,#283593)", desc: "Premium sound with 24hr battery & active noise cancellation", rating: 4.5, reviews: 128, badge: "Bestseller" },
-  { id: 2,  name: "Smart Watch Pro",                   category: "Electronics",   price: 2999, emoji: "⌚", bg: "linear-gradient(135deg,#0d47a1,#1565c0)", desc: "Health monitoring, GPS, 100+ sports modes & waterproof", rating: 4.3, reviews: 89 },
-  { id: 3,  name: "Power Bank 10000mAh",               category: "Electronics",   price: 999,  emoji: "🔋", bg: "linear-gradient(135deg,#1b5e20,#2e7d32)", desc: "Fast charging, dual USB + Type-C, LED indicator", rating: 4.4, reviews: 201 },
-  { id: 4,  name: "Portable Bluetooth Speaker",        category: "Electronics",   price: 1299, emoji: "🔊", bg: "linear-gradient(135deg,#4a148c,#6a1b9a)", desc: "360° surround sound, waterproof IPX5, 12hr playback", rating: 4.2, reviews: 156 },
-  { id: 5,  name: "LED USB Desk Lamp",                 category: "Electronics",   price: 699,  emoji: "💡", bg: "linear-gradient(135deg,#e65100,#f57c00)", desc: "Adjustable brightness & color temp, eye-care mode", rating: 4.1, reviews: 67,  badge: "New" },
-  // Clothing
-  { id: 6,  name: "Men's Premium Formal Shirt",        category: "Clothing",      price: 799,  emoji: "👔", bg: "linear-gradient(135deg,#bf360c,#d84315)", desc: "100% premium cotton, slim-fit, anti-wrinkle finish", rating: 4.1, reviews: 234 },
-  { id: 7,  name: "Women's Printed Kurti",             category: "Clothing",      price: 649,  emoji: "👗", bg: "linear-gradient(135deg,#880e4f,#ad1457)", desc: "Elegant floral print, breathable fabric, multiple sizes", rating: 4.3, reviews: 312, badge: "New" },
-  { id: 8,  name: "Kids T-Shirt Pack (3 pcs)",         category: "Clothing",      price: 399,  emoji: "👕", bg: "linear-gradient(135deg,#1b5e20,#388e3c)", desc: "Soft breathable cotton, vibrant colors, sizes 2-12 yrs", rating: 4.5, reviews: 189 },
-  { id: 9,  name: "Men's Slim-Fit Denim Jeans",        category: "Clothing",      price: 1299, emoji: "👖", bg: "linear-gradient(135deg,#0d47a1,#1976d2)", desc: "Stretchable premium denim, slim-fit, all sizes available", rating: 4.0, reviews: 445 },
-  { id: 10, name: "Women's Palazzo Suit Set",          category: "Clothing",      price: 899,  emoji: "👘", bg: "linear-gradient(135deg,#4a148c,#7b1fa2)", desc: "Flowy palazzo with matching top, great for all occasions", rating: 4.4, reviews: 167, badge: "Popular" },
   // Home & Kitchen
-  { id: 11, name: "Insulated Steel Water Bottle 1L",   category: "Home & Kitchen",price: 449,  emoji: "🫙", bg: "linear-gradient(135deg,#33691e,#558b2f)", desc: "Double-wall vacuum: cold 24hr, hot 12hr, leak-proof", rating: 4.6, reviews: 398, badge: "Bestseller" },
-  { id: 12, name: "Non-Stick Cookware Set (5 pcs)",    category: "Home & Kitchen",price: 1999, emoji: "🍳", bg: "linear-gradient(135deg,#bf360c,#e64a19)", desc: "PFOA-free coating, induction & gas compatible", rating: 4.4, reviews: 278, badge: "Popular" },
-  { id: 13, name: "King Size Bed Sheet Set",           category: "Home & Kitchen",price: 899,  emoji: "🛏️", bg: "linear-gradient(135deg,#1a237e,#3949ab)", desc: "300 thread count premium cotton with 2 pillow covers", rating: 4.2, reviews: 156 },
-  { id: 14, name: "Airtight Storage Containers (6 pcs)",category:"Home & Kitchen",price: 599,  emoji: "📦", bg: "linear-gradient(135deg,#e65100,#f57c00)", desc: "BPA-free, microwave safe, stackable design", rating: 4.3, reviews: 89 },
-  { id: 15, name: "Digital Kitchen Scale",             category: "Home & Kitchen",price: 349,  emoji: "⚖️", bg: "linear-gradient(135deg,#37474f,#546e7a)", desc: "Precise up to 5kg, slim profile, tare function", rating: 4.1, reviews: 112, badge: "New" },
-  // Footwear
-  { id: 16, name: "Men's Casual Sneakers",             category: "Footwear",      price: 1299, emoji: "👟", bg: "linear-gradient(135deg,#212121,#424242)", desc: "Lightweight mesh upper, cushioned sole, all-day comfort", rating: 4.1, reviews: 345 },
-  { id: 17, name: "Women's Block Heel Sandals",        category: "Footwear",      price: 699,  emoji: "👡", bg: "linear-gradient(135deg,#880e4f,#c2185b)", desc: "Elegant design, cushioned footbed, anti-slip sole", rating: 4.3, reviews: 223, badge: "New" },
-  { id: 18, name: "Kids Sports Shoes",                 category: "Footwear",      price: 599,  emoji: "👟", bg: "linear-gradient(135deg,#1565c0,#1976d2)", desc: "Velcro closure, flexible durable sole, sizes 5-10", rating: 4.4, reviews: 178 },
-  { id: 19, name: "Men's Genuine Leather Formal Shoes",category: "Footwear",      price: 1799, emoji: "👞", bg: "linear-gradient(135deg,#3e2723,#5d4037)", desc: "Full grain leather, anti-slip rubber sole, lace-up", rating: 4.2, reviews: 267, badge: "Premium" },
-  // Bags
-  { id: 20, name: "Women's PU Leather Tote Bag",      category: "Bags",          price: 1199, emoji: "👜", bg: "linear-gradient(135deg,#880e4f,#ad1457)", desc: "Spacious with inner pockets, zip closure, durable strap", rating: 4.2, reviews: 198 },
-  { id: 21, name: "School Backpack 30L",               category: "Bags",          price: 799,  emoji: "🎒", bg: "linear-gradient(135deg,#1b5e20,#2e7d32)", desc: "Waterproof, multiple compartments, ergonomic padded straps", rating: 4.5, reviews: 456, badge: "Bestseller" },
-  { id: 22, name: "Hardshell Trolley Bag 24\"",        category: "Bags",          price: 2499, emoji: "🧳", bg: "linear-gradient(135deg,#1a237e,#283593)", desc: "360° spinner wheels, TSA lock, scratch-resistant shell", rating: 4.3, reviews: 134, badge: "Premium" },
-  { id: 23, name: "Men's Laptop Messenger Bag",        category: "Bags",          price: 999,  emoji: "💼", bg: "linear-gradient(135deg,#37474f,#455a64)", desc: "Fits 15.6\" laptop, water-resistant, padded shoulder strap", rating: 4.1, reviews: 89 },
-  // Toys & Games
-  { id: 24, name: "Educational Building Blocks (100 pcs)",category:"Toys & Games",price: 499,  emoji: "🧱", bg: "linear-gradient(135deg,#e65100,#f57c00)", desc: "Colorful ABS blocks for ages 3+, boosts creativity & IQ", rating: 4.6, reviews: 267, badge: "Bestseller" },
-  { id: 25, name: "Remote Control Racing Car",         category: "Toys & Games",  price: 799,  emoji: "🏎️", bg: "linear-gradient(135deg,#b71c1c,#c62828)", desc: "High-speed 1:18 scale RC car with rechargeable battery", rating: 4.4, reviews: 198 },
-  { id: 26, name: "DIY Art & Craft Kit",               category: "Toys & Games",  price: 399,  emoji: "🎨", bg: "linear-gradient(135deg,#4a148c,#6a1b9a)", desc: "Complete kit: colors, brushes, drawing book & stencils", rating: 4.5, reviews: 312, badge: "New" },
+  { id: 1,  name: "3-in-1 Kitchen Bowl Set",                  category: "Home & Kitchen", price: 580,  image: "images/products/IMG-20260308-WA0138.jpg", desc: "Versatile 3-in-1 mixing and serving bowl set for everyday kitchen use", rating: 4.3, reviews: 12, badge: "New" },
+  { id: 2,  name: "Jumbo 4-Slice Sandwich Griller",           category: "Home & Kitchen", price: 1600, image: "images/products/IMG-20260308-WA0140.jpg", desc: "Large capacity 4-slice sandwich maker & griller — perfect for quick family meals", rating: 4.5, reviews: 8,  badge: "Popular" },
+  // Bags & Accessories
+  { id: 3,  name: "3-Grid PU Leather Cosmetic Bag",           category: "Bags",           price: 500,  image: "images/products/IMG-20260308-WA0144.jpg", desc: "Spacious 3-compartment PU leather makeup organizer, perfect for travel", rating: 4.2, reviews: 15 },
+  { id: 7,  name: "YSL Tote Bag – 12A Quality",              category: "Bags",           price: 2999, image: "images/products/IMG-20260308-WA0163.jpg", desc: "Premium 12A quality YSL-inspired tote bag with superior finish and stitching", rating: 4.6, reviews: 27, badge: "Premium" },
+  { id: 8,  name: "Coach Field Tote 30",                      category: "Bags",           price: 3300, image: "images/products/IMG-20260308-WA0172.jpg", desc: "Classic Coach Field Tote 30 in premium leather finish with signature hardware", rating: 4.7, reviews: 19, badge: "Premium" },
+  { id: 11, name: "Coach 3-Piece Men's Combo",                category: "Bags",           price: 1350, image: "images/products/IMG-20260308-WA0183.jpg", desc: "Complete Coach men's set: Belt + Wallet + Card Holder in premium quality", rating: 4.5, reviews: 41, badge: "Popular" },
+  { id: 12, name: "Alex 3-Piece Men's Combo",                 category: "Bags",           price: 1400, image: "images/products/IMG-20260308-WA0189.jpg", desc: "Stylish Alex men's combo: premium belt, bi-fold wallet & card holder", rating: 4.4, reviews: 36 },
+  // Clothing
+  { id: 4,  name: "Tommy Hilfiger Rose Gold Ladies Watch",    category: "Clothing",       price: 1950, image: "images/products/IMG-20260308-WA0152.jpg", desc: "Elegant Tommy Hilfiger ladies watch with stunning rose gold dial and strap", rating: 4.7, reviews: 22, badge: "Bestseller" },
+  { id: 5,  name: "Richard Mille Watch",                      category: "Clothing",       price: 1850, image: "images/products/IMG-20260308-WA0153.jpg", desc: "Bold Richard Mille inspired design watch — a statement piece for any occasion", rating: 4.6, reviews: 18, badge: "Premium" },
+  { id: 6,  name: "Tommy Hilfiger Men's Automatic Watch",     category: "Clothing",       price: 2400, image: "images/products/IMG-20260308-WA0160.jpg", desc: "Classic Tommy Hilfiger men's automatic wristwatch with premium finish", rating: 4.8, reviews: 31, badge: "Bestseller" },
+  { id: 9,  name: "Marc Jacobs Sunglasses",                   category: "Clothing",       price: 600,  image: "images/products/IMG-20260308-WA0176.jpg", desc: "Stylish Marc Jacobs sunglasses (Indian box). Full kit with case available at ₹1300", rating: 4.4, reviews: 33 },
+  { id: 10, name: "Celine Metal Sunglasses",                  category: "Clothing",       price: 1100, image: "images/products/IMG-20260308-WA0180.jpg", desc: "Premium Celine metal frame sunglasses. Full kit with pouch available at ₹1300", rating: 4.3, reviews: 25 },
+  { id: 13, name: "Heavy Embroidery Lehenga Set",             category: "Clothing",       price: 1930, image: "images/products/IMG-20260308-WA0195.jpg", desc: "Stunning heavy embroidered lehenga set — ideal for weddings and festive occasions", rating: 4.8, reviews: 14, badge: "New" },
+  { id: 14, name: "Agni Jwala Designer Gown",                 category: "Clothing",       price: 1450, image: "images/products/IMG-20260308-WA0199.jpg", desc: "Gorgeous Agni Jwala designer gown for parties and special events", rating: 4.6, reviews: 11, badge: "New" },
+  { id: 15, name: "Fashion Accessories Set",                  category: "Clothing",       price: 450,  image: "images/products/IMG-20260308-WA0204.jpg", desc: "Trendy fashion accessories set at an unbeatable price — limited stock!", rating: 4.2, reviews: 9 },
 ];
 
 // ── CART STATE ───────────────────────────────
@@ -136,10 +122,15 @@ function renderProducts(list, containerId) {
     return;
   }
 
-  el.innerHTML = list.map(p => `
+  el.innerHTML = list.map(p => {
+    const badgeClass = p.badge === 'New' ? 'new' : p.badge === 'Bestseller' ? 'hot' : p.badge === 'Premium' ? 'premium' : '';
+    const imageHtml = p.image
+      ? `<div class="product-image product-image-photo"><img src="${p.image}" alt="${p.name}" loading="lazy" /></div>`
+      : `<div class="product-image" style="background:${p.bg}">${p.emoji}</div>`;
+    return `
     <div class="product-card">
-      ${p.badge ? `<span class="product-badge ${p.badge === 'New' ? 'new' : p.badge === 'Bestseller' ? 'hot' : p.badge === 'Premium' ? 'premium' : ''}">${p.badge}</span>` : ''}
-      <div class="product-image" style="background:${p.bg}">${p.emoji}</div>
+      ${p.badge ? `<span class="product-badge ${badgeClass}">${p.badge}</span>` : ''}
+      ${imageHtml}
       <div class="product-info">
         <div class="product-category">${p.category}</div>
         <div class="product-name">${p.name}</div>
@@ -156,7 +147,8 @@ function renderProducts(list, containerId) {
         </div>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 // ── RENDER CART ───────────────────────────────
@@ -176,9 +168,13 @@ function renderCart() {
     return;
   }
 
-  container.innerHTML = cart.map(item => `
+  container.innerHTML = cart.map(item => {
+    const cartImageHtml = item.image
+      ? `<div class="cart-item-image cart-item-image-photo"><img src="${item.image}" alt="${item.name}" loading="lazy" /></div>`
+      : `<div class="cart-item-image" style="background:${item.bg}">${item.emoji}</div>`;
+    return `
     <div class="cart-item">
-      <div class="cart-item-image" style="background:${item.bg}">${item.emoji}</div>
+      ${cartImageHtml}
       <div class="cart-item-details">
         <div class="cart-item-name">${item.name}</div>
         <div class="cart-item-category">${item.category}</div>
@@ -191,7 +187,8 @@ function renderCart() {
       </div>
       <button class="remove-btn" onclick="removeFromCart(${item.id})" title="Remove">🗑️</button>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   refreshSummary();
 }
@@ -388,8 +385,7 @@ function initProductsPage() {
 
 // ── HOMEPAGE FEATURED ─────────────────────────
 function initHomePage() {
-  // Featured: items with badge
-  const featured = products.filter(p => p.badge).slice(0, 8);
+  const featured = products.filter(p => p.badge);
   renderProducts(featured.length ? featured : products.slice(0, 8), 'featuredProducts');
 }
 
