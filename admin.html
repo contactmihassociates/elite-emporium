@@ -5,12 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Panel – Elite Emporium</title>
 
-  <!-- Firebase SDKs -->
+  <!-- Firebase SDKs (Auth + Firestore only — images via Cloudinary) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
   <script src="firebase-config.js"></script>
+
+  <!-- Cloudinary config -->
+  <script>
+    const CLOUDINARY_CLOUD  = 'dwygvtjad';
+    const CLOUDINARY_PRESET = 'ml_default';
+  </script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -569,7 +574,7 @@
 
 <script>
   // ── FIREBASE INIT ──────────────────────────────
-  let auth, db, storage;
+  let auth, db;
 
   function initFirebase() {
     if (!window.firebaseConfig || window.firebaseConfig.apiKey === 'YOUR_API_KEY') {
@@ -579,9 +584,8 @@
       return false;
     }
     if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
-    auth    = firebase.auth();
-    db      = firebase.firestore();
-    storage = firebase.storage();
+    auth = firebase.auth();
+    db   = firebase.firestore();
     return true;
   }
 
@@ -678,27 +682,13 @@
     btn.textContent = '⏳ Uploading image…';
 
     try {
-      // 1 — Upload image to Firebase Storage
-      const fileName  = `products/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-      const storageRef = storage.ref(fileName);
-      const uploadTask = storageRef.put(file);
-
-      // Show progress
+      // 1 — Upload image to Cloudinary
       document.getElementById('uploadProgress').style.display = 'block';
 
-      await new Promise((resolve, reject) => {
-        uploadTask.on('state_changed',
-          snapshot => {
-            const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-            document.getElementById('progressFill').style.width  = pct + '%';
-            document.getElementById('progressLabel').textContent = `Uploading… ${pct}%`;
-          },
-          reject,
-          resolve
-        );
+      const imageUrl = await uploadToCloudinary(file, pct => {
+        document.getElementById('progressFill').style.width  = pct + '%';
+        document.getElementById('progressLabel').textContent = `Uploading… ${pct}%`;
       });
-
-      const imageUrl = await storageRef.getDownloadURL();
 
       // 2 — Save product to Firestore
       btn.textContent = '⏳ Saving product…';
@@ -768,7 +758,7 @@
             <div class="p-meta">${p.category}</div>
             <div class="p-price">₹${p.price.toLocaleString('en-IN')}</div>
           </div>
-          <button class="btn-delete" onclick="deleteProduct('${doc.id}', '${p.image || ''}')">🗑️</button>
+          <button class="btn-delete" onclick="deleteProduct('${doc.id}')">🗑️</button>
         </div>`;
       }).join('');
 
@@ -777,32 +767,50 @@
     }
   }
 
+  // ── CLOUDINARY UPLOAD ──────────────────────────
+  function uploadToCloudinary(file, onProgress) {
+    return new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append('file',           file);
+      formData.append('upload_preset',  CLOUDINARY_PRESET);
+      formData.append('folder',         'elite-emporium');
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`);
+
+      xhr.upload.onprogress = e => {
+        if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
+      };
+
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const res = JSON.parse(xhr.responseText);
+          resolve(res.secure_url);
+        } else {
+          reject(new Error('Cloudinary upload failed: ' + xhr.statusText));
+        }
+      };
+
+      xhr.onerror = () => reject(new Error('Network error during image upload.'));
+      xhr.send(formData);
+    });
+  }
+
   // ── DELETE PRODUCT ─────────────────────────────
-  async function deleteProduct(firestoreId, imageUrl) {
+  async function deleteProduct(firestoreId) {
     if (!confirm('Delete this product from the store?')) return;
 
     try {
-      // Delete from Firestore
       await db.collection('products').doc(firestoreId).delete();
 
-      // Delete image from Storage (if it's a Firebase Storage URL)
-      if (imageUrl && imageUrl.includes('firebasestorage')) {
-        try {
-          await storage.refFromURL(imageUrl).delete();
-        } catch (_) { /* image may already be gone */ }
-      }
-
-      // Remove from DOM immediately
       const el = document.getElementById('item_' + firestoreId);
       if (el) el.remove();
 
-      // Update count
       const countEl = document.getElementById('fbProductCount');
       countEl.textContent = Math.max(0, parseInt(countEl.textContent) - 1);
 
       toast('Product deleted.', 'success');
 
-      // If no products left, show empty state
       const remaining = document.querySelectorAll('.product-item');
       if (remaining.length === 0) {
         document.getElementById('productListContainer').innerHTML = `
@@ -811,7 +819,6 @@
             <p>No products added yet.</p>
           </div>`;
       }
-
     } catch (err) {
       toast('Delete failed: ' + err.message, 'error');
     }
