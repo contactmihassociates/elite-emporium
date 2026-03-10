@@ -142,6 +142,7 @@ function renderProducts(list, containerId) {
   el.innerHTML = list.map(p => {
     const badgeClass = p.badge === 'New' ? 'new' : p.badge === 'Bestseller' ? 'hot' : p.badge === 'Premium' ? 'premium' : '';
     const pid = 'pid_' + p.id;
+    const detailLink = `product.html?id=${p.id}`;
     let imageHtml, swatchHtml = '';
     if (p.variants && p.variants.length > 1) {
       const swatches = p.variants.map((v, i) =>
@@ -151,17 +152,17 @@ function renderProducts(list, containerId) {
               onmouseenter="document.getElementById('vlbl_${pid}').textContent='${v.color}'"
               title="${v.color}" loading="lazy" />`
       ).join('');
-      imageHtml = `<div class="product-image product-image-photo">
+      imageHtml = `<a href="${detailLink}" class="pd-card-link"><div class="product-image product-image-photo">
         <img id="${pid}" src="${p.variants[0].image}" alt="${p.name}" loading="lazy" />
-      </div>`;
+      </div></a>`;
       swatchHtml = `<div class="variant-swatches">
         <span class="vcolor-name">Color: <strong id="vlbl_${pid}">${p.variants[0].color}</strong></span>
         <div class="vswatch-row">${swatches}</div>
       </div>`;
     } else if (p.image) {
-      imageHtml = `<div class="product-image product-image-photo"><img src="${p.image}" alt="${p.name}" loading="lazy" /></div>`;
+      imageHtml = `<a href="${detailLink}" class="pd-card-link"><div class="product-image product-image-photo"><img src="${p.image}" alt="${p.name}" loading="lazy" /></div></a>`;
     } else {
-      imageHtml = `<div class="product-image" style="background:${p.bg}">${p.emoji}</div>`;
+      imageHtml = `<a href="${detailLink}" class="pd-card-link"><div class="product-image" style="background:${p.bg}">${p.emoji}</div></a>`;
     }
     return `
     <div class="product-card">
@@ -170,7 +171,7 @@ function renderProducts(list, containerId) {
       ${swatchHtml}
       <div class="product-info">
         <div class="product-category">${p.category}</div>
-        <div class="product-name">${p.name}</div>
+        <div class="product-name"><a href="${detailLink}" class="pd-name-link">${p.name}</a></div>
         <div class="product-desc">${p.desc}</div>
         <div class="product-rating">
           ${renderStars(p.rating)}
@@ -436,6 +437,92 @@ function initHomePage() {
   renderProducts(featured.length ? featured : products.slice(0, 8), 'featuredProducts');
 }
 
+// ── PRODUCT DETAIL PAGE ───────────────────────
+function initProductDetailPage() {
+  const params = new URLSearchParams(window.location.search);
+  const rawId  = params.get('id');
+  const p      = products.find(prod => String(prod.id) === String(rawId));
+
+  if (!p) {
+    document.getElementById('pdTitle').textContent = 'Product not found';
+    const breadEl = document.getElementById('pdBreadcrumb');
+    if (breadEl) breadEl.innerHTML = `<a href="index.html">Home</a> › <a href="products.html">Products</a> › Not Found`;
+    return;
+  }
+
+  document.title = p.name + ' – Elite Emporium';
+
+  // Breadcrumb
+  const breadEl = document.getElementById('pdBreadcrumb');
+  if (breadEl) breadEl.innerHTML =
+    `<a href="index.html">Home</a> › <a href="products.html">All Products</a> › <a href="products.html?category=${encodeURIComponent(p.category)}">${p.category}</a> › ${p.name}`;
+
+  // Badge
+  if (p.badge) {
+    const badgeClass = p.badge === 'New' ? 'new' : p.badge === 'Bestseller' ? 'hot' : p.badge === 'Premium' ? 'premium' : '';
+    const bw = document.getElementById('pdBadgeWrap');
+    if (bw) bw.innerHTML = `<span class="product-badge ${badgeClass}" style="position:static;margin-bottom:12px;display:inline-block;">${p.badge}</span>`;
+  }
+
+  // Category, title, rating, price, description
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('pdCategory', p.category);
+  set('pdTitle',    p.name);
+  set('pdPrice',    '₹' + p.price.toLocaleString('en-IN'));
+  set('pdDesc',     p.desc);
+
+  const ratingEl = document.getElementById('pdRating');
+  if (ratingEl) ratingEl.innerHTML = `${renderStars(p.rating)} <span class="rating-count">(${p.reviews} reviews)</span>`;
+
+  // Main image & color picker
+  const mainImg     = document.getElementById('pdMainImage');
+  const colorPicker = document.getElementById('pdColorPicker');
+
+  if (p.variants && p.variants.length > 1) {
+    if (mainImg) mainImg.src = p.variants[0].image;
+    if (colorPicker) {
+      colorPicker.innerHTML =
+        `<div class="pd-color-label">Color: <strong id="pdSelectedColor">${p.variants[0].color}</strong></div>
+         <div class="pd-color-swatches">
+           ${p.variants.map((v, i) =>
+             `<div class="pd-swatch-item${i === 0 ? ' active' : ''}"
+                   onclick="selectDetailVariant(this,${JSON.stringify(v.image)},${JSON.stringify(v.color)})">
+               <img src="${v.image}" alt="${v.color}" loading="lazy" />
+               <span>${v.color}</span>
+             </div>`
+           ).join('')}
+         </div>`;
+    }
+  } else {
+    if (mainImg) mainImg.src = p.image || '';
+    if (colorPicker) colorPicker.style.display = 'none';
+  }
+
+  // WhatsApp order button
+  const waBtn = document.getElementById('pdWhatsApp');
+  if (waBtn) {
+    const msg = encodeURIComponent(`Hi! I want to order:\n\n*${p.name}*\nPrice: ₹${p.price.toLocaleString('en-IN')}\n\nPlease confirm availability.`);
+    waBtn.href = `https://wa.me/917358650774?text=${msg}`;
+  }
+
+  // Add to cart
+  const cartBtn = document.getElementById('pdAddToCart');
+  if (cartBtn) cartBtn.onclick = () => addToCart(p.id);
+}
+
+function selectDetailVariant(el, imgSrc, colorName) {
+  const mainImg = document.getElementById('pdMainImage');
+  if (mainImg) {
+    mainImg.style.opacity = '0.6';
+    mainImg.src = imgSrc;
+    mainImg.onload = () => { mainImg.style.opacity = '1'; };
+  }
+  const lbl = document.getElementById('pdSelectedColor');
+  if (lbl) lbl.textContent = colorName;
+  el.closest('.pd-color-swatches').querySelectorAll('.pd-swatch-item').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+}
+
 // ── INIT ──────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   updateCartUI();
@@ -446,4 +533,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (document.getElementById('featuredProducts')) initHomePage();
   if (document.getElementById('productsGrid'))     initProductsPage();
   if (document.getElementById('cartItems'))        renderCart();
+  if (document.getElementById('pdTitle'))          initProductDetailPage();
 });

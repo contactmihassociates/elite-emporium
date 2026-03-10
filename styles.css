@@ -1151,3 +1151,206 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
 .vswatch:hover   { border-color: var(--gold); transform: scale(1.1); }
 .vswatch.vactive { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold); transform: scale(1.05); }
+
+/* ── PRODUCT DETAIL PAGE ─────────────────── */
+.pd-page {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 0 20px 60px;
+}
+
+.pd-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.pd-main-image {
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--light-gray);
+}
+
+.pd-main-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity 0.2s ease;
+}
+
+.pd-info { padding-top: 8px; }
+
+.pd-category-tag {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gold-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 10px;
+}
+
+.pd-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  color: var(--primary);
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 14px;
+}
+
+.pd-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.pd-price {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 22px;
+}
+
+.pd-color-section { margin-bottom: 24px; }
+
+.pd-color-label {
+  font-size: 14px;
+  color: var(--gray);
+  margin-bottom: 14px;
+}
+
+.pd-color-label strong { color: var(--primary); font-weight: 700; }
+
+.pd-color-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.pd-swatch-item {
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.15s;
+}
+
+.pd-swatch-item img {
+  width: 68px;
+  height: 68px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 2px solid var(--light-gray);
+  display: block;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.pd-swatch-item span {
+  font-size: 11px;
+  color: var(--gray);
+  display: block;
+  margin-top: 5px;
+  max-width: 68px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pd-swatch-item:hover img {
+  border-color: var(--gold);
+  transform: scale(1.08);
+}
+
+.pd-swatch-item.active img {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px var(--gold);
+  transform: scale(1.05);
+}
+
+.pd-swatch-item.active span { color: var(--primary); font-weight: 700; }
+
+.pd-desc {
+  color: var(--gray);
+  font-size: 15px;
+  line-height: 1.75;
+  margin-bottom: 26px;
+}
+
+.pd-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.pd-actions .add-to-cart {
+  flex: 1;
+  min-width: 160px;
+  padding: 14px 20px;
+  font-size: 15px;
+  border-radius: 30px;
+}
+
+.pd-btn-wa {
+  flex: 1;
+  min-width: 160px;
+  padding: 14px 20px;
+  background: #25D366;
+  color: #fff;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 15px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.pd-btn-wa:hover { background: #128C7E; }
+
+.pd-info-box {
+  background: var(--gold-light);
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: var(--primary-dark);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Clickable product card */
+.pd-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.pd-card-link:hover .product-image img { transform: scale(1.04); }
+
+.pd-name-link { color: inherit; text-decoration: none; }
+.pd-name-link:hover { color: var(--gold-dark); }
+
+@media (max-width: 768px) {
+  .pd-container { grid-template-columns: 1fr; gap: 24px; }
+  .pd-title { font-size: 22px; }
+  .pd-price { font-size: 28px; }
+  .pd-swatch-item img { width: 56px; height: 56px; }
+  .pd-swatch-item span { max-width: 56px; }
+}
+
+@media (max-width: 480px) {
+  .pd-page { padding: 0 14px 40px; }
+  .pd-actions { flex-direction: column; }
+  .pd-actions .add-to-cart, .pd-btn-wa { min-width: unset; width: 100%; }
+}
