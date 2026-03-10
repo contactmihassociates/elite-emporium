@@ -56,7 +56,10 @@ async function loadProducts() {
 }
 
 // ── CART STATE ───────────────────────────────
-let cart = JSON.parse(localStorage.getItem('eliteEmporiumCart')) || [];
+let cart = (JSON.parse(localStorage.getItem('eliteEmporiumCart')) || []).map(i => ({
+  ...i,
+  cartKey: i.cartKey || (String(i.id) + '|' + (i.selectedColor || ''))
+}));
 
 function saveCart() {
   localStorage.setItem('eliteEmporiumCart', JSON.stringify(cart));
@@ -72,19 +75,27 @@ function updateCartUI() {
 }
 
 // ── ADD / REMOVE / UPDATE ────────────────────
-function addToCart(productId) {
+function addToCart(productId, selectedColor, selectedImage) {
   const product = products.find(p => p.id === productId);
   if (!product) return;
 
-  const existing = cart.find(i => i.id === productId);
+  const cartKey  = String(productId) + '|' + (selectedColor || '');
+  const existing = cart.find(i => i.cartKey === cartKey);
   if (existing) {
     existing.quantity += 1;
   } else {
-    cart.push({ ...product, quantity: 1 });
+    cart.push({
+      ...product,
+      quantity: 1,
+      cartKey,
+      selectedColor: selectedColor || null,
+      image: selectedImage || product.image
+    });
   }
 
   saveCart();
-  showToast(`✅ ${product.name} added to cart!`);
+  const colorStr = selectedColor ? ` (${selectedColor})` : '';
+  showToast(`✅ ${product.name}${colorStr} added to cart!`);
 
   const btn = document.querySelector(`[data-pid="${productId}"]`);
   if (btn) {
@@ -95,17 +106,17 @@ function addToCart(productId) {
   }
 }
 
-function removeFromCart(productId) {
-  cart = cart.filter(i => i.id !== productId);
+function removeFromCart(cartKey) {
+  cart = cart.filter(i => i.cartKey !== cartKey);
   saveCart();
   renderCart();
 }
 
-function updateQuantity(productId, delta) {
-  const item = cart.find(i => i.id === productId);
+function updateQuantity(cartKey, delta) {
+  const item = cart.find(i => i.cartKey === cartKey);
   if (!item) return;
   item.quantity += delta;
-  if (item.quantity <= 0) { removeFromCart(productId); return; }
+  if (item.quantity <= 0) { removeFromCart(cartKey); return; }
   saveCart();
   renderCart();
 }
@@ -220,20 +231,21 @@ function renderCart() {
     const cartImageHtml = item.image
       ? `<div class="cart-item-image cart-item-image-photo"><img src="${item.image}" alt="${item.name}" loading="lazy" /></div>`
       : `<div class="cart-item-image" style="background:${item.bg}">${item.emoji}</div>`;
+    const escKey = (item.cartKey || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
     return `
     <div class="cart-item">
       ${cartImageHtml}
       <div class="cart-item-details">
         <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-category">${item.category}</div>
+        <div class="cart-item-category">${item.category}${item.selectedColor ? ` — <span style="color:var(--primary);font-weight:600;">${item.selectedColor}</span>` : ''}</div>
         <div class="cart-item-price">₹${(item.price * item.quantity).toLocaleString('en-IN')}</div>
       </div>
       <div class="quantity-controls">
-        <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">−</button>
+        <button class="qty-btn" data-key="${escKey}" onclick="updateQuantity(this.dataset.key, -1)">−</button>
         <span class="qty-value">${item.quantity}</span>
-        <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+        <button class="qty-btn" data-key="${escKey}" onclick="updateQuantity(this.dataset.key, 1)">+</button>
       </div>
-      <button class="remove-btn" onclick="removeFromCart(${item.id})" title="Remove">🗑️</button>
+      <button class="remove-btn" data-key="${escKey}" onclick="removeFromCart(this.dataset.key)" title="Remove">🗑️</button>
     </div>
   `;
   }).join('');
@@ -507,9 +519,19 @@ function initProductDetailPage() {
     waBtn.href = `https://wa.me/917358650774?text=${msg}`;
   }
 
-  // Add to cart
+  // Add to cart — pass selected variant
   const cartBtn = document.getElementById('pdAddToCart');
-  if (cartBtn) cartBtn.onclick = () => addToCart(p.id);
+  if (cartBtn) {
+    if (p.variants && p.variants.length > 1) {
+      cartBtn.dataset.selectedColor = p.variants[0].color;
+      cartBtn.dataset.selectedImage = p.variants[0].image;
+    }
+    cartBtn.onclick = () => {
+      const color = cartBtn.dataset.selectedColor || undefined;
+      const img   = cartBtn.dataset.selectedImage || undefined;
+      addToCart(p.id, color, img);
+    };
+  }
 }
 
 function selectDetailVariant(el) {
@@ -525,6 +547,12 @@ function selectDetailVariant(el) {
   if (lbl) lbl.textContent = colorName;
   el.closest('.pd-color-swatches').querySelectorAll('.pd-swatch-item').forEach(s => s.classList.remove('active'));
   el.classList.add('active');
+  // Keep cart button in sync with selected variant
+  const cartBtn = document.getElementById('pdAddToCart');
+  if (cartBtn) {
+    cartBtn.dataset.selectedColor = colorName;
+    cartBtn.dataset.selectedImage = imgSrc;
+  }
 }
 
 // ── INIT ──────────────────────────────────────
