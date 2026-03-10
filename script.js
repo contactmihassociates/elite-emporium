@@ -486,7 +486,9 @@ function initProductDetailPage() {
          <div class="pd-color-swatches">
            ${p.variants.map((v, i) =>
              `<div class="pd-swatch-item${i === 0 ? ' active' : ''}"
-                   onclick="selectDetailVariant(this,${JSON.stringify(v.image)},${JSON.stringify(v.color)})">
+                   data-img="${v.image.replace(/"/g,'&quot;')}"
+                   data-color="${v.color.replace(/"/g,'&quot;')}"
+                   onclick="selectDetailVariant(this)">
                <img src="${v.image}" alt="${v.color}" loading="lazy" />
                <span>${v.color}</span>
              </div>`
@@ -510,8 +512,10 @@ function initProductDetailPage() {
   if (cartBtn) cartBtn.onclick = () => addToCart(p.id);
 }
 
-function selectDetailVariant(el, imgSrc, colorName) {
-  const mainImg = document.getElementById('pdMainImage');
+function selectDetailVariant(el) {
+  const imgSrc    = el.dataset.img;
+  const colorName = el.dataset.color;
+  const mainImg   = document.getElementById('pdMainImage');
   if (mainImg) {
     mainImg.style.opacity = '0.6';
     mainImg.src = imgSrc;
