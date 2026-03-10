@@ -1249,6 +1249,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: 2px solid var(--light-gray);
   display: block;
   transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  pointer-events: none;
 }
 
 .pd-swatch-item span {
@@ -1260,6 +1261,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  pointer-events: none;
 }
 
 .pd-swatch-item:hover img {
