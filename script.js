@@ -16,8 +16,8 @@ const CONFIG = {
   deliveryCharge: 60,
 };
 
-// ── PRODUCT CATALOG ──────────────────────────
-const products = [
+// ── PRODUCT CATALOG (base / hardcoded) ───────
+const HARDCODED_PRODUCTS = [
   // Home & Kitchen
   { id: 1,  name: "3-in-1 Kitchen Bowl Set",                  category: "Home & Kitchen", price: 580,  image: "images/products/IMG-20260308-WA0138.jpg", desc: "Versatile 3-in-1 mixing and serving bowl set for everyday kitchen use", rating: 4.3, reviews: 12, badge: "New" },
   { id: 2,  name: "Jumbo 4-Slice Sandwich Griller",           category: "Home & Kitchen", price: 1600, image: "images/products/IMG-20260308-WA0140.jpg", desc: "Large capacity 4-slice sandwich maker & griller — perfect for quick family meals", rating: 4.5, reviews: 8,  badge: "Popular" },
@@ -37,6 +37,23 @@ const products = [
   { id: 14, name: "Agni Jwala Designer Gown",                 category: "Clothing",       price: 1450, image: "images/products/IMG-20260308-WA0199.jpg", desc: "Gorgeous Agni Jwala designer gown for parties and special events", rating: 4.6, reviews: 11, badge: "New" },
   { id: 15, name: "Fashion Accessories Set",                  category: "Clothing",       price: 450,  image: "images/products/IMG-20260308-WA0204.jpg", desc: "Trendy fashion accessories set at an unbeatable price — limited stock!", rating: 4.2, reviews: 9 },
 ];
+
+// ── DYNAMIC PRODUCTS (hardcoded + Firebase) ──
+let products = [...HARDCODED_PRODUCTS];
+
+async function loadProducts() {
+  if (typeof firebase === 'undefined' || !window.firebaseConfig ||
+      window.firebaseConfig.apiKey === 'YOUR_API_KEY') return;
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
+    const db   = firebase.firestore();
+    const snap = await db.collection('products').orderBy('createdAt', 'desc').get();
+    const fbProds = snap.docs.map(doc => ({ firestoreId: doc.id, ...doc.data() }));
+    products = [...HARDCODED_PRODUCTS, ...fbProds];
+  } catch (e) {
+    // Firebase unavailable — fall back to hardcoded products silently
+  }
+}
 
 // ── CART STATE ───────────────────────────────
 let cart = JSON.parse(localStorage.getItem('eliteEmporiumCart')) || [];
@@ -390,9 +407,11 @@ function initHomePage() {
 }
 
 // ── INIT ──────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   updateCartUI();
   initHeaderSearch();
+
+  await loadProducts();
 
   if (document.getElementById('featuredProducts')) initHomePage();
   if (document.getElementById('productsGrid'))     initProductsPage();
