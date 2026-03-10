@@ -141,9 +141,22 @@ function renderProducts(list, containerId) {
 
   el.innerHTML = list.map(p => {
     const badgeClass = p.badge === 'New' ? 'new' : p.badge === 'Bestseller' ? 'hot' : p.badge === 'Premium' ? 'premium' : '';
-    const imageHtml = p.image
-      ? `<div class="product-image product-image-photo"><img src="${p.image}" alt="${p.name}" loading="lazy" /></div>`
-      : `<div class="product-image" style="background:${p.bg}">${p.emoji}</div>`;
+    const pid = 'pid_' + p.id;
+    let imageHtml;
+    if (p.variants && p.variants.length > 1) {
+      const thumbs = p.variants.map((v, i) =>
+        `<img src="${v.image}" class="vthumb${i === 0 ? ' vactive' : ''}"
+              onclick="swapVariant(this,'${pid}')" title="${v.color}" loading="lazy" />`
+      ).join('');
+      imageHtml = `<div class="product-image product-image-photo">
+        <img id="${pid}" src="${p.variants[0].image}" alt="${p.name}" loading="lazy" />
+        <div class="vthumb-strip">${thumbs}</div>
+      </div>`;
+    } else if (p.image) {
+      imageHtml = `<div class="product-image product-image-photo"><img src="${p.image}" alt="${p.name}" loading="lazy" /></div>`;
+    } else {
+      imageHtml = `<div class="product-image" style="background:${p.bg}">${p.emoji}</div>`;
+    }
     return `
     <div class="product-card">
       ${p.badge ? `<span class="product-badge ${badgeClass}">${p.badge}</span>` : ''}
@@ -166,6 +179,14 @@ function renderProducts(list, containerId) {
     </div>
   `;
   }).join('');
+}
+
+// ── SWAP VARIANT IMAGE ────────────────────────
+function swapVariant(thumb, pid) {
+  const main = document.getElementById(pid);
+  if (main) main.src = thumb.src;
+  thumb.closest('.vthumb-strip').querySelectorAll('.vthumb').forEach(t => t.classList.remove('vactive'));
+  thumb.classList.add('vactive');
 }
 
 // ── RENDER CART ───────────────────────────────

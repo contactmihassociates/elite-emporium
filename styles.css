@@ -1112,3 +1112,27 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   .product-image { height: 160px; font-size: 50px; }
   .cart-item { flex-wrap: wrap; }
 }
+
+/* ── COLOR VARIANT THUMBNAILS ────────────────── */
+.vthumb-strip {
+  display: flex;
+  gap: 5px;
+  padding: 6px 8px;
+  background: rgba(255,255,255,0.96);
+  border-top: 1px solid #f0f0f0;
+  flex-wrap: wrap;
+}
+
+.vthumb {
+  width: 34px;
+  height: 34px;
+  border-radius: 5px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.15s, transform 0.1s;
+  flex-shrink: 0;
+}
+
+.vthumb:hover { transform: scale(1.1); }
+.vthumb.vactive { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
