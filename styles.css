@@ -1113,26 +1113,41 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   .cart-item { flex-wrap: wrap; }
 }
 
-/* ── COLOR VARIANT THUMBNAILS ────────────────── */
-.vthumb-strip {
+/* ── AMAZON-STYLE COLOR PICKER ──────────────── */
+.variant-swatches {
+  padding: 8px 12px 6px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.vcolor-name {
+  font-size: 12px;
+  color: var(--gray);
+  display: block;
+  margin-bottom: 7px;
+}
+
+.vcolor-name strong {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.vswatch-row {
   display: flex;
-  gap: 5px;
-  padding: 6px 8px;
-  background: rgba(255,255,255,0.96);
-  border-top: 1px solid #f0f0f0;
+  gap: 7px;
   flex-wrap: wrap;
 }
 
-.vthumb {
-  width: 34px;
-  height: 34px;
-  border-radius: 5px;
+.vswatch {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
   object-fit: cover;
   cursor: pointer;
-  border: 2px solid transparent;
-  transition: border-color 0.15s, transform 0.1s;
+  border: 2px solid #ddd;
+  transition: border-color 0.15s, transform 0.12s, box-shadow 0.15s;
   flex-shrink: 0;
 }
 
-.vthumb:hover { transform: scale(1.1); }
-.vthumb.vactive { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+.vswatch:hover   { border-color: var(--gold); transform: scale(1.1); }
+.vswatch.vactive { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold); transform: scale(1.05); }

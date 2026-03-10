@@ -142,15 +142,21 @@ function renderProducts(list, containerId) {
   el.innerHTML = list.map(p => {
     const badgeClass = p.badge === 'New' ? 'new' : p.badge === 'Bestseller' ? 'hot' : p.badge === 'Premium' ? 'premium' : '';
     const pid = 'pid_' + p.id;
-    let imageHtml;
+    let imageHtml, swatchHtml = '';
     if (p.variants && p.variants.length > 1) {
-      const thumbs = p.variants.map((v, i) =>
-        `<img src="${v.image}" class="vthumb${i === 0 ? ' vactive' : ''}"
-              onclick="swapVariant(this,'${pid}')" title="${v.color}" loading="lazy" />`
+      const swatches = p.variants.map((v, i) =>
+        `<img src="${v.image}"
+              class="vswatch${i === 0 ? ' vactive' : ''}"
+              onclick="swapVariant(this,'${pid}','vlbl_${pid}')"
+              onmouseenter="document.getElementById('vlbl_${pid}').textContent='${v.color}'"
+              title="${v.color}" loading="lazy" />`
       ).join('');
       imageHtml = `<div class="product-image product-image-photo">
         <img id="${pid}" src="${p.variants[0].image}" alt="${p.name}" loading="lazy" />
-        <div class="vthumb-strip">${thumbs}</div>
+      </div>`;
+      swatchHtml = `<div class="variant-swatches">
+        <span class="vcolor-name">Color: <strong id="vlbl_${pid}">${p.variants[0].color}</strong></span>
+        <div class="vswatch-row">${swatches}</div>
       </div>`;
     } else if (p.image) {
       imageHtml = `<div class="product-image product-image-photo"><img src="${p.image}" alt="${p.name}" loading="lazy" /></div>`;
@@ -161,6 +167,7 @@ function renderProducts(list, containerId) {
     <div class="product-card">
       ${p.badge ? `<span class="product-badge ${badgeClass}">${p.badge}</span>` : ''}
       ${imageHtml}
+      ${swatchHtml}
       <div class="product-info">
         <div class="product-category">${p.category}</div>
         <div class="product-name">${p.name}</div>
@@ -182,11 +189,13 @@ function renderProducts(list, containerId) {
 }
 
 // ── SWAP VARIANT IMAGE ────────────────────────
-function swapVariant(thumb, pid) {
+function swapVariant(swatch, pid, labelId) {
   const main = document.getElementById(pid);
-  if (main) main.src = thumb.src;
-  thumb.closest('.vthumb-strip').querySelectorAll('.vthumb').forEach(t => t.classList.remove('vactive'));
-  thumb.classList.add('vactive');
+  if (main) { main.style.opacity = '0.7'; main.src = swatch.src; main.onload = () => main.style.opacity = '1'; }
+  swatch.closest('.vswatch-row').querySelectorAll('.vswatch').forEach(s => s.classList.remove('vactive'));
+  swatch.classList.add('vactive');
+  const lbl = document.getElementById(labelId);
+  if (lbl) lbl.textContent = swatch.title;
 }
 
 // ── RENDER CART ───────────────────────────────
