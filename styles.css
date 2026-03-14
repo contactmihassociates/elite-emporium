@@ -64,20 +64,41 @@ header {
 .logo {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
   text-decoration: none;
   flex-shrink: 0;
+  /* Leather-textured badge */
+  background:
+    repeating-radial-gradient(circle at 20% 30%, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 6px),
+    repeating-radial-gradient(circle at 70% 60%, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 8px),
+    linear-gradient(150deg, #A52525 0%, #7B0D0D 40%, #8C1616 70%, #6A0808 100%);
+  background-size: 10px 10px, 14px 14px, 100% 100%;
+  border-radius: 10px;
+  padding: 7px 10px;
+  box-shadow:
+    0 4px 14px rgba(0,0,0,0.45),
+    inset 0 1px 2px rgba(255,255,255,0.12),
+    inset 0 -2px 5px rgba(0,0,0,0.35),
+    0 0 0 1px rgba(190,140,40,0.35);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.logo:hover {
+  transform: scale(1.03);
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.5),
+    inset 0 1px 2px rgba(255,255,255,0.15),
+    inset 0 -2px 5px rgba(0,0,0,0.3),
+    0 0 0 1.5px rgba(210,170,60,0.6);
 }
 .logo-img {
-  height: 46px;
+  height: 62px;
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35)) brightness(1.05);
-  transition: transform 0.2s ease, filter 0.2s ease;
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.6)) brightness(1.1) contrast(1.05);
+  transition: filter 0.2s ease;
 }
 .logo:hover .logo-img {
-  transform: scale(1.04);
-  filter: drop-shadow(0 3px 10px rgba(255,229,0,0.4)) brightness(1.12);
+  filter: drop-shadow(0 3px 8px rgba(200,160,40,0.5)) brightness(1.18) contrast(1.08);
 }
 .logo-text h1 { font-size:16px; font-weight:700; color:white; line-height:1.1; }
 .logo-text span { font-size:10px; color:var(--yellow); font-style:italic; font-weight:500; display:block; }
@@ -569,7 +590,11 @@ footer { background:#172337; color:#9b9b9b; padding:40px 4% 18px; }
 .footer-brand p { font-size:13px; color:#777; line-height:1.75; margin:10px 0 16px; }
 .footer-brand .logo-text h1 { font-size:17px; color:white; font-weight:700; }
 .footer-brand .logo-text span { color:var(--yellow); }
-.footer-brand .logo-img { height: 56px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5)) brightness(1.1); }
+.footer-brand .logo-img { height: 64px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5)) brightness(1.1); }
+.footer-brand .logo {
+  background: none; box-shadow: none; padding: 0; border-radius: 0;
+}
+.footer-brand .logo:hover { transform: none; box-shadow: none; }
 .gst-box { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:var(--radius); padding:12px; font-size:12px; color:#aaa; line-height:1.7; }
 .footer-col h4 { font-size:13px; font-weight:700; color:white; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.1); }
 .footer-col ul { list-style:none; }
