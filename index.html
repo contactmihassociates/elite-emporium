@@ -4,31 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Elite Emporium – Premium Online Store | Kayalpattinam</title>
-  <meta name="description" content="Elite Emporium – Your trusted online store in Kayalpattinam. Shop electronics, clothing, home goods, footwear, bags & toys. Order via WhatsApp!" />
+  <meta name="description" content="Elite Emporium – Your trusted online store in Kayalpattinam. Shop clothing, home goods, bags & more. Order via WhatsApp!" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
 <!-- ── HEADER ─────────────────────────────── -->
 <header>
-  <div class="header-top">
-    🎉 Free Delivery on orders above ₹499 &nbsp;|&nbsp; GST Registered Business &nbsp;|&nbsp; WhatsApp: +91 7358650774
-  </div>
   <div class="header-main">
     <a href="index.html" class="logo">
+      <div class="logo-badge">👑</div>
       <div class="logo-text">
-        <h1>👑 Elite Emporium</h1>
+        <h1>Elite Emporium</h1>
         <span>Explore Plus</span>
       </div>
     </a>
-
     <div class="header-search">
       <form id="headerSearchForm">
-        <input type="text" id="headerSearchInput" placeholder="Search for products, brands and more" autocomplete="off" />
+        <input type="text" id="headerSearchInput" placeholder="Search products, brands and more" autocomplete="off" />
         <button type="submit">🔍</button>
       </form>
     </div>
-
     <div class="header-actions">
       <a href="cart.html" class="cart-btn">
         🛒 Cart
@@ -36,168 +32,324 @@
       </a>
     </div>
   </div>
-  <nav>
-    <a href="index.html" class="active">🏠 Home</a>
-    <a href="products.html">🛍️ All Products</a>
-    <a href="products.html?category=Electronics">📱 Electronics</a>
-    <a href="products.html?category=Clothing">👗 Clothing</a>
-    <a href="products.html?category=Home & Kitchen">🏠 Home & Kitchen</a>
-    <a href="products.html?category=Footwear">👟 Footwear</a>
-    <a href="products.html?category=Bags">👜 Bags</a>
-    <a href="products.html?category=Toys & Games">🎮 Toys & Games</a>
-    <a href="#about">ℹ️ About Us</a>
-  </nav>
+
+  <!-- Shortcut Tiles -->
+  <div class="app-shortcuts">
+    <a href="products.html" class="shortcut-tile">
+      <div class="shortcut-tile-icon">🛍️</div>
+      <span class="shortcut-tile-label">Shop All</span>
+    </a>
+    <a href="products.html?category=Bags" class="shortcut-tile">
+      <div class="shortcut-tile-icon">👜</div>
+      <span class="shortcut-tile-label">Bags</span>
+    </a>
+    <a href="products.html?category=Clothing" class="shortcut-tile">
+      <div class="shortcut-tile-icon">👗</div>
+      <span class="shortcut-tile-label">Fashion</span>
+    </a>
+    <a href="products.html?category=Home & Kitchen" class="shortcut-tile">
+      <div class="shortcut-tile-icon">🍳</div>
+      <span class="shortcut-tile-label">Kitchen</span>
+    </a>
+  </div>
+
+  <!-- Location Bar -->
+  <div class="location-bar">
+    <div class="location-bar-text">
+      <strong>🏠 HOME</strong> 183b, Sadukai Street, Kayalpattinam, Thoothukudi…
+    </div>
+    <span class="location-bar-arrow">⌄</span>
+    <div class="location-bar-coins">💬 WhatsApp</div>
+  </div>
+
+  <!-- Category Strip -->
+  <div class="fk-cat-strip">
+    <div class="fk-cats">
+      <a href="products.html" class="fk-cat-item active">
+        <div class="fk-cat-icon">⭐</div>
+        <span class="fk-cat-label">For You</span>
+      </a>
+      <a href="products.html?category=Clothing" class="fk-cat-item">
+        <div class="fk-cat-icon">👗</div>
+        <span class="fk-cat-label">Fashion</span>
+      </a>
+      <a href="products.html?category=Bags" class="fk-cat-item">
+        <div class="fk-cat-icon">👜</div>
+        <span class="fk-cat-label">Bags</span>
+      </a>
+      <a href="products.html?category=Clothing" class="fk-cat-item">
+        <div class="fk-cat-icon">⌚</div>
+        <span class="fk-cat-label">Watches</span>
+      </a>
+      <a href="products.html?category=Clothing" class="fk-cat-item">
+        <div class="fk-cat-icon">🕶️</div>
+        <span class="fk-cat-label">Sunglasses</span>
+      </a>
+      <a href="products.html?category=Home & Kitchen" class="fk-cat-item">
+        <div class="fk-cat-icon">🍳</div>
+        <span class="fk-cat-label">Kitchen</span>
+      </a>
+      <a href="products.html?category=Footwear" class="fk-cat-item">
+        <div class="fk-cat-icon">👟</div>
+        <span class="fk-cat-label">Footwear</span>
+      </a>
+      <a href="products.html?category=Toys & Games" class="fk-cat-item">
+        <div class="fk-cat-icon">🎮</div>
+        <span class="fk-cat-label">Toys</span>
+      </a>
+      <a href="https://wa.me/917358650774" target="_blank" rel="noopener" class="fk-cat-item">
+        <div class="fk-cat-icon">💬</div>
+        <span class="fk-cat-label">WhatsApp</span>
+      </a>
+    </div>
+  </div>
 </header>
 
-<!-- ── HERO BANNER ────────────────────────── -->
-<section class="hero">
-  <div class="hero-content">
-    <div class="hero-badge">✨ GST Registered &amp; Udyam Certified</div>
-    <h2>Welcome to<br /><span>Elite Emporium</span></h2>
-    <p>Your one-stop destination for premium quality products. From fashion to home goods — shop with confidence and get instant WhatsApp order confirmation.</p>
-    <div class="hero-buttons">
-      <a href="products.html" class="btn-primary">🛍️ Shop Now</a>
-      <a href="https://wa.me/917358650774" target="_blank" rel="noopener" class="btn-outline">💬 WhatsApp Us</a>
-    </div>
-    <div class="hero-stats">
-      <div class="stat"><span class="number">500+</span><span class="label">Products</span></div>
-      <div class="stat"><span class="number">1000+</span><span class="label">Happy Customers</span></div>
-      <div class="stat"><span class="number">100%</span><span class="label">Genuine</span></div>
-      <div class="stat"><span class="number">Fast</span><span class="label">WhatsApp Orders</span></div>
-    </div>
-  </div>
-</section>
+<!-- ── HERO SLIDESHOW ────────────────────── -->
+<div class="hero-slideshow" id="heroSlideshow">
+  <div class="hero-slides" id="heroSlides">
 
-<!-- ── FEATURES STRIP ─────────────────────── -->
-<div class="features-banner">
-  <div class="feature-item">
-    <div class="feature-icon">🚚</div>
-    <div class="feature-text"><h4>Free Delivery</h4><p>On orders above ₹499</p></div>
+    <!-- Slide 1: Bags -->
+    <div class="hero-slide">
+      <div class="hero-slide-bg" style="background:linear-gradient(135deg,#7B0D0D 0%,#C62828 40%,#E53935 100%);"></div>
+      <div class="hero-slide-content">
+        <div class="hero-save-badge">🔥 BIG SAVING DAYS</div>
+        <h2>Premium Bags<br />&amp; Accessories</h2>
+        <p>YSL, Coach, Alex &amp; more — top quality picks</p>
+        <a href="products.html?category=Bags" class="hero-slide-btn">Shop Bags →</a>
+      </div>
+    </div>
+
+    <!-- Slide 2: Fashion -->
+    <div class="hero-slide">
+      <div class="hero-slide-bg" style="background:linear-gradient(135deg,#4A148C 0%,#7B1FA2 40%,#CE93D8 70%,#AB47BC 100%);"></div>
+      <div class="hero-slide-content">
+        <div class="hero-save-badge">✨ NEW ARRIVALS</div>
+        <h2>Fashion &amp; Watches<br />From ₹450</h2>
+        <p>Lehenga, Gown, Tommy Hilfiger Watches &amp; more</p>
+        <a href="products.html?category=Clothing" class="hero-slide-btn">Explore Fashion →</a>
+      </div>
+    </div>
+
+    <!-- Slide 3: Kitchen -->
+    <div class="hero-slide">
+      <div class="hero-slide-bg" style="background:linear-gradient(135deg,#004D40 0%,#00695C 40%,#00897B 80%,#26C6DA 100%);"></div>
+      <div class="hero-slide-content">
+        <div class="hero-save-badge">🏠 HOME ESSENTIALS</div>
+        <h2>Kitchen &amp; Home<br />From ₹580</h2>
+        <p>Bowl Sets, Sandwich Griller &amp; more</p>
+        <a href="products.html?category=Home & Kitchen" class="hero-slide-btn">Shop Kitchen →</a>
+      </div>
+    </div>
+
   </div>
-  <div class="feature-item">
-    <div class="feature-icon">💬</div>
-    <div class="feature-text"><h4>WhatsApp Orders</h4><p>Instant confirmation</p></div>
-  </div>
-  <div class="feature-item">
-    <div class="feature-icon">✅</div>
-    <div class="feature-text"><h4>Quality Assured</h4><p>100% genuine products</p></div>
-  </div>
-  <div class="feature-item">
-    <div class="feature-icon">🏛️</div>
-    <div class="feature-text"><h4>GST Registered</h4><p>Certified business</p></div>
+  <div class="slide-dots" id="slideDots">
+    <div class="slide-dot active" onclick="goToSlide(0)"></div>
+    <div class="slide-dot" onclick="goToSlide(1)"></div>
+    <div class="slide-dot" onclick="goToSlide(2)"></div>
   </div>
 </div>
 
-<!-- ── CATEGORIES ─────────────────────────── -->
-<section style="background:white; padding-bottom:28px;">
-  <div class="section-header">
-    <h2>Shop by Category</h2>
-    <a href="products.html">View All →</a>
-  </div>
-  <div class="categories-grid">
-    <a href="products.html?category=Electronics" class="category-card">
-      <span class="category-icon">📱</span>
-      <div class="category-name">Electronics</div>
-      <div class="category-count">5 Products</div>
-    </a>
-    <a href="products.html?category=Clothing" class="category-card">
-      <span class="category-icon">👗</span>
-      <div class="category-name">Clothing</div>
-      <div class="category-count">7 Products</div>
-    </a>
-    <a href="products.html?category=Home & Kitchen" class="category-card">
-      <span class="category-icon">🏠</span>
-      <div class="category-name">Home & Kitchen</div>
-      <div class="category-count">2 Products</div>
-    </a>
-    <a href="products.html?category=Footwear" class="category-card">
-      <span class="category-icon">👟</span>
-      <div class="category-name">Footwear</div>
-      <div class="category-count">4 Products</div>
-    </a>
-    <a href="products.html?category=Bags" class="category-card">
-      <span class="category-icon">👜</span>
-      <div class="category-name">Bags</div>
-      <div class="category-count">5 Products</div>
-    </a>
-    <a href="products.html?category=Toys & Games" class="category-card">
-      <span class="category-icon">🎮</span>
-      <div class="category-name">Toys & Games</div>
-      <div class="category-count">3 Products</div>
-    </a>
-  </div>
-</section>
+<!-- ── MAIN CONTENT ───────────────────────── -->
+<div class="fk-main">
 
-<!-- ── FEATURED PRODUCTS ──────────────────── -->
-<section>
-  <div class="section-header">
-    <h2>⭐ Top Picks For You</h2>
-    <a href="products.html">View All Products →</a>
-  </div>
-  <div class="products-grid" id="featuredProducts">
-    <!-- Populated by script.js -->
-  </div>
-  <div style="text-align:center;margin-top:22px;">
-    <a href="products.html" class="btn-primary">Browse All Products →</a>
-  </div>
-</section>
-
-<!-- ── PROMO BANNER ───────────────────────── -->
-<div class="promo-banner">
-  <h3>🚚 Free Delivery on Orders Above ₹499!</h3>
-  <p>Shop your favourite products and enjoy free doorstep delivery across India.</p>
-  <a href="products.html" class="btn-primary">Shop &amp; Save Now</a>
-</div>
-
-<!-- ── ABOUT ──────────────────────────────── -->
-<section class="about-section" id="about">
-  <div class="about-grid">
-    <div class="about-visual">
-      <div class="big-icon">👑</div>
-      <h3>Elite Emporium</h3>
-      <p>Kayalpattinam, Thoothukudi</p>
-      <p style="margin-top:12px;font-size:12px;color:rgba(255,255,255,0.5);">Udyam Registered Micro Enterprise</p>
+  <!-- Still Looking (category quick tiles) -->
+  <div class="still-looking">
+    <h2>Still looking for these? 👀</h2>
+    <div class="still-cards">
+      <a href="products.html?category=Bags" class="still-card">
+        <div class="still-card-img">👜</div>
+        <div class="still-card-label">Bags</div>
+      </a>
+      <a href="products.html?category=Clothing" class="still-card">
+        <div class="still-card-img">⌚</div>
+        <div class="still-card-label">Watches</div>
+      </a>
+      <a href="products.html?category=Home & Kitchen" class="still-card">
+        <div class="still-card-img">🍳</div>
+        <div class="still-card-label">Kitchen</div>
+      </a>
+      <a href="products.html?category=Clothing" class="still-card">
+        <div class="still-card-img">👗</div>
+        <div class="still-card-label">Lehenga</div>
+      </a>
+      <a href="products.html?category=Clothing" class="still-card">
+        <div class="still-card-img">🕶️</div>
+        <div class="still-card-label">Sunglasses</div>
+      </a>
+      <a href="products.html?category=Bags" class="still-card">
+        <div class="still-card-img">🎒</div>
+        <div class="still-card-label">Men's Combo</div>
+      </a>
+      <a href="products.html?category=Clothing" class="still-card">
+        <div class="still-card-img">💫</div>
+        <div class="still-card-label">Accessories</div>
+      </a>
     </div>
-    <div class="about-content">
-      <h2>About Our <span>Business</span></h2>
-      <p>Elite Emporium is a trusted retail trading enterprise based in Kayalpattinam, Thoothukudi, Tamil Nadu. We are proud to be a GST-registered and Udyam-certified business committed to offering high-quality products at honest prices.</p>
-      <p>Our store brings you a curated selection of clothing, home essentials, bags, and more — all delivered with the personal touch of a local business you can trust. Place orders conveniently via WhatsApp and receive instant confirmation.</p>
-      <div class="about-details">
-        <div class="detail-item">
-          <div class="detail-icon">📋</div>
-          <div class="detail-text"><h4>GST Number</h4><p>33DWGPN3169G1ZF</p></div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-icon">🏭</div>
-          <div class="detail-text"><h4>Udyam Number</h4><p>UDYAM-TN-26-0090343</p></div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-icon">📍</div>
-          <div class="detail-text"><h4>Location</h4><p>Kayalpattinam, Thoothukudi</p></div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-icon">📞</div>
-          <div class="detail-text"><h4>Contact</h4><p>+91 8072173467</p></div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-icon">💬</div>
-          <div class="detail-text"><h4>WhatsApp Orders</h4><p>+91 7358650774</p></div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-icon">📧</div>
-          <div class="detail-text"><h4>Email</h4><p>smnabu36@gmail.com</p></div>
+  </div>
+
+  <!-- Best Deals Strip -->
+  <div class="fk-section">
+    <div class="fk-section-head">
+      <h2>🔥 Best Deals For You</h2>
+      <a href="products.html">View All →</a>
+    </div>
+    <div class="fk-section-body">
+      <div class="fk-offer-strip">
+        <div class="fk-offer-cards">
+          <a href="products.html?category=Bags" class="fk-offer-card">
+            <div class="fk-offer-icon">👜</div>
+            <div class="fk-offer-name">Premium Bags</div>
+            <div class="fk-offer-disc">From ₹500</div>
+          </a>
+          <a href="products.html?category=Clothing" class="fk-offer-card">
+            <div class="fk-offer-icon">⌚</div>
+            <div class="fk-offer-name">Watches</div>
+            <div class="fk-offer-disc">From ₹1,850</div>
+          </a>
+          <a href="products.html?category=Clothing" class="fk-offer-card">
+            <div class="fk-offer-icon">🕶️</div>
+            <div class="fk-offer-name">Sunglasses</div>
+            <div class="fk-offer-disc">From ₹600</div>
+          </a>
+          <a href="products.html?category=Clothing" class="fk-offer-card">
+            <div class="fk-offer-icon">👗</div>
+            <div class="fk-offer-name">Lehenga &amp; Gown</div>
+            <div class="fk-offer-disc">From ₹1,450</div>
+          </a>
+          <a href="products.html?category=Home & Kitchen" class="fk-offer-card">
+            <div class="fk-offer-icon">🍳</div>
+            <div class="fk-offer-name">Kitchen Sets</div>
+            <div class="fk-offer-disc">From ₹580</div>
+          </a>
+          <a href="products.html?category=Bags" class="fk-offer-card">
+            <div class="fk-offer-icon">🎒</div>
+            <div class="fk-offer-name">Men's Combos</div>
+            <div class="fk-offer-disc">From ₹1,350</div>
+          </a>
+          <a href="products.html?category=Clothing" class="fk-offer-card">
+            <div class="fk-offer-icon">💎</div>
+            <div class="fk-offer-name">Accessories</div>
+            <div class="fk-offer-disc">From ₹450</div>
+          </a>
+          <a href="products.html?category=Bags" class="fk-offer-card">
+            <div class="fk-offer-icon">👝</div>
+            <div class="fk-offer-name">YSL Tote Bags</div>
+            <div class="fk-offer-disc">Premium Quality</div>
+          </a>
         </div>
       </div>
     </div>
   </div>
-</section>
+
+  <!-- Top Picks / Featured Products -->
+  <div class="fk-section">
+    <div class="fk-section-head">
+      <h2>⭐ Top Picks For You</h2>
+      <a href="products.html">View All →</a>
+    </div>
+    <div class="fk-section-body">
+      <div class="products-grid" id="featuredProducts">
+        <!-- Populated by script.js -->
+      </div>
+      <div style="text-align:center;margin-top:20px;">
+        <a href="products.html" class="btn-primary">Browse All Products →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trust Cards -->
+  <div class="fk-deal-row">
+    <a href="products.html" class="fk-deal-card">
+      <div class="fk-deal-icon">🚚</div>
+      <div class="fk-deal-text">
+        <h4>Free Delivery</h4>
+        <p>On orders above ₹499</p>
+        <span class="fk-deal-badge">FREE</span>
+      </div>
+    </a>
+    <a href="https://wa.me/917358650774" target="_blank" rel="noopener" class="fk-deal-card">
+      <div class="fk-deal-icon">💬</div>
+      <div class="fk-deal-text">
+        <h4>WhatsApp Orders</h4>
+        <p>Fast &amp; easy ordering</p>
+        <span class="fk-deal-badge">INSTANT</span>
+      </div>
+    </a>
+    <a href="#about" class="fk-deal-card">
+      <div class="fk-deal-icon">✅</div>
+      <div class="fk-deal-text">
+        <h4>GST Registered</h4>
+        <p>100% genuine products</p>
+        <span class="fk-deal-badge">VERIFIED</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- Promo Banner -->
+  <div class="promo-banner" style="border-radius:var(--radius);">
+    <h3>🚚 Free Delivery on Orders Above ₹499!</h3>
+    <p>Shop your favourite products and enjoy free doorstep delivery across India.</p>
+    <a href="products.html" class="btn-primary">Shop &amp; Save Now</a>
+  </div>
+
+  <!-- About -->
+  <div class="fk-section" id="about" style="margin-bottom:0;">
+    <div class="fk-section-head">
+      <h2>ℹ️ About Elite Emporium</h2>
+    </div>
+    <div class="fk-section-body">
+      <div class="about-grid">
+        <div class="about-visual">
+          <div class="big-icon">👑</div>
+          <h3>Elite Emporium</h3>
+          <p>Kayalpattinam, Thoothukudi</p>
+          <p style="margin-top:10px;font-size:11px;color:rgba(255,255,255,0.5);">Udyam Registered Micro Enterprise</p>
+        </div>
+        <div class="about-content">
+          <h2>About Our <span>Business</span></h2>
+          <p>Elite Emporium is a trusted retail trading enterprise based in Kayalpattinam, Thoothukudi, Tamil Nadu. We are proud to be a GST-registered and Udyam-certified business committed to offering high-quality products at honest prices.</p>
+          <p>Our store brings you a curated selection of clothing, home essentials, bags, and more — all delivered with the personal touch of a local business you can trust. Place orders conveniently via WhatsApp and receive instant confirmation.</p>
+          <div class="about-details">
+            <div class="detail-item">
+              <div class="detail-icon">📋</div>
+              <div class="detail-text"><h4>GST Number</h4><p>33DWGPN3169G1ZF</p></div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-icon">🏭</div>
+              <div class="detail-text"><h4>Udyam Number</h4><p>UDYAM-TN-26-0090343</p></div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-icon">📍</div>
+              <div class="detail-text"><h4>Location</h4><p>Kayalpattinam, Thoothukudi</p></div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-icon">📞</div>
+              <div class="detail-text"><h4>Contact</h4><p>+91 8072173467</p></div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-icon">💬</div>
+              <div class="detail-text"><h4>WhatsApp Orders</h4><p>+91 7358650774</p></div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-icon">📧</div>
+              <div class="detail-text"><h4>Email</h4><p>smnabu36@gmail.com</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.fk-main -->
 
 <!-- ── FOOTER ─────────────────────────────── -->
 <footer>
   <div class="footer-grid">
     <div class="footer-brand">
       <div class="logo" style="margin-bottom:10px;">
-        <div class="logo-text"><h1>👑 Elite Emporium</h1><span>Explore Plus</span></div>
+        <div class="logo-badge" style="background:rgba(255,229,0,0.18);border-radius:8px;">👑</div>
+        <div class="logo-text"><h1>Elite Emporium</h1><span>Explore Plus</span></div>
       </div>
       <p>Your trusted local online store for quality products. GST registered &amp; Udyam certified micro enterprise serving Kayalpattinam and beyond.</p>
       <div class="gst-box">
@@ -218,12 +370,11 @@
     <div class="footer-col">
       <h4>Categories</h4>
       <ul>
-        <li><a href="products.html?category=Electronics">📱 Electronics</a></li>
         <li><a href="products.html?category=Clothing">👗 Clothing</a></li>
-        <li><a href="products.html?category=Home & Kitchen">🏠 Home & Kitchen</a></li>
-        <li><a href="products.html?category=Footwear">👟 Footwear</a></li>
         <li><a href="products.html?category=Bags">👜 Bags</a></li>
-        <li><a href="products.html?category=Toys & Games">🎮 Toys</a></li>
+        <li><a href="products.html?category=Home & Kitchen">🏠 Home &amp; Kitchen</a></li>
+        <li><a href="products.html?category=Footwear">👟 Footwear</a></li>
+        <li><a href="products.html?category=Toys & Games">🎮 Toys &amp; Games</a></li>
       </ul>
     </div>
     <div class="footer-col">
@@ -240,6 +391,31 @@
   </div>
 </footer>
 
+<!-- ── BOTTOM NAV (mobile app style) ─────── -->
+<nav class="bottom-nav">
+  <a href="index.html" class="bottom-nav-item active">
+    <span class="bottom-nav-icon">🏠</span>
+    <span class="bottom-nav-label">Home</span>
+  </a>
+  <a href="products.html" class="bottom-nav-item">
+    <span class="bottom-nav-icon">🛍️</span>
+    <span class="bottom-nav-label">Products</span>
+  </a>
+  <a href="products.html" class="bottom-nav-item">
+    <span class="bottom-nav-icon">📦</span>
+    <span class="bottom-nav-label">Categories</span>
+  </a>
+  <a href="index.html#about" class="bottom-nav-item">
+    <span class="bottom-nav-icon">ℹ️</span>
+    <span class="bottom-nav-label">About</span>
+  </a>
+  <a href="cart.html" class="bottom-nav-item">
+    <span class="bottom-nav-icon">🛒</span>
+    <span class="bottom-nav-label">Cart</span>
+    <span class="bottom-nav-badge cart-count">0</span>
+  </a>
+</nav>
+
 <a href="https://wa.me/917358650774" class="whatsapp-float" target="_blank" rel="noopener" title="Chat on WhatsApp">💬</a>
 
 <!-- Firebase SDKs -->
@@ -247,5 +423,23 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="script.js"></script>
+
+<script>
+// Hero Slideshow
+(function() {
+  const slides = document.getElementById('heroSlides');
+  const dots   = document.querySelectorAll('.slide-dot');
+  let current  = 0;
+  const total  = 3;
+  function goToSlide(n) {
+    current = ((n % total) + total) % total;
+    slides.style.transform = 'translateX(-' + (current * 100) + '%)';
+    dots.forEach(function(d, i) { d.classList.toggle('active', i === current); });
+  }
+  window.goToSlide = goToSlide;
+  setInterval(function() { goToSlide(current + 1); }, 4000);
+})();
+</script>
+
 </body>
 </html>
