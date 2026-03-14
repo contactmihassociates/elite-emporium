@@ -56,10 +56,15 @@ async function loadProducts() {
 }
 
 // ── CART STATE ───────────────────────────────
-let cart = (JSON.parse(localStorage.getItem('eliteEmporiumCart')) || []).map(i => ({
-  ...i,
-  cartKey: i.cartKey || (String(i.id) + '|' + (i.selectedColor || ''))
-}));
+let cart = (JSON.parse(localStorage.getItem('eliteEmporiumCart')) || []).map(i => {
+  // Backfill image from product catalog for any old cart items missing the image field
+  const prod = HARDCODED_PRODUCTS.find(p => p.id === i.id);
+  return {
+    ...i,
+    cartKey: i.cartKey || (String(i.id) + '|' + (i.selectedColor || '')),
+    image: i.image || (prod ? prod.image : '')
+  };
+});
 
 function saveCart() {
   localStorage.setItem('eliteEmporiumCart', JSON.stringify(cart));
