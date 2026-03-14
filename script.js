@@ -136,78 +136,107 @@ function renderStars(rating) {
   return `<span class="stars">${html}</span>`;
 }
 
-// ── RENDER PRODUCTS ───────────────────────────
+// ── RENDER PRODUCTS (Flipkart style) ─────────
 function renderProducts(list, containerId) {
   const el = document.getElementById(containerId);
   if (!el) return;
 
   if (!list.length) {
-    el.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--gray);">
+    el.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:#878787;">
       <div style="font-size:55px;margin-bottom:15px;">🔍</div>
-      <h3 style="color:var(--primary);">No products found</h3>
+      <h3 style="color:#2874F0;">No products found</h3>
       <p>Try a different search term or category</p>
     </div>`;
     return;
   }
 
   el.innerHTML = list.map(p => {
-    const badgeClass = p.badge === 'New' ? 'new' : p.badge === 'Bestseller' ? 'hot' : p.badge === 'Premium' ? 'premium' : '';
-    const pid = 'pid_' + p.id;
-    const detailLink = `product.html?id=${p.id}`;
-    let imageHtml, swatchHtml = '';
+    const badgeClass  = p.badge === 'New' ? 'new' : p.badge === 'Bestseller' ? 'hot' : p.badge === 'Premium' ? 'premium' : '';
+    const pid         = 'pid_'     + p.id;
+    const btnId       = 'cartbtn_' + p.id;
+    const detailLink  = `product.html?id=${p.id}`;
+
+    // Default image & color for this card
+    const defaultImg   = (p.variants && p.variants.length > 1) ? p.variants[0].image : (p.image || '');
+    const defaultColor = (p.variants && p.variants.length > 1) ? p.variants[0].color : '';
+
+    // Image area
+    let imageHtml;
+    if (p.variants && p.variants.length > 1) {
+      imageHtml = `<a href="${detailLink}" class="product-img-link">
+        <div class="product-image product-image-photo">
+          <img id="${pid}" src="${p.variants[0].image}" alt="${p.name}" loading="lazy" />
+        </div></a>`;
+    } else if (p.image) {
+      imageHtml = `<a href="${detailLink}" class="product-img-link">
+        <div class="product-image product-image-photo">
+          <img id="${pid}" src="${p.image}" alt="${p.name}" loading="lazy" />
+        </div></a>`;
+    } else {
+      imageHtml = `<a href="${detailLink}" class="product-img-link">
+        <div class="product-image" style="font-size:64px;background:#f0f0f0;">${p.emoji || '📦'}</div></a>`;
+    }
+
+    // Variant swatches — also update cart button data attributes on click
+    let swatchHtml = '';
     if (p.variants && p.variants.length > 1) {
       const swatches = p.variants.map((v, i) =>
         `<img src="${v.image}"
               class="vswatch${i === 0 ? ' vactive' : ''}"
-              onclick="swapVariant(this,'${pid}','vlbl_${pid}')"
-              onmouseenter="document.getElementById('vlbl_${pid}').textContent='${v.color}'"
+              onclick="swapVariant(this,'${pid}','vlbl_${pid}','${btnId}')"
               title="${v.color}" loading="lazy" />`
       ).join('');
-      imageHtml = `<a href="${detailLink}" class="pd-card-link"><div class="product-image product-image-photo">
-        <img id="${pid}" src="${p.variants[0].image}" alt="${p.name}" loading="lazy" />
-      </div></a>`;
       swatchHtml = `<div class="variant-swatches">
         <span class="vcolor-name">Color: <strong id="vlbl_${pid}">${p.variants[0].color}</strong></span>
         <div class="vswatch-row">${swatches}</div>
       </div>`;
-    } else if (p.image) {
-      imageHtml = `<a href="${detailLink}" class="pd-card-link"><div class="product-image product-image-photo"><img src="${p.image}" alt="${p.name}" loading="lazy" /></div></a>`;
-    } else {
-      imageHtml = `<a href="${detailLink}" class="pd-card-link"><div class="product-image" style="background:${p.bg}">${p.emoji}</div></a>`;
     }
+
+    // Add-to-cart: pass the button's live data-color & data-img for variant products
+    const addToCartCall = (p.variants && p.variants.length > 1)
+      ? `(function(b){addToCart(${p.id},b.dataset.color,b.dataset.img)})(document.getElementById('${btnId}'))`
+      : `addToCart(${p.id})`;
+
     return `
     <div class="product-card">
       ${p.badge ? `<span class="product-badge ${badgeClass}">${p.badge}</span>` : ''}
       ${imageHtml}
       ${swatchHtml}
       <div class="product-info">
-        <div class="product-category">${p.category}</div>
-        <div class="product-name"><a href="${detailLink}" class="pd-name-link">${p.name}</a></div>
-        <div class="product-desc">${p.desc}</div>
+        <div class="product-name"><a href="${detailLink}">${p.name}</a></div>
         <div class="product-rating">
-          ${renderStars(p.rating)}
-          <span class="rating-count">(${p.reviews} reviews)</span>
+          <span class="fk-rating-badge">★ ${p.rating}</span>
+          <span class="rating-count">(${p.reviews})</span>
         </div>
         <div class="product-footer">
           <div class="product-price">₹${p.price.toLocaleString('en-IN')}</div>
-          <button class="add-to-cart" data-pid="${p.id}" onclick="addToCart(${p.id})">
-            🛒 Add to Cart
+          <button class="add-to-cart"
+            id="${btnId}"
+            data-pid="${p.id}"
+            data-color="${defaultColor}"
+            data-img="${defaultImg}"
+            onclick="${addToCartCall}">
+            🛒 Add
           </button>
         </div>
       </div>
-    </div>
-  `;
+    </div>`;
   }).join('');
 }
 
 // ── SWAP VARIANT IMAGE ────────────────────────
-function swapVariant(swatch, pid, labelId) {
+function swapVariant(swatch, pid, labelId, btnId) {
   const main = document.getElementById(pid);
   if (main) { main.style.opacity = '0.7'; main.src = swatch.src; main.onload = () => main.style.opacity = '1'; }
   swatch.closest('.vswatch-row').querySelectorAll('.vswatch').forEach(s => s.classList.remove('vactive'));
   swatch.classList.add('vactive');
   const lbl = document.getElementById(labelId);
   if (lbl) lbl.textContent = swatch.title;
+  // Keep cart button in sync so the right color & image go into WhatsApp message
+  if (btnId) {
+    const btn = document.getElementById(btnId);
+    if (btn) { btn.dataset.color = swatch.title; btn.dataset.img = swatch.src; }
+  }
 }
 
 // ── RENDER CART ───────────────────────────────
