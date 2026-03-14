@@ -2,10 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "Elite Emporium (Python)",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8080"],
-      "port": 8080
+      "name": "Elite Emporium",
+      "runtimeExecutable": "C:\\Windows\\System32\\cmd.exe",
+      "runtimeArgs": ["/c", "C:\\Users\\LENOVO\\Desktop\\code\\elite emporium\\serve.bat"],
+      "autoPort": true
     }
   ]
 }

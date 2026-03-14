@@ -270,9 +270,10 @@ function refreshSummary() {
 
 // ── WHATSAPP ORDER ────────────────────────────
 function buildWhatsAppMessage(details) {
-  const now   = new Date();
-  const date  = now.toLocaleDateString('en-IN',  { day:'2-digit', month:'2-digit', year:'numeric' });
-  const time  = now.toLocaleTimeString('en-IN',  { hour:'2-digit', minute:'2-digit' });
+  const now     = new Date();
+  const date    = now.toLocaleDateString('en-IN',  { day:'2-digit', month:'2-digit', year:'numeric' });
+  const time    = now.toLocaleTimeString('en-IN',  { hour:'2-digit', minute:'2-digit' });
+  const baseUrl = 'https://elite-emporium-one.vercel.app/';
 
   let msg = `🛍️ *NEW ORDER — ELITE EMPORIUM*\n`;
   msg    += `━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
@@ -280,7 +281,13 @@ function buildWhatsAppMessage(details) {
 
   cart.forEach((item, i) => {
     msg += `${i + 1}. *${item.name}*\n`;
-    msg += `   Qty: ${item.quantity} × ₹${item.price.toLocaleString('en-IN')} = *₹${(item.price * item.quantity).toLocaleString('en-IN')}*\n\n`;
+    if (item.selectedColor) msg += `   🎨 Color: *${item.selectedColor}*\n`;
+    msg += `   Qty: ${item.quantity} × ₹${item.price.toLocaleString('en-IN')} = *₹${(item.price * item.quantity).toLocaleString('en-IN')}*\n`;
+    if (item.image) {
+      const imgUrl = item.image.startsWith('http') ? item.image : baseUrl + item.image;
+      msg += `   🖼️ ${imgUrl}\n`;
+    }
+    msg += `\n`;
   });
 
   const sub = getSubtotal();
