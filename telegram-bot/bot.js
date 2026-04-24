@@ -35,7 +35,7 @@ function isAdmin(msg) {
 }
 
 // ── CONSTANTS ─────────────────────────────────────────────────────────────────
-const CATEGORIES = ['Home & Kitchen', 'Bags', 'Clothing', 'Electronics', 'Other'];
+const CATEGORIES = ['Home & Kitchen', 'Bags', 'Clothing', 'Electronics', 'Footwear', 'Toys & Games', 'Wallets', 'Coolers', 'Watches', 'Others'];
 const BADGES     = ['New', 'Popular', 'Bestseller', 'Premium', 'none'];
 
 // ── WIZARD STATE ──────────────────────────────────────────────────────────────
@@ -81,45 +81,184 @@ async function uploadPhoto(fileId) {
   return await getDownloadURL(storageRef);
 }
 
-// ── BULK TEXT PARSER ──────────────────────────────────────────────────────────
-// Each product block separated by a blank line. Fields: Key: Value
-function parseBulkText(text) {
-  const blocks   = text.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
-  const products = [];
-  for (const block of blocks) {
+// ── SMART PARSER ──────────────────────────────────────────────────────────────
+
+function stripMarkup(line) {
+  return line
+    .replace(/\*/g, '')
+    .replace(/[\u{1F300}-\u{1FFFF}]/gu, '') // remove all emoji
+    .replace(/[✅👉📦✔️😎🤩💯]/g, '')
+    .replace(/_/g, ' ')
+    .replace(/^[-👉•]\s*/, '')
+    .trim();
+}
+
+function detectCategory(text) {
+  const t = text.toLowerCase();
+  if (/\bwatch\b|tissot|rolex|omega|fossil|g.shock|patek|casio|chronograph|timepiece/.test(t)) return 'Watches';
+  if (/\bwallet\b|\bpurse\b|cardholder|card.?holder/.test(t)) return 'Wallets';
+  if (/cooler|sunglass|\bshades\b|goggle|uv.?protect|spectacle|optical/.test(t)) return 'Coolers';
+  if (/bag|tote|sling|clutch|pouch|handbag|vanity|crossbody|backpack/.test(t)) return 'Bags';
+  if (/saree|dress|gown|lehenga|kurta|jeans|shirt|blouse|trouser/.test(t)) return 'Clothing';
+  if (/kitchen|bowl|griller|tiffin|cooker|pan|plate|mug|bottle|jar/.test(t)) return 'Home & Kitchen';
+  if (/phone|cable|charger|earphone|headphone|speaker|laptop/.test(t)) return 'Electronics';
+  if (/shoe|boot|sandal|slipper|heel|footwear/.test(t)) return 'Footwear';
+  if (/toy|game|puzzle|lego|doll/.test(t)) return 'Toys & Games';
+  return 'Others';
+}
+
+function extractPriceFromLine(line) {
+  const clean = stripMarkup(line);
+  // Patterns: "PRICE:2899", "RS 2899", "₹2899", "@900/-", "2899/-", "@1200/- ONLY"
+  const m = clean.match(
+    /@([\d,]+)\s*\/?\-?|(?:price|rs\.?|₹|inr)[^0-9]*([\d,]+)|([\d,]{3,5})\s*\/\-/i
+  );
+  if (!m) return null;
+  const raw = (m[1] || m[2] || m[3]).replace(/,/g, '');
+  const price = parseInt(raw);
+  return (price >= 100 && price <= 99999) ? price : null;
+}
+
+function parseBlock(lines) {
+  // ── Structured Key: Value format ──
+  const cleanLines = lines.map(stripMarkup).filter(Boolean);
+  if (cleanLines.some(l => /^(name|category|cat|desc|badge|image)\s*:/i.test(l))) {
     const p = {};
-    for (const line of block.split('\n')) {
+    for (const line of cleanLines) {
       const m = line.match(/^([^:]+):\s*(.+)$/);
       if (!m) continue;
       const key = m[1].trim().toLowerCase();
       const val = m[2].trim();
       if      (key === 'name')                          p.name     = val;
       else if (key === 'category' || key === 'cat')     p.category = val;
-      else if (key === 'price')                         p.price    = val.replace(/[^\d.]/g, '');
+      else if (key === 'price')                         p.price    = parseInt(val.replace(/[^\d]/g,''));
       else if (key === 'desc' || key === 'description') p.desc     = val;
       else if (key === 'badge')                         p.badge    = val;
       else if (key === 'image' || key === 'img')        p.image    = val;
     }
-    if (p.name && p.price) products.push(p);
+    if (p.name && p.price) return p;
+    return null;
   }
+
+  // ── WhatsApp / freeform format ──
+  let price = null;
+  for (const line of lines) {
+    price = extractPriceFromLine(line);
+    if (price) break;
+  }
+  if (!price) return null;
+
+  const isBoldLine  = l => /^\s*\*[^*]+\*\s*$/.test(l);
+  const isColorLine = l => /^\s*[-•]\s*\w/.test(l);
+  const isSizeLine  = l => /size\s*[:\-_\s]\s*[\dH]/i.test(l);
+  const isPriceLine = l => /price|₹|rs\./i.test(l) && /\d{3,}/.test(l);
+  const isSkip      = l => /^(brand|check|best|comes|inside|avl|available|only|with\s+box|without|video|article|personal|arrival)$/i.test(stripMarkup(l));
+
+  // Name: first bold lines that are not price/skip/quality markers
+  const nameParts = [];
+  for (const line of lines) {
+    if (!isBoldLine(line)) continue;
+    const c = stripMarkup(line);
+    if (isPriceLine(line)) continue;
+    if (isSkip(line)) continue;
+    if (/\d{2}a\s*quality|100%|pure leather|dust\s*cover|card\s*slot|fold\s*wallet|uv.?protect|shipping|booking/i.test(c)) continue;
+    if (isSizeLine(line)) continue;
+    nameParts.push(c);
+    if (nameParts.length >= 2) break;
+  }
+  // If only one bold name line, also grab first non-bold non-color non-size line as model name
+  if (nameParts.length <= 1) {
+    const modelLine = lines.find(l => !isBoldLine(l) && !isColorLine(l) && !isSizeLine(l) && !isPriceLine(l) && !/avail|colour|color|quality/i.test(l) && stripMarkup(l).length > 3);
+    if (modelLine) nameParts.push(stripMarkup(modelLine));
+  }
+
+  const name = nameParts.join(' ')
+    .replace(/^BRAND[-:\s]+/i, '')
+    .replace(/\s+/g, ' ').trim();
+  if (!name) return null;
+
+  // Colors
+  const colors = lines.filter(isColorLine).map(l => stripMarkup(l).replace(/^[-•]\s*/, '').trim()).filter(Boolean);
+
+  // Size
+  let size = '';
+  for (const line of lines) {
+    const m = stripMarkup(line).match(/size\s*[:\-_\s]+(.+)/i);
+    if (m) { size = m[1].replace(/\s*only\s*$/i,'').trim(); break; }
+  }
+
+  // Quality / features from bold lines
+  const features = lines
+    .filter(l => isBoldLine(l) && /quality|leather|cover|dust|card|box|sling|chain|fold|slot|catlouge|catalogue/i.test(l))
+    .map(stripMarkup).slice(0, 2);
+
+  const descParts = [];
+  if (size)           descParts.push(`Size: ${size}`);
+  if (colors.length)  descParts.push(`Colors: ${colors.join(', ')}`);
+  descParts.push(...features);
+
+  return {
+    name,
+    price,
+    category: detectCategory(lines.join(' ')),
+    desc: descParts.join(' | '),
+    badge: 'Premium',
+  };
+}
+
+function parseBulkText(text) {
+  // If user used "---" as explicit separator, use that
+  if (/^-{3,}$/m.test(text)) {
+    return text.split(/\n?-{3,}\n?/).map(c => c.trim()).filter(Boolean)
+      .map(chunk => parseBlock(chunk.split('\n').filter(Boolean)))
+      .filter(Boolean);
+  }
+
+  // Auto-split: each product ends at its PRICE line
+  const lines = text.split('\n');
+  const products = [];
+  let block = [];
+
+  for (const line of lines) {
+    block.push(line);
+    if (isPriceEndLine(line)) {
+      const p = parseBlock(block.filter(l => l.trim()));
+      if (p) products.push(p);
+      block = [];
+    }
+  }
+  // Catch any remaining block
+  if (block.filter(l => l.trim()).length) {
+    const p = parseBlock(block.filter(l => l.trim()));
+    if (p) products.push(p);
+  }
+
   return products;
+}
+
+function isPriceEndLine(line) {
+  // Don't split on "WITH ... @price" lines — those are price variants, not new products
+  const clean = stripMarkup(line);
+  if (/^with\b/i.test(clean)) return false;
+  return (/price/i.test(line) || /@\d{3,}/.test(line) || /\d{3,}\s*\/\-\s*(only)?/i.test(line)) && /\d{3,}/.test(line);
 }
 
 // ── /start ────────────────────────────────────────────────────────────────────
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
-  send(chatId,
-    `👋 *Elite Emporium Product Bot*\n\n` +
-    `Your Chat ID: \`${chatId}\`\n` +
-    `_(Paste this into .env → ADMIN\\_CHAT\\_ID)_\n\n` +
-    `*Commands:*\n` +
+  bot.sendMessage(chatId,
+    `👋 <b>Elite Emporium Product Bot</b>\n\n` +
+    `Your Chat ID: <code>${chatId}</code>\n` +
+    `(Paste this into .env as ADMIN_CHAT_ID)\n\n` +
+    `<b>Commands:</b>\n` +
     `• /add — step-by-step product wizard\n` +
     `• /list — view products in Firebase\n` +
-    `• /delete <id> — remove a product\n` +
+    `• /delete &lt;id&gt; — remove a product\n` +
     `• /cancel — cancel the wizard\n\n` +
-    `*Bulk add* — paste product details like this:\n` +
-    `\`\`\`\nName: Silk Saree\nCategory: Clothing\nPrice: 2500\nDesc: Beautiful silk saree\nBadge: New\n\`\`\`\n` +
-    `Separate multiple products with a blank line.`
+    `<b>Bulk add</b> — paste product details like this:\n` +
+    `<pre>Name: Silk Saree\nCategory: Clothing\nPrice: 2500\nDesc: Beautiful silk saree\nBadge: New</pre>\n` +
+    `Separate multiple products with a blank line.`,
+    { parse_mode: 'HTML' }
   );
 });
 
@@ -258,7 +397,9 @@ bot.on('message', async (msg) => {
   }
 
   // ── BULK PASTE ────────────────────────────────────────────────────────────
-  if (text.toLowerCase().includes('name:') && text.toLowerCase().includes('price:')) {
+  // Trigger on structured format OR WhatsApp-style (has price digits + product keywords)
+  const looksLikeProduct = (/price/i.test(text) || /@\d{3,}/.test(text) || /\d{3,}\s*\/\-/.test(text)) && /\d{3,}/.test(text);
+  if (looksLikeProduct) {
     const products = parseBulkText(text);
     if (!products.length) {
       return send(chatId, '⚠️ Could not parse products. Make sure each has at least Name: and Price:');
