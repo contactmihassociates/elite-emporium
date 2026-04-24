@@ -1,0 +1,15 @@
+{
+  "name": "elite-emporium-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot to add products to Elite Emporium website",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^0.66.0",
+    "firebase": "^10.0.0",
+    "dotenv": "^16.0.0",
+    "node-fetch": "^2.7.0"
+  }
+}
