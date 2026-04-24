@@ -522,7 +522,8 @@ function initProductDetailPage() {
   set('pdCategory', p.category);
   set('pdTitle',    p.name);
   set('pdPrice',    '₹' + p.price.toLocaleString('en-IN'));
-  set('pdDesc',     p.desc);
+  const descEl = document.getElementById('pdDesc');
+  if (descEl) descEl.innerHTML = p.desc || '';
 
   const ratingEl = document.getElementById('pdRating');
   if (ratingEl) ratingEl.innerHTML = `${renderStars(p.rating)} <span class="rating-count">(${p.reviews} reviews)</span>`;
