@@ -382,6 +382,50 @@
 
     .btn-delete:hover { background: #ffeeee; }
 
+    .btn-edit {
+      background: none;
+      border: 1px solid #cce0ff;
+      color: #2874f0;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-right: 6px;
+      transition: background 0.15s;
+    }
+    .btn-edit:hover { background: #eef4ff; }
+
+    #editModeBanner {
+      display: none;
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      color: #6d4c00;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+    #editModeBanner b { color: #4a3500; }
+    #cancelEditBtn {
+      background: none;
+      border: none;
+      color: var(--red);
+      text-decoration: underline;
+      cursor: pointer;
+      margin-left: 12px;
+      font-size: 13px;
+    }
+    .variants-readonly-note {
+      background: #f0f4ff;
+      border: 1px dashed #b8c8e8;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--gray);
+      margin-top: 8px;
+    }
+
     .empty-list {
       text-align: center;
       padding: 40px 20px;
@@ -529,6 +573,12 @@
         <h3>➕ Add New Product</h3>
       </div>
       <div class="card-body">
+
+        <!-- Edit Mode Banner -->
+        <div id="editModeBanner">
+          ✏️ Editing: <b id="editingProductName">—</b>
+          <button type="button" id="cancelEditBtn" onclick="cancelEdit()">Cancel</button>
+        </div>
 
         <!-- Product Images — Color Variants -->
         <div class="form-group">
@@ -686,6 +736,9 @@
     toast('Signed out successfully.', 'success');
   }
 
+  // ── EDIT STATE ─────────────────────────────────
+  let editingDocId = null;  // null = ADD mode; docId string = EDIT mode
+
   // ── VARIANT ROW MANAGEMENT ─────────────────────
   let variantCount = 0;
 
@@ -731,6 +784,8 @@
 
   // ── ADD PRODUCT ────────────────────────────────
   async function addProduct() {
+    if (editingDocId) return saveEdit();
+
     const name     = document.getElementById('pName').value.trim();
     const price    = parseInt(document.getElementById('pPrice').value);
     const category = document.getElementById('pCategory').value;
@@ -837,7 +892,8 @@
             <div class="p-meta">${p.category}</div>
             <div class="p-price">₹${p.price.toLocaleString('en-IN')}</div>
           </div>
-          <button class="btn-delete" onclick="deleteProduct('${doc.id}')">🗑️</button>
+          <button class="btn-edit" onclick="editProduct('${doc.id}')" title="Edit">✏️</button>
+          <button class="btn-delete" onclick="deleteProduct('${doc.id}')" title="Delete">🗑️</button>
         </div>`;
       }).join('');
 
@@ -903,6 +959,89 @@
     }
   }
 
+  // ── EDIT PRODUCT ───────────────────────────────
+  async function editProduct(firestoreId) {
+    try {
+      const snap = await db.collection('products').doc(firestoreId).get();
+      if (!snap.exists) { toast('Product not found.', 'error'); return; }
+      const p = snap.data();
+
+      editingDocId = firestoreId;
+
+      // Populate form fields
+      document.getElementById('pName').value     = p.name     || '';
+      document.getElementById('pPrice').value    = p.price    || '';
+      document.getElementById('pCategory').value = p.category || '';
+      document.getElementById('pDesc').value     = p.desc     || '';
+      document.getElementById('pBadge').value    = p.badge    || '';
+
+      // Images: render read-only thumbnails; hide upload UI
+      const list = document.getElementById('variantsList');
+      const imgs = (Array.isArray(p.variants) && p.variants.length)
+        ? p.variants
+        : (p.image ? [{ color: '', image: p.image }] : []);
+      list.innerHTML = imgs.map(v => `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--gold-light);border-radius:10px;margin-bottom:6px;">
+          <img src="${v.image}" style="width:50px;height:50px;border-radius:8px;object-fit:cover;" />
+          <span style="font-size:13px;color:var(--gray);">${v.color || 'Default'}</span>
+        </div>`).join('') +
+        `<div class="variants-readonly-note">📌 Images are locked in edit mode. To change product images, delete this product and re-add it.</div>`;
+
+      // Show banner and update button text
+      document.getElementById('editModeBanner').style.display = 'block';
+      document.getElementById('editingProductName').textContent = p.name;
+      document.getElementById('addBtn').textContent = '💾 Save Changes';
+
+      // Hide the "+ Add Color / Image" button while editing
+      const addColorBtn = document.querySelector('button[onclick="addVariantRow()"]');
+      if (addColorBtn) addColorBtn.style.display = 'none';
+
+      // Scroll form into view
+      document.getElementById('pName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch (err) {
+      toast('Error loading product: ' + err.message, 'error');
+    }
+  }
+
+  function cancelEdit() {
+    resetForm();
+  }
+
+  // ── SAVE EDIT ──────────────────────────────────
+  async function saveEdit() {
+    const name     = document.getElementById('pName').value.trim();
+    const price    = parseInt(document.getElementById('pPrice').value);
+    const category = document.getElementById('pCategory').value;
+    const desc     = document.getElementById('pDesc').value.trim();
+    const badge    = document.getElementById('pBadge').value;
+
+    if (!name)              { toast('Please enter product name.', 'error');    return; }
+    if (!price || price<=0) { toast('Please enter a valid price.', 'error');   return; }
+    if (!category)          { toast('Please select a category.', 'error');     return; }
+    if (!desc)              { toast('Please enter a description.', 'error');   return; }
+
+    const btn = document.getElementById('addBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Saving…';
+
+    try {
+      await db.collection('products').doc(editingDocId).update({
+        name, price, category, desc,
+        badge: badge || null
+      });
+      toast(`✅ "${name}" updated.`, 'success');
+      resetForm();
+      loadFirebaseProducts();
+    } catch (err) {
+      console.error(err);
+      toast('Error: ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      // resetForm() sets editingDocId=null, so check before using it
+      btn.textContent = editingDocId ? '💾 Save Changes' : '➕ Add Product to Store';
+    }
+  }
+
   // ── RESET FORM ─────────────────────────────────
   function resetForm() {
     document.getElementById('pName').value     = '';
@@ -914,6 +1053,15 @@
     document.getElementById('progressFill').style.width = '0%';
     variantCount = 0;
     addVariantRow(); // start fresh with one empty row
+
+    // Clear edit state
+    editingDocId = null;
+    const banner = document.getElementById('editModeBanner');
+    if (banner) banner.style.display = 'none';
+    const btn = document.getElementById('addBtn');
+    if (btn) btn.textContent = '➕ Add Product to Store';
+    const addColorBtn = document.querySelector('button[onclick="addVariantRow()"]');
+    if (addColorBtn) addColorBtn.style.display = '';
   }
 
   // ── TOAST ──────────────────────────────────────
