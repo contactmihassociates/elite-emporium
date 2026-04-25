@@ -498,7 +498,7 @@
       const stars  = '★'.repeat(Math.round(p.rating || 4)) + '☆'.repeat(5 - Math.round(p.rating || 4));
       const price  = (p.price || 0).toLocaleString('en-IN');
       return `
-        <div class="product-card" onclick="location.href='product.html?id=${p.docId}'">
+        <div class="product-card" onclick="location.href='product.html?id=${p.id}'">
           <div class="product-img-wrap">
             ${img ? `<img src="${img}" alt="${p.name}" loading="lazy" class="product-img" />` : `<div class="product-img-placeholder">💎</div>`}
             ${badge}
@@ -527,13 +527,13 @@
     const p = allHDProducts.find(x => x.docId === docId);
     if (!p) return;
     const cart    = JSON.parse(localStorage.getItem('eliteEmporiumCart') || '[]');
-    const cartKey = String(docId) + '|';
+    const cartKey = String(p.id) + '|';
     const existing = cart.find(c => c.cartKey === cartKey);
     if (existing) {
       existing.quantity = (existing.quantity || 1) + 1;
     } else {
       cart.push({
-        id:            docId,
+        id:            p.id,
         name:          p.name,
         price:         p.price,
         image:         p.image || (Array.isArray(p.variants) && p.variants[0]?.image) || '',
