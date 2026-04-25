@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hanii Dhanii – Admin Panel</title>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <script>
+    const CLOUDINARY_CLOUD  = 'dwygvtjad';
+    const CLOUDINARY_PRESET = 'ml_default';
+  </script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --hd-red:    #B71C1C;
+      --hd-dark:   #7B0000;
+      --hd-gold:   #C9A84C;
+      --hd-light:  #fff8f0;
+      --white:     #ffffff;
+      --gray:      #6c757d;
+      --light:     #f8f9fa;
+      --red:       #e74c3c;
+      --green:     #27ae60;
+      --radius:    12px;
+      --shadow:    0 4px 20px rgba(0,0,0,0.12);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--light);
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    /* ── LOGIN ───────────────────────────────── */
+    #loginScreen {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 20px;
+      background: linear-gradient(135deg, #7B0000 0%, #B71C1C 60%, #C62828 100%);
+    }
+    .login-card {
+      background: var(--white); border-radius: 20px;
+      padding: 40px 36px; width: 100%; max-width: 400px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;
+    }
+    .login-logo { font-size: 42px; margin-bottom: 6px; }
+    .login-card h1 { font-size: 22px; color: var(--hd-dark); margin-bottom: 4px; }
+    .login-card p { color: var(--gray); font-size: 13px; margin-bottom: 28px; }
+    .form-group { margin-bottom: 16px; text-align: left; }
+    .form-group label {
+      display: block; font-size: 12px; font-weight: 600; color: var(--gray);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+    }
+    .form-group input {
+      width: 100%; padding: 12px 14px; border: 2px solid #e0e0e0;
+      border-radius: 10px; font-size: 14px; transition: border-color 0.2s;
+    }
+    .form-group input:focus { outline: none; border-color: var(--hd-red); }
+    .btn-primary {
+      width: 100%; padding: 14px; background: var(--hd-red); color: var(--white);
+      border: none; border-radius: 10px; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: background 0.2s; margin-top: 4px;
+    }
+    .btn-primary:hover { background: var(--hd-dark); }
+    .error-msg { color: var(--red); font-size: 13px; margin-top: 10px; min-height: 18px; }
+
+    /* ── ADMIN PANEL ─────────────────────────── */
+    #adminPanel { display: none; }
+
+    .admin-header {
+      background: linear-gradient(135deg, #7B0000, #B71C1C);
+      color: var(--white); padding: 16px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    }
+    .admin-header h1 { font-size: 18px; font-weight: 800; }
+    .admin-header h1 span { font-size: 12px; font-weight: 400; opacity: 0.8; display: block; }
+    .btn-signout {
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+      color: var(--white); padding: 8px 14px; border-radius: 8px;
+      cursor: pointer; font-size: 13px; font-weight: 600;
+    }
+    .btn-signout:hover { background: rgba(255,255,255,0.25); }
+
+    .admin-body {
+      display: flex; gap: 0; min-height: calc(100vh - 60px);
+    }
+
+    /* ── LEFT — FORM ─────────────────────────── */
+    .admin-form-panel {
+      width: 420px; flex-shrink: 0; background: var(--white);
+      border-right: 1px solid #eee; padding: 24px 20px;
+      overflow-y: auto; max-height: calc(100vh - 60px);
+    }
+
+    .form-section-title {
+      font-size: 11px; font-weight: 700; color: var(--gray);
+      text-transform: uppercase; letter-spacing: 1px; margin: 20px 0 10px;
+    }
+    .form-section-title:first-child { margin-top: 0; }
+
+    .field-group { margin-bottom: 14px; }
+    .field-group label {
+      display: block; font-size: 12px; font-weight: 600; color: var(--gray);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+    }
+    .field-group input, .field-group select, .field-group textarea {
+      width: 100%; padding: 10px 12px; border: 2px solid #e8e8e8;
+      border-radius: 10px; font-size: 14px; font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .field-group input:focus, .field-group select:focus, .field-group textarea:focus {
+      outline: none; border-color: var(--hd-red);
+    }
+    .field-group textarea { resize: vertical; min-height: 100px; }
+
+    /* edit mode banner */
+    #editModeBanner {
+      display: none; background: #fff8e1; border: 1px solid #ffe082;
+      color: #6d4c00; padding: 10px 14px; border-radius: 10px;
+      font-size: 13px; margin-bottom: 14px;
+    }
+    #editModeBanner b { color: #4a3500; }
+    #cancelEditBtn {
+      background: none; border: none; color: var(--red);
+      text-decoration: underline; cursor: pointer;
+      margin-left: 12px; font-size: 13px;
+    }
+    .variants-readonly-note {
+      background: #f0f4ff; border: 1px dashed #b8c8e8;
+      border-radius: 8px; padding: 10px 12px;
+      font-size: 12px; color: var(--gray); margin-top: 8px;
+    }
+
+    /* variant rows */
+    .variant-row {
+      display: flex; align-items: center; gap: 10px;
+      background: #fff0f0; border: 1px solid #f5c6c6;
+      border-radius: 10px; padding: 10px; margin-bottom: 10px;
+    }
+    .vbox {
+      width: 58px; height: 58px; border-radius: 8px;
+      border: 2px dashed var(--hd-red); position: relative; overflow: hidden;
+      cursor: pointer; background: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .vbox input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .vbox img { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .vcolor-input {
+      flex: 1; padding: 10px 12px; border: 2px solid #e0e0e0;
+      border-radius: 8px; font-size: 14px; font-family: inherit; background: var(--white);
+    }
+    .vcolor-input:focus { outline: none; border-color: var(--hd-red); }
+    .btn-remove-v {
+      background: none; border: 1px solid #ffcccc; color: var(--red);
+      width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+      font-size: 15px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-add-variant {
+      width: 100%; padding: 11px;
+      background: #fff0f0; border: 2px dashed var(--hd-red);
+      border-radius: 10px; color: var(--hd-dark);
+      font-weight: 700; cursor: pointer; font-size: 14px; margin-top: 2px;
+    }
+    .btn-add-variant:hover { background: #ffe0e0; }
+
+    .upload-progress { margin-top: 10px; }
+    .progress-bar { background: #f0f0f0; border-radius: 10px; height: 6px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--hd-red); width: 0%; transition: width 0.3s; }
+    .progress-label { font-size: 12px; color: var(--gray); margin-top: 4px; }
+
+    #addBtn {
+      width: 100%; padding: 14px; background: var(--hd-red);
+      color: var(--white); border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      margin-top: 16px; transition: background 0.2s;
+    }
+    #addBtn:hover { background: var(--hd-dark); }
+    #addBtn:disabled { opacity: 0.6; cursor: default; }
+
+    /* ── RIGHT — PRODUCT LIST ─────────────────── */
+    .admin-list-panel {
+      flex: 1; padding: 24px 20px;
+      overflow-y: auto; max-height: calc(100vh - 60px);
+    }
+
+    .list-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
+    }
+    .list-header h2 { font-size: 16px; font-weight: 700; color: var(--hd-dark); }
+
+    .search-bar {
+      padding: 9px 14px; border: 2px solid #e0e0e0;
+      border-radius: 10px; font-size: 14px; width: 220px;
+    }
+    .search-bar:focus { outline: none; border-color: var(--hd-red); }
+
+    .product-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .product-item {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--white); border: 1px solid #eee;
+      border-radius: 12px; padding: 10px 14px;
+      transition: box-shadow 0.15s;
+    }
+    .product-item:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+
+    .product-item-thumb {
+      width: 52px; height: 52px; border-radius: 8px;
+      object-fit: cover; flex-shrink: 0; background: #f5f5f5;
+    }
+    .product-item-info { flex: 1; min-width: 0; }
+    .product-item-info .p-name {
+      font-size: 14px; font-weight: 600;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .product-item-info .p-cat { font-size: 12px; color: var(--gray); margin-top: 1px; }
+    .product-item-info .p-price {
+      font-size: 13px; font-weight: 700; color: var(--hd-dark); margin-top: 2px;
+    }
+
+    .btn-edit {
+      background: none; border: 1px solid #cce0ff; color: #2874f0;
+      padding: 6px 10px; border-radius: 8px; cursor: pointer;
+      font-size: 14px; flex-shrink: 0; margin-right: 6px; transition: background 0.15s;
+    }
+    .btn-edit:hover { background: #eef4ff; }
+
+    .btn-delete {
+      background: none; border: 1px solid #ffcccc; color: var(--red);
+      padding: 6px 10px; border-radius: 8px; cursor: pointer;
+      font-size: 14px; flex-shrink: 0; transition: background 0.15s;
+    }
+    .btn-delete:hover { background: #ffeeee; }
+
+    .empty-list { text-align: center; padding: 40px 20px; color: var(--gray); }
+    .empty-list .empty-icon { font-size: 36px; margin-bottom: 8px; }
+
+    /* ── TOAST ───────────────────────────────── */
+    #adminToast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #222; color: var(--white); padding: 12px 22px;
+      border-radius: 30px; font-size: 14px; font-weight: 600;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+      white-space: nowrap; z-index: 9999;
+    }
+    #adminToast.show { opacity: 1; }
+    #adminToast.success { background: var(--green); }
+    #adminToast.error   { background: var(--red); }
+
+    @media (max-width: 768px) {
+      .admin-body { flex-direction: column; }
+      .admin-form-panel { width: 100%; max-height: none; border-right: none; border-bottom: 1px solid #eee; }
+      .admin-list-panel { max-height: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ─────────────────────── -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">💎</div>
+    <h1>Hanii Dhanii Admin</h1>
+    <p>Sign in to manage Hanii Dhanii products</p>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="admin@email.com" autocomplete="email" />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+    <button class="btn-primary" id="loginBtn" onclick="signIn()">Sign In</button>
+    <div class="error-msg" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ── ADMIN PANEL ───────────────────────── -->
+<div id="adminPanel">
+
+  <div class="admin-header">
+    <h1>💎 Hanii Dhanii Admin <span>Fancy & Cosmetics — Product Manager</span></h1>
+    <button class="btn-signout" onclick="signOut()">Sign Out</button>
+  </div>
+
+  <div class="admin-body">
+
+    <!-- LEFT: ADD / EDIT FORM -->
+    <div class="admin-form-panel">
+
+      <!-- Edit mode banner -->
+      <div id="editModeBanner">
+        ✏️ Editing: <b id="editingProductName">—</b>
+        <button type="button" id="cancelEditBtn" onclick="cancelEdit()">Cancel</button>
+      </div>
+
+      <div class="form-section-title">Product Details</div>
+
+      <div class="field-group">
+        <label>Product Name *</label>
+        <input type="text" id="pName" placeholder="e.g. Silver Crystal Fan Hath Pan" />
+      </div>
+      <div class="field-group">
+        <label>Price (₹) *</label>
+        <input type="number" id="pPrice" placeholder="e.g. 300" min="1" />
+      </div>
+      <div class="field-group">
+        <label>Category *</label>
+        <select id="pCategory">
+          <option value="">— Select Category —</option>
+          <option value="Jewellery">💎 Jewellery</option>
+          <option value="Cosmetics">💄 Cosmetics</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label>Badge</label>
+        <select id="pBadge">
+          <option value="">None</option>
+          <option value="New">New</option>
+          <option value="Bestseller">Bestseller</option>
+          <option value="Popular">Popular</option>
+          <option value="Premium">Premium</option>
+          <option value="Sale">Sale</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label>Description (HTML allowed) *</label>
+        <textarea id="pDesc" placeholder="<p>Product description…</p>"></textarea>
+      </div>
+
+      <div class="form-section-title">Product Images</div>
+      <p style="font-size:12px;color:var(--gray);margin-bottom:10px;">Add one image per color/variant. First image is the main image.</p>
+
+      <div id="variantsList"></div>
+
+      <button class="btn-add-variant" onclick="addVariantRow()">+ Add Color / Image</button>
+
+      <div class="upload-progress">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-label" id="progressLabel"></div>
+      </div>
+
+      <button id="addBtn" onclick="addProduct()">➕ Add Product to Store</button>
+    </div>
+
+    <!-- RIGHT: PRODUCT LIST -->
+    <div class="admin-list-panel">
+      <div class="list-header">
+        <h2>Hanii Dhanii Products <span id="productCount" style="font-size:13px;color:var(--gray);font-weight:400;"></span></h2>
+        <input type="text" class="search-bar" id="searchInput" placeholder="🔍 Search products…" oninput="filterProducts(this.value)" />
+      </div>
+      <div class="product-list" id="productList">
+        <div class="empty-list"><div class="empty-icon">⏳</div><p>Loading products…</p></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="adminToast"></div>
+
+<script>
+  let auth, db;
+  let editingDocId = null;
+  let variantCount = 0;
+  let allProducts  = [];
+
+  // ── FIREBASE INIT ──────────────────────────────
+  function initFirebase() {
+    if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
+    auth = firebase.auth();
+    db   = firebase.firestore();
+    return true;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initFirebase();
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        // Only allow the Hanii Dhanii admin email
+        if (user.email !== 'haniidhanii.admin@eliteemporium.com') {
+          auth.signOut();
+          document.getElementById('loginError').textContent = '⚠️ Access denied. Use Hanii Dhanii admin credentials.';
+          return;
+        }
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminPanel').style.display  = 'block';
+        if (!document.getElementById('variantsList').children.length) addVariantRow();
+        loadProducts();
+      } else {
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('adminPanel').style.display  = 'none';
+      }
+    });
+    document.getElementById('loginPassword').addEventListener('keydown', e => {
+      if (e.key === 'Enter') signIn();
+    });
+  });
+
+  // ── AUTH ───────────────────────────────────────
+  async function signIn() {
+    const email    = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errEl    = document.getElementById('loginError');
+    const btn      = document.getElementById('loginBtn');
+    errEl.textContent = '';
+    if (!email || !password) { errEl.textContent = 'Please enter email and password.'; return; }
+    btn.disabled = true; btn.textContent = 'Signing in…';
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+    } catch (e) {
+      errEl.textContent = e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found'
+        ? 'Invalid email or password.' : e.message;
+    } finally {
+      btn.disabled = false; btn.textContent = 'Sign In';
+    }
+  }
+
+  function signOut() {
+    auth.signOut();
+  }
+
+  // ── LOAD PRODUCTS ──────────────────────────────
+  async function loadProducts() {
+    const list = document.getElementById('productList');
+    list.innerHTML = '<div class="empty-list"><div class="empty-icon">⏳</div><p>Loading…</p></div>';
+    try {
+      const snap = await db.collection('products')
+        .where('brand', '==', 'Hanii Dhanii')
+        .orderBy('createdAt', 'desc')
+        .get();
+      allProducts = snap.docs.map(d => ({ docId: d.id, ...d.data() }));
+      renderList(allProducts);
+    } catch (err) {
+      // Fallback: load all and filter
+      try {
+        const snap2 = await db.collection('products').orderBy('createdAt', 'desc').get();
+        allProducts = snap2.docs.map(d => ({ docId: d.id, ...d.data() })).filter(p => p.brand === 'Hanii Dhanii');
+        renderList(allProducts);
+      } catch(e2) {
+        list.innerHTML = `<div class="empty-list"><p style="color:red;">Error: ${e2.message}</p></div>`;
+      }
+    }
+  }
+
+  function renderList(prods) {
+    const list = document.getElementById('productList');
+    document.getElementById('productCount').textContent = `(${prods.length} products)`;
+    if (!prods.length) {
+      list.innerHTML = '<div class="empty-list"><div class="empty-icon">💎</div><p>No Hanii Dhanii products yet. Add your first one!</p></div>';
+      return;
+    }
+    list.innerHTML = prods.map(p => {
+      const img = p.image || (Array.isArray(p.variants) && p.variants[0]?.image) || '';
+      return `
+        <div class="product-item">
+          ${img ? `<img src="${img}" class="product-item-thumb" />` : `<div class="product-item-thumb" style="display:flex;align-items:center;justify-content:center;font-size:28px;">💎</div>`}
+          <div class="product-item-info">
+            <div class="p-name">${p.name}</div>
+            <div class="p-cat">${p.category || '—'} ${p.badge ? `· <span style="color:var(--hd-red);font-weight:600;">${p.badge}</span>` : ''}</div>
+            <div class="p-price">₹${(p.price || 0).toLocaleString('en-IN')}</div>
+          </div>
+          <button class="btn-edit" onclick="editProduct('${p.docId}')" title="Edit">✏️</button>
+          <button class="btn-delete" onclick="deleteProduct('${p.docId}', '${p.name.replace(/'/g,"\\'")}')">🗑️</button>
+        </div>`;
+    }).join('');
+  }
+
+  function filterProducts(query) {
+    const q = query.toLowerCase();
+    const filtered = q
+      ? allProducts.filter(p => p.name.toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q))
+      : allProducts;
+    renderList(filtered);
+  }
+
+  // ── ADD VARIANT ROW ────────────────────────────
+  function addVariantRow() {
+    variantCount++;
+    const id  = 'vrow_' + variantCount;
+    const row = document.createElement('div');
+    row.className = 'variant-row';
+    row.id = id;
+    row.innerHTML = `
+      <div class="vbox" onclick="document.getElementById('vfile_${variantCount}').click()">
+        📷
+        <input type="file" id="vfile_${variantCount}" accept="image/*"
+               onchange="previewVariant(this, '${id}')" />
+        <img id="vimg_${id}" />
+      </div>
+      <input class="vcolor-input" type="text" placeholder="Color name (optional)"
+             id="vcolor_${id}" />
+      <button class="btn-remove-v" onclick="removeVariantRow('${id}')" title="Remove">✕</button>`;
+    document.getElementById('variantsList').appendChild(row);
+  }
+
+  function previewVariant(input, rowId) {
+    const file = input.files[0];
+    if (!file) return;
+    const img = document.getElementById('vimg_' + rowId);
+    img.src = URL.createObjectURL(file);
+    img.style.display = 'block';
+    input.parentElement.querySelector(':scope > :not(input):not(img)').style.display = 'none';
+  }
+
+  function removeVariantRow(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  }
+
+  // ── UPLOAD TO CLOUDINARY ───────────────────────
+  async function uploadImage(file, onProgress) {
+    return new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append('file',          file);
+      formData.append('upload_preset', CLOUDINARY_PRESET);
+      formData.append('folder',        'elite-emporium/hanii-dhanii');
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`);
+      xhr.upload.onprogress = e => { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
+      xhr.onload = () => {
+        if (xhr.status === 200) resolve(JSON.parse(xhr.responseText).secure_url);
+        else reject(new Error('Upload failed: ' + xhr.statusText));
+      };
+      xhr.onerror = () => reject(new Error('Network error during upload'));
+      xhr.send(formData);
+    });
+  }
+
+  // ── ADD PRODUCT ────────────────────────────────
+  async function addProduct() {
+    if (editingDocId) return saveEdit();
+
+    const name     = document.getElementById('pName').value.trim();
+    const price    = parseInt(document.getElementById('pPrice').value);
+    const category = document.getElementById('pCategory').value;
+    const desc     = document.getElementById('pDesc').value.trim();
+    const badge    = document.getElementById('pBadge').value;
+
+    if (!name)              { toast('Please enter product name.',     'error'); return; }
+    if (!price || price<=0) { toast('Please enter a valid price.',    'error'); return; }
+    if (!category)          { toast('Please select a category.',      'error'); return; }
+    if (!desc)              { toast('Please enter a description.',    'error'); return; }
+
+    const rows = document.getElementById('variantsList').querySelectorAll('.variant-row');
+    const variantFiles = [];
+    rows.forEach(row => {
+      const fileInput = row.querySelector('input[type="file"]');
+      const colorInput = row.querySelector('.vcolor-input');
+      if (fileInput && fileInput.files[0]) {
+        variantFiles.push({ file: fileInput.files[0], color: colorInput ? colorInput.value.trim() : '' });
+      }
+    });
+
+    if (!variantFiles.length) { toast('Please add at least one product image.', 'error'); return; }
+
+    const btn = document.getElementById('addBtn');
+    btn.disabled = true; btn.textContent = '⏳ Uploading images…';
+
+    try {
+      const progressFill  = document.getElementById('progressFill');
+      const progressLabel = document.getElementById('progressLabel');
+      const variants = [];
+
+      for (let i = 0; i < variantFiles.length; i++) {
+        progressLabel.textContent = `Uploading image ${i+1} of ${variantFiles.length}…`;
+        const url = await uploadImage(variantFiles[i].file, pct => {
+          progressFill.style.width = (((i + pct) / variantFiles.length) * 100) + '%';
+        });
+        variants.push({ color: variantFiles[i].color, image: url });
+      }
+      progressFill.style.width = '100%';
+      progressLabel.textContent = 'Saving to store…';
+
+      const docData = {
+        id:        Date.now(),
+        name, price, category, desc,
+        badge:     badge || null,
+        image:     variants[0].image,
+        variants:  variants.length > 1 ? variants : null,
+        rating:    4.5,
+        reviews:   0,
+        brand:     'Hanii Dhanii',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      };
+
+      await db.collection('products').add(docData);
+      toast(`✅ "${name}" added!`, 'success');
+      resetForm();
+      loadProducts();
+    } catch (err) {
+      console.error(err);
+      toast('Error: ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = editingDocId ? '💾 Save Changes' : '➕ Add Product to Store';
+      document.getElementById('progressFill').style.width  = '0%';
+      document.getElementById('progressLabel').textContent = '';
+    }
+  }
+
+  // ── EDIT PRODUCT ───────────────────────────────
+  async function editProduct(firestoreId) {
+    try {
+      const snap = await db.collection('products').doc(firestoreId).get();
+      if (!snap.exists) { toast('Product not found.', 'error'); return; }
+      const p = snap.data();
+
+      editingDocId = firestoreId;
+
+      document.getElementById('pName').value     = p.name     || '';
+      document.getElementById('pPrice').value    = p.price    || '';
+      document.getElementById('pCategory').value = p.category || '';
+      document.getElementById('pDesc').value     = p.desc     || '';
+      document.getElementById('pBadge').value    = p.badge    || '';
+
+      const list = document.getElementById('variantsList');
+      const imgs = (Array.isArray(p.variants) && p.variants.length)
+        ? p.variants : (p.image ? [{ color: '', image: p.image }] : []);
+      list.innerHTML = imgs.map(v => `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px;border:1px solid #f5c6c6;border-radius:10px;margin-bottom:6px;">
+          <img src="${v.image}" style="width:50px;height:50px;border-radius:8px;object-fit:cover;" />
+          <span style="font-size:13px;color:var(--gray);">${v.color || 'Default'}</span>
+        </div>`).join('') +
+        `<div class="variants-readonly-note">📌 Images are locked in edit mode. To change images, delete and re-add the product.</div>`;
+
+      document.getElementById('editModeBanner').style.display = 'block';
+      document.getElementById('editingProductName').textContent = p.name;
+      document.getElementById('addBtn').textContent = '💾 Save Changes';
+      const addColorBtn = document.querySelector('button[onclick="addVariantRow()"]');
+      if (addColorBtn) addColorBtn.style.display = 'none';
+
+      document.getElementById('pName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch (err) {
+      toast('Error loading product: ' + err.message, 'error');
+    }
+  }
+
+  function cancelEdit() { resetForm(); }
+
+  // ── SAVE EDIT ──────────────────────────────────
+  async function saveEdit() {
+    const name     = document.getElementById('pName').value.trim();
+    const price    = parseInt(document.getElementById('pPrice').value);
+    const category = document.getElementById('pCategory').value;
+    const desc     = document.getElementById('pDesc').value.trim();
+    const badge    = document.getElementById('pBadge').value;
+
+    if (!name)              { toast('Please enter product name.',  'error'); return; }
+    if (!price || price<=0) { toast('Please enter a valid price.', 'error'); return; }
+    if (!category)          { toast('Please select a category.',   'error'); return; }
+    if (!desc)              { toast('Please enter a description.', 'error'); return; }
+
+    const btn = document.getElementById('addBtn');
+    btn.disabled = true; btn.textContent = '⏳ Saving…';
+    try {
+      await db.collection('products').doc(editingDocId).update({
+        name, price, category, desc, badge: badge || null
+      });
+      toast(`✅ "${name}" updated.`, 'success');
+      resetForm();
+      loadProducts();
+    } catch (err) {
+      console.error(err);
+      toast('Error: ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = editingDocId ? '💾 Save Changes' : '➕ Add Product to Store';
+    }
+  }
+
+  // ── DELETE PRODUCT ─────────────────────────────
+  async function deleteProduct(docId, name) {
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+    try {
+      await db.collection('products').doc(docId).delete();
+      toast(`🗑️ "${name}" deleted.`, 'success');
+      allProducts = allProducts.filter(p => p.docId !== docId);
+      renderList(allProducts);
+    } catch (err) {
+      toast('Delete failed: ' + err.message, 'error');
+    }
+  }
+
+  // ── RESET FORM ─────────────────────────────────
+  function resetForm() {
+    document.getElementById('pName').value     = '';
+    document.getElementById('pPrice').value    = '';
+    document.getElementById('pCategory').value = '';
+    document.getElementById('pDesc').value     = '';
+    document.getElementById('pBadge').value    = '';
+    document.getElementById('variantsList').innerHTML = '';
+    document.getElementById('progressFill').style.width  = '0%';
+    document.getElementById('progressLabel').textContent = '';
+    variantCount = 0;
+    addVariantRow();
+
+    editingDocId = null;
+    const banner = document.getElementById('editModeBanner');
+    if (banner) banner.style.display = 'none';
+    const btn = document.getElementById('addBtn');
+    if (btn) btn.textContent = '➕ Add Product to Store';
+    const addColorBtn = document.querySelector('button[onclick="addVariantRow()"]');
+    if (addColorBtn) addColorBtn.style.display = '';
+  }
+
+  // ── TOAST ──────────────────────────────────────
+  let toastTimer;
+  function toast(msg, type = '') {
+    const el = document.getElementById('adminToast');
+    el.textContent = msg;
+    el.className   = 'show ' + type;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.className = ''; }, 3500);
+  }
+</script>
+</body>
+</html>
