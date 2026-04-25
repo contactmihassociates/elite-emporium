@@ -35,7 +35,7 @@ function isAdmin(msg) {
 }
 
 // ── CONSTANTS ─────────────────────────────────────────────────────────────────
-const CATEGORIES = ['Home & Kitchen', 'Bags', 'Clothing', 'Electronics', 'Footwear', 'Toys & Games', 'Wallets', 'Coolers', 'Watches', 'Others'];
+const CATEGORIES = ['Home & Kitchen', 'Bags', 'Clothing', 'Electronics', 'Footwear', 'Toys & Games', 'Wallets', 'Coolers', 'Watches', 'Others', 'Jewellery', 'Cosmetics'];
 const BADGES     = ['New', 'Popular', 'Bestseller', 'Premium', 'none'];
 
 // ── WIZARD STATE ──────────────────────────────────────────────────────────────

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hanii Dhanii – Fancy &amp; Cosmetics | Elite Emporium</title>
+  <meta name="description" content="Shop Hanii Dhanii – Gold Covering Jewellery, AD Stone Jewellery, Fancy Earrings, Cosmetics &amp; more. Exclusive partner brand at Elite Emporium." />
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    /* ── HANII DHANII BRAND STYLES ─────────── */
+    :root {
+      --hd-red:    #B71C1C;
+      --hd-dark:   #7B0000;
+      --hd-gold:   #C9A84C;
+      --hd-cream:  #FFF8F0;
+    }
+
+    /* Brand Hero */
+    .hd-hero {
+      background: linear-gradient(135deg, #7B0000 0%, #B71C1C 40%, #C62828 70%, #8B0000 100%);
+      padding: 36px 20px 28px;
+      text-align: center;
+      color: white;
+    }
+
+    .hd-logo-wrap {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+
+    .hd-logo-ring {
+      width: 90px;
+      height: 90px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      border: 3px solid #C9A84C;
+      overflow: hidden;
+    }
+
+    .hd-logo-text-inner {
+      text-align: center;
+      line-height: 1.1;
+    }
+
+    .hd-logo-text-inner .hd-brand-big {
+      font-size: 13px;
+      font-weight: 900;
+      color: #B71C1C;
+      letter-spacing: -0.5px;
+    }
+
+    .hd-logo-text-inner .hd-brand-sub {
+      font-size: 7px;
+      color: #555;
+      font-style: italic;
+      letter-spacing: 0.3px;
+    }
+
+    .hd-hero h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .hd-hero .hd-tagline {
+      font-size: 13px;
+      color: rgba(255,255,255,0.85);
+      font-style: italic;
+      margin-bottom: 16px;
+    }
+
+    .hd-hero .hd-cats {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .hd-cat-pill {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .hd-hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hd-btn-ig {
+      background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+      color: white;
+      padding: 9px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hd-btn-wa {
+      background: #25D366;
+      color: white;
+      padding: 9px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Category Tabs */
+    .hd-tabs {
+      display: flex;
+      gap: 0;
+      background: white;
+      border-bottom: 2px solid #f0f0f0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .hd-tabs::-webkit-scrollbar { display: none; }
+
+    .hd-tab {
+      padding: 12px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #666;
+      white-space: nowrap;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .hd-tab.active, .hd-tab:hover {
+      color: var(--hd-red);
+      border-bottom-color: var(--hd-red);
+    }
+
+    /* Products Section */
+    .hd-main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+    }
+
+    .hd-section-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1a1a1a;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hd-section-title::after {
+      content: '';
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(to right, #B71C1C22, transparent);
+      border-radius: 2px;
+    }
+
+    /* Empty / Loading */
+    .hd-empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: #999;
+    }
+    .hd-empty .hd-empty-icon { font-size: 48px; margin-bottom: 12px; }
+    .hd-empty p { font-size: 14px; }
+
+    /* About Brand */
+    .hd-about {
+      background: linear-gradient(135deg, #fff8f0, #fff0f0);
+      border: 1px solid #f5c6c6;
+      border-radius: 14px;
+      padding: 22px 20px;
+      margin-bottom: 28px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .hd-about-icon {
+      font-size: 36px;
+      flex-shrink: 0;
+    }
+
+    .hd-about h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #B71C1C;
+      margin-bottom: 6px;
+    }
+
+    .hd-about p {
+      font-size: 13px;
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 4px;
+    }
+
+    /* Partner badge */
+    .hd-partner-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #B71C1C;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Breadcrumb */
+    .hd-breadcrumb {
+      padding: 10px 16px;
+      font-size: 12px;
+      color: #888;
+      background: #fafafa;
+      border-bottom: 1px solid #eee;
+    }
+    .hd-breadcrumb a { color: #B71C1C; text-decoration: none; }
+    .hd-breadcrumb a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ─────────────────────────────── -->
+<header>
+  <div class="header-main">
+    <a href="index.html" class="logo">
+      <img src="images/logo.png" class="logo-img" alt="Elite Emporium" />
+    </a>
+    <div class="header-search">
+      <form id="headerSearchForm">
+        <input type="text" id="headerSearchInput" placeholder="Search Hanii Dhanii products…" autocomplete="off" />
+        <button type="submit">🔍</button>
+      </form>
+    </div>
+    <div class="header-actions">
+      <a href="cart.html" class="cart-btn">
+        🛒 Cart
+        <span class="cart-count">0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- Breadcrumb -->
+<div class="hd-breadcrumb">
+  <a href="index.html">🏠 Home</a> › <a href="products.html">All Products</a> › Hanii Dhanii
+</div>
+
+<!-- ── BRAND HERO ────────────────────────── -->
+<div class="hd-hero">
+  <div class="hd-logo-wrap">
+    <div class="hd-logo-ring">
+      <div class="hd-logo-text-inner">
+        <div class="hd-brand-big">Hanii<br/>Dhanii</div>
+        <div class="hd-brand-sub">Fancy &amp; Cosmetics</div>
+      </div>
+    </div>
+  </div>
+  <h1>Hanii Dhanii</h1>
+  <div class="hd-tagline">Fancy &amp; Cosmetics — Jewellery That Speaks For You</div>
+  <div class="hd-cats">
+    <span class="hd-cat-pill">💎 Gold Covering Jewels</span>
+    <span class="hd-cat-pill">✨ AD Stone Jewellery</span>
+    <span class="hd-cat-pill">💄 Cosmetics</span>
+    <span class="hd-cat-pill">👂 Fancy Earrings</span>
+    <span class="hd-cat-pill">👜 Hand Bags</span>
+  </div>
+  <div class="hd-hero-actions">
+    <a href="https://www.instagram.com/haniidhanii2026" target="_blank" rel="noopener" class="hd-btn-ig">
+      📷 Follow on Instagram
+    </a>
+    <a href="https://wa.me/917358650774" target="_blank" rel="noopener" class="hd-btn-wa">
+      💬 Order via WhatsApp
+    </a>
+  </div>
+</div>
+
+<!-- ── CATEGORY TABS ─────────────────────── -->
+<div class="hd-tabs" id="hdTabs">
+  <div class="hd-tab active" onclick="filterHD('All')">✨ All</div>
+  <div class="hd-tab" onclick="filterHD('Jewellery')">💎 Jewellery</div>
+  <div class="hd-tab" onclick="filterHD('Cosmetics')">💄 Cosmetics</div>
+</div>
+
+<!-- ── MAIN CONTENT ───────────────────────── -->
+<div class="hd-main">
+
+  <!-- About Brand -->
+  <div class="hd-about">
+    <div class="hd-about-icon">💎</div>
+    <div>
+      <div class="hd-partner-badge">✅ Elite Emporium Partner Brand</div>
+      <h3>About Hanii Dhanii</h3>
+      <p>Hanii Dhanii is a trusted name in fancy jewellery and cosmetics, specialising in gold covering jewels, AD stone jewellery, fancy earrings, and premium cosmetic items.</p>
+      <p>As an exclusive partner brand of Elite Emporium, all Hanii Dhanii products are available for ordering via WhatsApp with fast, reliable delivery.</p>
+    </div>
+  </div>
+
+  <!-- Products -->
+  <div class="hd-section-title" id="hdSectionTitle">💎 All Products</div>
+  <div class="products-grid" id="hdProductsGrid">
+    <div class="hd-empty">
+      <div class="hd-empty-icon">💎</div>
+      <p>Loading products…</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── FOOTER ─────────────────────────────── -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div style="margin-bottom:10px;font-size:20px;font-weight:800;color:#C9A84C;">Hanii Dhanii</div>
+      <p>Fancy &amp; Cosmetics — Gold covering jewels, AD stone jewellery, fancy earrings, cosmetics and more. Official partner brand of Elite Emporium.</p>
+      <div class="gst-box" style="margin-top:12px;">
+        📷 Instagram: @haniidhanii2026<br />
+        💬 WhatsApp Orders: +91 7358650774
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="index.html">🏠 Home</a></li>
+        <li><a href="products.html">🛍️ All Products</a></li>
+        <li><a href="products.html?category=Jewellery">💎 Jewellery</a></li>
+        <li><a href="products.html?category=Cosmetics">💄 Cosmetics</a></li>
+        <li><a href="cart.html">🛒 My Cart</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="https://wa.me/917358650774" target="_blank">💬 WhatsApp Order</a></li>
+        <li><a href="https://www.instagram.com/haniidhanii2026" target="_blank">📷 Instagram</a></li>
+        <li><a href="index.html#about">ℹ️ About Elite Emporium</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2024 Elite Emporium · Partner Brand: Hanii Dhanii Fancy &amp; Cosmetics</p>
+  </div>
+</footer>
+
+<!-- ── CART TOAST ──────────────────────────── -->
+<div id="cartToast" class="cart-toast">✅ Added to cart!</div>
+
+<!-- ── FIREBASE ───────────────────────────── -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+  // ── FIREBASE INIT ──────────────────────────
+  let db;
+  if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
+  db = firebase.firestore();
+
+  // ── CART COUNT ─────────────────────────────
+  function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    document.querySelectorAll('.cart-count').forEach(el => el.textContent = cart.length);
+  }
+  updateCartCount();
+
+  // ── ALL PRODUCTS (HD categories) ───────────
+  let allHDProducts = [];
+  let activeFilter  = 'All';
+
+  async function loadHDProducts() {
+    const grid = document.getElementById('hdProductsGrid');
+    try {
+      const snap = await db.collection('products')
+        .where('category', 'in', ['Jewellery', 'Cosmetics'])
+        .orderBy('createdAt', 'desc')
+        .get();
+
+      if (snap.empty) {
+        grid.innerHTML = `
+          <div class="hd-empty" style="grid-column:1/-1;">
+            <div class="hd-empty-icon">💎</div>
+            <p>Products coming soon — follow <a href="https://www.instagram.com/haniidhanii2026" target="_blank" style="color:#B71C1C;">@haniidhanii2026</a> for updates!</p>
+          </div>`;
+        return;
+      }
+
+      allHDProducts = snap.docs.map(d => ({ docId: d.id, ...d.data() }));
+      renderHD();
+    } catch (err) {
+      // Fallback: load all and filter client-side (handles missing composite index)
+      try {
+        const snap2 = await db.collection('products').orderBy('createdAt', 'desc').get();
+        allHDProducts = snap2.docs
+          .map(d => ({ docId: d.id, ...d.data() }))
+          .filter(p => ['Jewellery', 'Cosmetics'].includes(p.category));
+        if (!allHDProducts.length) {
+          grid.innerHTML = `
+            <div class="hd-empty" style="grid-column:1/-1;">
+              <div class="hd-empty-icon">💎</div>
+              <p>Products coming soon — follow <a href="https://www.instagram.com/haniidhanii2026" target="_blank" style="color:#B71C1C;">@haniidhanii2026</a> for updates!</p>
+            </div>`;
+          return;
+        }
+        renderHD();
+      } catch (e2) {
+        grid.innerHTML = `<div class="hd-empty" style="grid-column:1/-1;"><p style="color:red;">Error loading: ${e2.message}</p></div>`;
+      }
+    }
+  }
+
+  function renderHD() {
+    const grid = document.getElementById('hdProductsGrid');
+    const title = document.getElementById('hdSectionTitle');
+
+    const filtered = activeFilter === 'All'
+      ? allHDProducts
+      : allHDProducts.filter(p => p.category === activeFilter);
+
+    const catEmoji = { Jewellery: '💎', Cosmetics: '💄', All: '✨' };
+    const catLabel = { Jewellery: 'Jewellery', Cosmetics: 'Cosmetics', All: 'All Products' };
+    title.textContent = `${catEmoji[activeFilter] || '✨'} ${catLabel[activeFilter] || activeFilter} (${filtered.length})`;
+
+    if (!filtered.length) {
+      grid.innerHTML = `<div class="hd-empty" style="grid-column:1/-1;"><div class="hd-empty-icon">🔍</div><p>No products in this category yet.</p></div>`;
+      return;
+    }
+
+    grid.innerHTML = filtered.map(p => {
+      const img    = p.image || (Array.isArray(p.variants) && p.variants[0]?.image) || '';
+      const badge  = p.badge ? `<div class="product-badge">${p.badge}</div>` : '';
+      const stars  = '★'.repeat(Math.round(p.rating || 4)) + '☆'.repeat(5 - Math.round(p.rating || 4));
+      const price  = (p.price || 0).toLocaleString('en-IN');
+      return `
+        <div class="product-card" onclick="location.href='product.html?id=${p.docId}'">
+          <div class="product-img-wrap">
+            ${img ? `<img src="${img}" alt="${p.name}" loading="lazy" class="product-img" />` : `<div class="product-img-placeholder">💎</div>`}
+            ${badge}
+          </div>
+          <div class="product-info">
+            <div class="product-name">${p.name}</div>
+            <div class="product-meta">${p.category}</div>
+            <div class="product-rating"><span class="stars">${stars}</span> <span class="rating-count">(${p.reviews || 0})</span></div>
+            <div class="product-price">₹${price}</div>
+            <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('${p.docId}', this)">🛒 Add to Cart</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function filterHD(cat) {
+    activeFilter = cat;
+    // Update tab styles
+    document.querySelectorAll('.hd-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    renderHD();
+  }
+
+  // ── ADD TO CART ────────────────────────────
+  function addToCart(docId, btn) {
+    const p = allHDProducts.find(x => x.docId === docId);
+    if (!p) return;
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const existing = cart.find(c => c.id === docId);
+    if (existing) { existing.qty = (existing.qty || 1) + 1; }
+    else { cart.push({ id: docId, name: p.name, price: p.price, image: p.image || '', qty: 1 }); }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    const toast = document.getElementById('cartToast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+    btn.textContent = '✅ Added!';
+    setTimeout(() => btn.textContent = '🛒 Add to Cart', 1500);
+  }
+
+  // ── SEARCH ────────────────────────────────
+  document.getElementById('headerSearchForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const q = document.getElementById('headerSearchInput').value.trim();
+    if (q) location.href = `products.html?search=${encodeURIComponent(q)}`;
+  });
+
+  // ── INIT ──────────────────────────────────
+  loadHDProducts();
+</script>
+</body>
+</html>
