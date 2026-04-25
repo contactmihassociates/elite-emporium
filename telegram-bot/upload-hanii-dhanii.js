@@ -18,7 +18,7 @@ const firebaseConfig = {
 
 const CLOUDINARY_CLOUD  = 'dwygvtjad';
 const CLOUDINARY_PRESET = 'ml_default';
-const IMAGE_DIR = 'C:\\Users\\HP\\Desktop\\inam workings\\inam\\landing page elite emporium\\whatsapp_extract';
+const IMAGE_DIR = 'C:\\Users\\HP\\Desktop\\inam workings\\elite emporium\\whatsapp-extract';
 
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
