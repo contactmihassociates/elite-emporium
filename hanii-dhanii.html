@@ -421,8 +421,12 @@
 
   // ── CART COUNT ─────────────────────────────
   function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    document.querySelectorAll('.cart-count').forEach(el => el.textContent = cart.length);
+    const cart = JSON.parse(localStorage.getItem('eliteEmporiumCart') || '[]');
+    const total = cart.reduce((s, i) => s + (i.quantity || 1), 0);
+    document.querySelectorAll('.cart-count').forEach(el => {
+      el.textContent = total;
+      el.style.display = total > 0 ? 'flex' : 'none';
+    });
   }
   updateCartCount();
 
@@ -522,11 +526,24 @@
   function addToCart(docId, btn) {
     const p = allHDProducts.find(x => x.docId === docId);
     if (!p) return;
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existing = cart.find(c => c.id === docId);
-    if (existing) { existing.qty = (existing.qty || 1) + 1; }
-    else { cart.push({ id: docId, name: p.name, price: p.price, image: p.image || '', qty: 1 }); }
-    localStorage.setItem('cart', JSON.stringify(cart));
+    const cart    = JSON.parse(localStorage.getItem('eliteEmporiumCart') || '[]');
+    const cartKey = String(docId) + '|';
+    const existing = cart.find(c => c.cartKey === cartKey);
+    if (existing) {
+      existing.quantity = (existing.quantity || 1) + 1;
+    } else {
+      cart.push({
+        id:            docId,
+        name:          p.name,
+        price:         p.price,
+        image:         p.image || (Array.isArray(p.variants) && p.variants[0]?.image) || '',
+        category:      p.category || '',
+        quantity:      1,
+        cartKey:       cartKey,
+        selectedColor: null
+      });
+    }
+    localStorage.setItem('eliteEmporiumCart', JSON.stringify(cart));
     updateCartCount();
     const toast = document.getElementById('cartToast');
     toast.classList.add('show');
