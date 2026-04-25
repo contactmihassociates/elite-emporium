@@ -65,41 +65,41 @@ const PRODUCTS = [
     desc: `<p>Striking hand harness featuring a chain of baguette-cut crystals with a square blue sapphire-style centre stone. Elegant T-bar wrist design with ring loop — perfect for bridal styling.</p><p><strong>Key Features:</strong></p><ul><li>Baguette-cut crystal chain</li><li>Square blue sapphire-style focal stone</li><li>T-bar wrist design</li><li>Adjustable 80mm fit</li><li>Bridal and party wear</li></ul>`
   },
 
-  // ── ₹300 · AD Stone Necklace Sets ─────────────────────────────────────────
+  // ── ₹1400 · AD Stone Necklace Sets ────────────────────────────────────────
   {
     file: 'IMG-20260425-WA0062.jpg',
     name: 'Gold AD Stone Necklace Set – White',
-    price: 300, category: 'Jewellery', badge: 'Bestseller',
+    price: 1400, category: 'Jewellery', badge: 'Bestseller',
     desc: `<p>Rose gold plated American Diamond (AD) stone choker necklace set with matching dangling earrings and maang tikka. Dense fringe of white CZ stones — a timeless bridal classic.</p><p><strong>Key Features:</strong></p><ul><li>Rose gold plated base metal</li><li>White CZ / AD stones throughout</li><li>Set includes: necklace, earrings and maang tikka</li><li>Adjustable necklace length</li><li>Perfect for weddings, engagements and festive occasions</li></ul>`
   },
   {
     file: 'IMG-20260425-WA0063.jpg',
     name: 'Gold AD Stone Necklace Set – Blue',
-    price: 300, category: 'Jewellery', badge: 'Bestseller',
+    price: 1400, category: 'Jewellery', badge: 'Bestseller',
     desc: `<p>Rose gold plated American Diamond choker necklace set with vibrant sky blue stone accents. The same premium fringe-style design in a refreshing blue — ideal for festive and formal occasions.</p><p><strong>Key Features:</strong></p><ul><li>Rose gold plated base metal</li><li>Sky blue CZ / AD stones</li><li>Set includes: necklace, earrings and maang tikka</li><li>Adjustable necklace length</li><li>Festive, bridal and party wear</li></ul>`
   },
   {
     file: 'IMG-20260425-WA0064.jpg',
     name: 'Gold AD Stone Necklace Set – Navy',
-    price: 300, category: 'Jewellery', badge: 'Bestseller',
+    price: 1400, category: 'Jewellery', badge: 'Bestseller',
     desc: `<p>Rose gold plated American Diamond choker set with deep navy blue stone accents. Rich and regal — perfect for pairing with silk sarees and lehengas.</p><p><strong>Key Features:</strong></p><ul><li>Rose gold plated base metal</li><li>Deep navy CZ / AD stones</li><li>Set includes: necklace, earrings and maang tikka</li><li>Adjustable necklace length</li><li>Bridal and grand occasion wear</li></ul>`
   },
   {
     file: 'IMG-20260425-WA0065.jpg',
     name: 'Gold AD Stone Necklace Set – Black',
-    price: 300, category: 'Jewellery', badge: 'Bestseller',
+    price: 1400, category: 'Jewellery', badge: 'Bestseller',
     desc: `<p>Rose gold plated American Diamond choker set with elegant black stone accents. Bold contrast of gold and black — makes a dramatic statement at any event.</p><p><strong>Key Features:</strong></p><ul><li>Rose gold plated base metal</li><li>Black CZ / AD stones</li><li>Set includes: necklace, earrings and maang tikka</li><li>Adjustable necklace length</li><li>Festive, party and reception wear</li></ul>`
   },
   {
     file: 'IMG-20260425-WA0066.jpg',
     name: 'Gold AD Stone Necklace Set – Pink',
-    price: 300, category: 'Jewellery', badge: 'Bestseller',
+    price: 1400, category: 'Jewellery', badge: 'Bestseller',
     desc: `<p>Rose gold plated American Diamond choker set with delicate baby pink stone accents. Soft and feminine — the perfect jewellery for mehndi, haldi and sangeet celebrations.</p><p><strong>Key Features:</strong></p><ul><li>Rose gold plated base metal</li><li>Baby pink CZ / AD stones</li><li>Set includes: necklace, earrings and maang tikka</li><li>Adjustable necklace length</li><li>Bridal and pre-wedding events</li></ul>`
   },
   {
     file: 'IMG-20260425-WA0067.jpg',
     name: 'Gold AD Stone Necklace Set – Multicolour',
-    price: 300, category: 'Jewellery', badge: 'Popular',
+    price: 1400, category: 'Jewellery', badge: 'Popular',
     desc: `<p>Rose gold plated American Diamond choker set with eye-catching multicolour stone accents — pink, green, blue and red. A celebration of colour for festive occasions.</p><p><strong>Key Features:</strong></p><ul><li>Rose gold plated base metal</li><li>Multicolour CZ / AD stones (pink, green, blue, red)</li><li>Set includes: necklace, earrings and maang tikka</li><li>Adjustable necklace length</li><li>Perfect for festivals, garba and celebrations</li></ul>`
   },
 
