@@ -2614,7 +2614,44 @@ function initHomePage() {
   initTrending();
   initDealOfDay();
   initForYou();
+  initMostLoved();
   setTimeout(initCartReminder, 2000);
+}
+
+// ── MOST LOVED (rating × log(reviews+1) score) ──
+function initMostLoved() {
+  if (!document.getElementById('featuredProducts')) return; // homepage only
+  // Inject the section once, above the Top Picks block
+  if (document.getElementById('mostLovedSection')) return;
+  const scored = products
+    .filter(p => p.inStock !== false && (p.rating || 0) >= 4.3 && (p.reviews || 0) >= 5)
+    .map(p => ({ p, score: (p.rating || 0) * Math.log((p.reviews || 0) + 1) }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 8)
+    .map(x => x.p);
+  if (scored.length < 4) return;
+
+  const section = document.createElement('div');
+  section.id = 'mostLovedSection';
+  section.className = 'fk-section';
+  section.innerHTML = `
+    <div class="fk-section-head">
+      <h2>❤️ Most Loved by Customers</h2>
+      <a href="products.html?sort=rating">View All →</a>
+    </div>
+    <div class="horiz-product-strip" id="mostLovedStrip"></div>`;
+
+  // Insert right before the "Top Picks" featured-products section
+  const featuredSection = document.getElementById('featuredProducts')?.closest('.fk-section');
+  if (featuredSection?.parentElement) {
+    featuredSection.parentElement.insertBefore(section, featuredSection);
+  } else {
+    document.querySelector('.fk-main')?.appendChild(section);
+  }
+
+  renderProducts(scored, 'mostLovedStrip');
+  const strip = document.getElementById('mostLovedStrip');
+  if (strip) { strip.style.display = 'flex'; strip.style.overflowX = 'auto'; }
 }
 
 // ── SIZE GUIDE ────────────────────────────────
@@ -3568,8 +3605,8 @@ const SEEDED_REVIEWS = {
 
 function getProductReviews(pid) {
   const all = JSON.parse(localStorage.getItem(REVIEWS_KEY) || '{}');
-  const user = all[pid] || [];
-  const seeded = SEEDED_REVIEWS[pid] || [];
+  const user = (all[pid] || []).map(r => ({ ...r, _verified: false }));
+  const seeded = (SEEDED_REVIEWS[pid] || []).map(r => ({ ...r, _verified: true }));
   // User reviews appear first (most recent activity), seeded reviews follow
   return [...user, ...seeded];
 }
@@ -3593,13 +3630,19 @@ function renderLocalReviews(pid) {
     if (formWrap) section.insertBefore(listEl, formWrap);
   }
   if (!reviews.length) { listEl.innerHTML = ''; return; }
-  listEl.innerHTML = `<div class="rv-list-head">💬 Customer Reviews (${reviews.length})</div>` +
+  const avg = (reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviews.length).toFixed(1);
+  const dist = [5,4,3,2,1].map(star => reviews.filter(r => r.rating === star).length);
+  listEl.innerHTML = `
+    <div class="rv-list-head">💬 Customer Reviews (${reviews.length}) · Avg <strong style="color:#FF9F00;">★ ${avg}</strong></div>
+    ` +
     reviews.map(r => {
       const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
       const d = new Date(r.date).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+      const verifiedBadge = r._verified ? `<span class="rv-verified" title="Verified purchase">✓ Verified Buyer</span>` : '';
       return `<div class="rv-local-item">
         <div class="rv-local-header">
           <span class="rv-local-name">${r.name || 'Anonymous'}</span>
+          ${verifiedBadge}
           <span class="rv-local-stars" style="color:#FF9F00;">${stars}</span>
           <span class="rv-local-date">${d}</span>
         </div>
