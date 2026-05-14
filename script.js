@@ -4309,6 +4309,79 @@ function initDarkMode() {
 }
 
 // ── CART REMINDER BANNER (homepage) ──────────
+// ── EXIT-INTENT CART RECOVERY ────────────────
+// On desktop, if the cursor moves toward the top of the viewport while
+// there are items in the cart, show a one-time modal nudging the user
+// to either complete their order or save it. Mobile uses a 'back button'
+// equivalent — popstate after a sentinel pushState — so they get a
+// gentler pause instead of just leaving.
+function initExitIntent() {
+  if (sessionStorage.getItem('exitIntentShown')) return;
+
+  function showExitIntent() {
+    if (sessionStorage.getItem('exitIntentShown')) return;
+    if (!cart.length) return;
+    sessionStorage.setItem('exitIntentShown', '1');
+
+    const itemCount = cart.reduce((s, i) => s + i.quantity, 0);
+    const sub       = getSubtotal();
+    const minFree   = (CONFIG && CONFIG.minFreeDelivery) || 499;
+    const freeMsg   = sub >= minFree
+      ? `🎉 You've unlocked FREE delivery — your order is ready!`
+      : `Add ₹${(minFree - sub).toLocaleString('en-IN')} more to unlock <strong>FREE delivery</strong>.`;
+
+    const modal = document.createElement('div');
+    modal.className = 'exit-intent-backdrop';
+    modal.innerHTML = `
+      <div class="exit-intent-modal" role="dialog" aria-labelledby="eiTitle" aria-modal="true">
+        <button class="exit-intent-close" aria-label="Close">✕</button>
+        <div class="exit-intent-emoji">👋</div>
+        <h2 id="eiTitle">Wait! Don't leave yet…</h2>
+        <p>You have <strong>${itemCount} item${itemCount > 1 ? 's' : ''}</strong> worth <strong>₹${sub.toLocaleString('en-IN')}</strong> in your cart.</p>
+        <p class="ei-free">${freeMsg}</p>
+        <div class="ei-actions">
+          <a href="cart.html" class="ei-checkout">Complete Order →</a>
+          <button class="ei-stay" type="button">Keep Browsing</button>
+        </div>
+        <div class="ei-coupon">
+          💝 Tip: use code <strong>ELITE10</strong> at checkout to save 10% more.
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    requestAnimationFrame(() => modal.classList.add('show'));
+
+    const dismiss = () => {
+      modal.classList.remove('show');
+      setTimeout(() => modal.remove(), 240);
+    };
+    modal.querySelector('.exit-intent-close').addEventListener('click', dismiss);
+    modal.querySelector('.ei-stay').addEventListener('click', dismiss);
+    modal.addEventListener('click', e => { if (e.target === modal) dismiss(); });
+    document.addEventListener('keydown', function esc(e) {
+      if (e.key === 'Escape') { dismiss(); document.removeEventListener('keydown', esc); }
+    });
+  }
+
+  // Desktop: cursor leaves through the top
+  document.addEventListener('mouseout', e => {
+    if (!e.toElement && !e.relatedTarget && e.clientY < 10) showExitIntent();
+  });
+
+  // Mobile: sentinel pushState + popstate triggers the modal once
+  if ('ontouchstart' in window) {
+    setTimeout(() => {
+      if (!cart.length) return;
+      history.pushState({ _ee_exit: 1 }, '');
+      window.addEventListener('popstate', () => {
+        if (!sessionStorage.getItem('exitIntentShown')) {
+          history.pushState({ _ee_exit: 1 }, '');
+          showExitIntent();
+        }
+      });
+    }, 3000);
+  }
+}
+
 // ── FESTIVE AUTO-THEMING ─────────────────────
 // Applies a subtle banner + theme accent based on the current month/date.
 // Festivals included: Diwali (mid-Oct to mid-Nov), Ramadan/Eid (variable —
@@ -5296,6 +5369,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initWelcomeBack();
   initFirstVisitModal();
   initFestiveTheming();
+  initExitIntent();
   if (document.getElementById('productsGrid'))     initProductsPage();
   if (document.getElementById('cartItems')) {
     restoreCartFromUrl();

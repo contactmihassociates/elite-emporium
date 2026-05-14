@@ -5081,6 +5081,136 @@ html { scroll-padding-top: 80px; }
   border-radius: 6px;
 }
 
+/* ── Exit-intent cart-abandonment modal ──────── */
+.exit-intent-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 9600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.24s ease;
+}
+.exit-intent-backdrop.show { opacity: 1; }
+.exit-intent-modal {
+  background: var(--surface, #fff);
+  border-radius: 18px;
+  padding: 32px 28px 24px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+  transform: scale(0.92) translateY(20px);
+  transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+.exit-intent-backdrop.show .exit-intent-modal { transform: scale(1) translateY(0); }
+.exit-intent-close {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--text2, #6c757d);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+.exit-intent-close:hover { background: var(--bg, #f0f0f0); color: var(--text, #1a1a1a); }
+.exit-intent-emoji {
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: 10px;
+  animation: eiWave 1.4s ease-in-out infinite;
+  transform-origin: 70% 70%;
+}
+@keyframes eiWave {
+  0%, 100% { transform: rotate(0); }
+  20%      { transform: rotate(-15deg); }
+  40%      { transform: rotate(12deg); }
+  60%      { transform: rotate(-8deg); }
+  80%      { transform: rotate(5deg); }
+}
+.exit-intent-modal h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text, #1a1a1a);
+  margin-bottom: 8px;
+}
+.exit-intent-modal p {
+  font-size: 14px;
+  color: var(--text2, #6c757d);
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+.exit-intent-modal p strong { color: var(--text, #1a1a1a); }
+.ei-free {
+  background: rgba(40,116,240,0.10);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 10px 0 18px !important;
+  font-size: 13px !important;
+  color: #0d47a1 !important;
+}
+.ei-free strong { color: #0d47a1 !important; }
+[data-theme="dark"] .ei-free { background: rgba(40,116,240,0.18); color: #90caf9 !important; }
+[data-theme="dark"] .ei-free strong { color: #bbdefb !important; }
+.ei-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.ei-checkout {
+  flex: 2;
+  background: var(--red, #DB3022);
+  color: #fff;
+  padding: 12px;
+  border-radius: 22px;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  transition: transform 0.15s, box-shadow 0.18s;
+  font-size: 14px;
+}
+.ei-checkout:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(219,48,34,0.3);
+}
+.ei-stay {
+  flex: 1;
+  background: var(--bg, #f6f7fb);
+  color: var(--text, #1a1a1a);
+  border: 1.5px solid var(--border, #e0e0e0);
+  padding: 12px;
+  border-radius: 22px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  transition: background 0.15s;
+}
+.ei-stay:hover { background: var(--surface-2, #fff); }
+.ei-coupon {
+  font-size: 12px;
+  background: rgba(255,152,0,0.10);
+  border: 1px dashed #ff9800;
+  border-radius: 10px;
+  padding: 9px 12px;
+  color: #bf360c;
+}
+.ei-coupon strong {
+  font-family: 'SF Mono', monospace;
+  background: rgba(255,255,255,0.6);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+[data-theme="dark"] .ei-coupon { background: rgba(255,152,0,0.12); color: #ffb74d; }
+[data-theme="dark"] .ei-coupon strong { background: rgba(255,255,255,0.08); }
+
 /* ── Festive auto-theming banner ──────────────── */
 .festive-banner {
   position: relative;
