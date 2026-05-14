@@ -325,6 +325,15 @@ This is **fully frontend** — no backend needed. The merchant reconciles by mat
 
 1. Read `git log --oneline -20` to see what just landed.
 2. `git status` to see any uncommitted work in flight.
-3. Skim this README for context, then jump into `script.js` and `styles.css` based on the task.
-4. If the request is open-ended ("keep improvising"), pick something user-visible from the long backlog: better empty states, micro-animations, accessibility audit, lighthouse score, new sections, fresh testimonials, partner brand parity, payment integration scaffolding.
-5. Always finish with `node --check script.js` before declaring done.
+3. Skim `CHANGELOG.md` for a thematic summary of every wave that's been shipped.
+4. Then jump into `script.js` and `styles.css` based on the task.
+5. If the request is open-ended ("keep improvising"), most of the obvious wins are already shipped (admin v2, Razorpay scaffolding, SEO, a11y, conversion-juice, festive theming, side-cart drawer, seeded reviews, exit-intent, etc.). Good remaining angles to consider:
+   - **Cart drawer enhancements** — savings line ("you'd save ₹X vs MRP"), recommended add-on under min-free-delivery threshold.
+   - **Product detail "Compare" inline panel** — currently compare opens a modal; could be a slide-out.
+   - **Loyalty / referral** — needs at least Firestore-backed tracking; scaffold the UI even without backend.
+   - **Festival-themed product collections** — auto-surface seasonal categories above the fold during the festival window.
+   - **Genuine Razorpay embedded checkout** — adds ~30 lines of Vercel serverless to create order IDs server-side.
+   - **Image-CDN-backed responsive `srcset`** — Cloudinary already supports `f_auto,q_auto,w_400` transformations.
+   - **WhatsApp Business API templates** — formalise the order message format so it's parseable by a future bot.
+6. **Always** finish with `node --check script.js` before declaring done — the file is large and easy to break silently.
+7. **Always** push every coherent batch immediately (`git push origin master`) — Vercel auto-deploys, and the user prefers to see changes live within minutes.
