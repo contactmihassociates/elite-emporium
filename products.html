@@ -1,13 +1,19 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>All Products – Elite Emporium</title>
-  <meta name="description" content="Browse all products at Elite Emporium – Electronics, Clothing, Home & Kitchen, Footwear, Bags and Toys." />
+  <meta name="description" content="Browse all products at Elite Emporium – Bags, Watches, Fashion, Abaiya, Sarees, Kitchen & more. Order via WhatsApp." />
+  <meta property="og:title" content="All Products – Elite Emporium" />
+  <meta property="og:description" content="Browse Bags, Watches, Fashion, Abaiya, Sarees & more. Free delivery above ₹499." />
+  <meta property="og:image" content="images/logo.png" />
+  <meta property="og:type" content="website" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#DB3022" />
 </head>
-<body>
+<body><div id="scrollProgress"></div>
 
 <!-- ── HEADER ─────────────────────────────── -->
 <header>
@@ -27,16 +33,44 @@
   </div>
   <nav>
     <a href="index.html">🏠 Home</a>
-    <a href="products.html" class="active">🛍️ All Products</a>
-    <a href="products.html?category=Electronics">📱 Electronics</a>
-    <a href="products.html?category=Clothing">👗 Clothing</a>
-    <a href="products.html?category=Home & Kitchen">🏠 Home & Kitchen</a>
-    <a href="products.html?category=Footwear">👟 Footwear</a>
+    <a href="products.html" class="active">⭐ All</a>
+    <a href="products.html?category=Clothing">👗 Fashion</a>
+    <a href="products.html?category=Abaiya">🕌 Abaiya</a>
+    <a href="products.html?category=Hijab">🧕 Hijab</a>
+    <a href="products.html?category=Sarees">👘 Sarees</a>
+    <a href="products.html?category=Kurta Sets">🥻 Kurtas</a>
+    <a href="products.html?category=Mens Dress">👔 Mens</a>
+    <a href="products.html?category=Kids Wear">👶 Kids</a>
     <a href="products.html?category=Bags">👜 Bags</a>
-    <a href="products.html?category=Toys & Games">🎮 Toys & Games</a>
-    <a href="index.html#about">ℹ️ About Us</a>
+    <a href="products.html?category=Watches">⌚ Watches</a>
+    <a href="products.html?category=Coolers">🕶️ Sunglasses</a>
+    <a href="products.html?category=Wallets">👛 Wallets</a>
+    <a href="products.html?category=Perfumes">🧴 Perfumes</a>
+    <a href="products.html?category=Cosmetics">💄 Cosmetics</a>
+    <a href="products.html?category=Hair Care">💆 Hair</a>
+    <a href="products.html?category=Home & Kitchen">🍳 Kitchen</a>
+    <a href="products.html?category=Sports">🏃 Sports</a>
+    <a href="products.html?category=Footwear">👟 Footwear</a>
+    <a href="products.html?category=Toys & Games">🎮 Toys</a>
+    <a href="hanii-dhanii.html">💎 Jewellery</a>
   </nav>
 </header>
+
+<!-- ── ANNOUNCEMENT TICKER ───────────────── -->
+<div class="announcement-bar">
+  <div class="announcement-track">
+    <span class="announcement-item">🚚 <span>Free Delivery</span> on orders above ₹499</span>
+    <span class="announcement-item">✅ GST Invoice Available &nbsp;|&nbsp; GST: <span>33DWGPN3169G1ZF</span></span>
+    <span class="announcement-item">💬 WhatsApp Orders: <span>+91 7358650774</span></span>
+    <span class="announcement-item">🏭 Udyam Certified Micro Enterprise</span>
+    <span class="announcement-item">👑 Premium Quality Products at Honest Prices</span>
+    <span class="announcement-item">🚚 <span>Free Delivery</span> on orders above ₹499</span>
+    <span class="announcement-item">✅ GST Invoice Available &nbsp;|&nbsp; GST: <span>33DWGPN3169G1ZF</span></span>
+    <span class="announcement-item">💬 WhatsApp Orders: <span>+91 7358650774</span></span>
+    <span class="announcement-item">🏭 Udyam Certified Micro Enterprise</span>
+    <span class="announcement-item">👑 Premium Quality Products at Honest Prices</span>
+  </div>
+</div>
 
 <!-- ── PAGE HEADER ────────────────────────── -->
 <div class="page-header">
@@ -47,9 +81,21 @@
 <!-- ── PRODUCTS LAYOUT ────────────────────── -->
 <div class="products-layout">
 
+  <!-- Mobile filter overlay -->
+  <div class="filter-sheet-overlay" id="filterSheetOverlay" onclick="toggleFilters()"></div>
+
   <!-- Sidebar Filters -->
   <aside class="filters-sidebar">
-    <div class="filter-title">🔧 Filters</div>
+    <div class="filter-sheet-handle"><div class="filter-sheet-handle-bar"></div></div>
+    <div class="filter-sheet-header">
+      <span class="filter-sheet-title">🔧 Filters</span>
+      <button class="filter-sheet-done" onclick="toggleFilters()">Done</button>
+      <button class="filter-sheet-close" onclick="clearAllFilters()" title="Clear all">⟳</button>
+    </div>
+    <div class="filter-title" style="display:flex;align-items:center;justify-content:space-between;">
+      <span>🔧 Filters</span>
+      <button onclick="clearAllFilters()" style="background:transparent;border:none;color:rgba(255,255,255,0.75);font-size:11px;cursor:pointer;font-family:'Poppins',sans-serif;text-decoration:underline;padding:0;">Clear All</button>
+    </div>
 
     <div class="filter-group">
       <div class="search-bar">
@@ -112,16 +158,87 @@
         <input type="radio" name="category" id="catCosmetics" value="Cosmetics" />
         <label for="catCosmetics">💄 Cosmetics</label>
       </div>
+      <div class="filter-option">
+        <input type="radio" name="category" id="catAbaiya" value="Abaiya" />
+        <label for="catAbaiya">🕌 Abaiya</label>
+      </div>
+      <div class="filter-option">
+        <input type="radio" name="category" id="catHijab" value="Hijab" />
+        <label for="catHijab">🧕 Hijab</label>
+      </div>
+      <div class="filter-option">
+        <input type="radio" name="category" id="catMensDress" value="Mens Dress" />
+        <label for="catMensDress">👔 Mens Dress</label>
+      </div>
+      <div class="filter-option">
+        <input type="radio" name="category" id="catSarees" value="Sarees" />
+        <label for="catSarees">👘 Sarees</label>
+      </div>
+      <div class="filter-option">
+        <input type="radio" name="category" id="catKurta" value="Kurta Sets" />
+        <label for="catKurta">🥻 Kurta Sets</label>
+      </div>
+      <div class="filter-option">
+        <input type="radio" name="category" id="catKids" value="Kids Wear" />
+        <label for="catKids">👶 Kids Wear</label>
+      </div>
+      <div class="filter-option">
+        <input type="radio" name="category" id="catPerfumes" value="Perfumes" />
+        <label for="catPerfumes">🧴 Perfumes</label>
+      </div>
+      <div class="filter-option">
+        <input type="radio" name="category" id="catHair" value="Hair Care" />
+        <label for="catHair">💆 Hair Care</label>
+      </div>
+      <div class="filter-option">
+        <input type="radio" name="category" id="catSports" value="Sports" />
+        <label for="catSports">🏃 Sports &amp; Fitness</label>
+      </div>
+      <div class="filter-option">
+        <input type="radio" name="category" id="catBelts" value="Belts" />
+        <label for="catBelts">🔗 Belts</label>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <h4>Price Range</h4>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+        <input type="number" id="priceMin" class="price-range-input" placeholder="Min ₹" min="0" />
+        <span style="color:var(--text-light);flex-shrink:0;">–</span>
+        <input type="number" id="priceMax" class="price-range-input" placeholder="Max ₹" min="0" />
+      </div>
+      <button class="price-range-btn" onclick="applyPriceFilter()">Apply</button>
+      <button class="price-range-clear" onclick="clearPriceFilter()">Clear</button>
+    </div>
+
+    <div class="filter-group">
+      <label class="instock-toggle-label">
+        <input type="checkbox" id="inStockOnly" />
+        <span class="instock-toggle-track"><span class="instock-toggle-thumb"></span></span>
+        <span>In Stock Only</span>
+      </label>
+    </div>
+
+    <div class="filter-group">
+      <h4>Min Rating</h4>
+      <div class="rating-filter-options">
+        <label class="rating-filter-opt"><input type="radio" name="ratingFilter" value="0" checked /> All Ratings</label>
+        <label class="rating-filter-opt"><input type="radio" name="ratingFilter" value="4.5" /> ★ 4.5 & above</label>
+        <label class="rating-filter-opt"><input type="radio" name="ratingFilter" value="4" /> ★ 4.0 & above</label>
+        <label class="rating-filter-opt"><input type="radio" name="ratingFilter" value="3.5" /> ★ 3.5 & above</label>
+      </div>
     </div>
 
     <div class="filter-group">
       <h4>Sort By</h4>
       <select id="sortSelect" class="form-select" style="width:100%;">
         <option value="default">Default</option>
+        <option value="new">🆕 New Arrivals</option>
         <option value="price-asc">Price: Low to High</option>
         <option value="price-desc">Price: High to Low</option>
         <option value="rating">Top Rated</option>
         <option value="popular">Most Popular</option>
+        <option value="discount">💸 Best Discount</option>
       </select>
     </div>
 
@@ -140,13 +257,31 @@
   <main>
     <div class="products-header">
       <span id="productsCount" class="products-count">Loading products…</span>
+      <div style="display:flex;gap:6px;align-items:center;margin-left:auto;">
+        <button class="view-toggle-btn active" id="viewGrid" onclick="setViewMode('grid',this)" title="Grid view">⊞</button>
+        <button class="view-toggle-btn" id="viewList" onclick="setViewMode('list',this)" title="List view">≡</button>
+      </div>
+      <button class="filter-toggle-btn" id="filterToggleBtn" onclick="toggleFilters()">🔧 Filters</button>
       <select id="sortSelectMobile" class="sort-select" style="display:none;">
         <option value="default">Sort: Default</option>
+        <option value="new">🆕 New Arrivals</option>
         <option value="price-asc">Price: Low → High</option>
         <option value="price-desc">Price: High → Low</option>
         <option value="rating">Top Rated</option>
         <option value="popular">Most Popular</option>
+        <option value="discount">💸 Best Discount</option>
       </select>
+    </div>
+    <div id="categoryBanner" class="cat-banner" style="display:none;"></div>
+    <div id="activeFiltersBar" class="active-filters-bar"></div>
+    <div class="sort-chips-row" id="sortChipsRow">
+      <button class="sort-chip active" data-sort="default" onclick="applySortChip('default',this)">⭐ Default</button>
+      <button class="sort-chip" data-sort="new" onclick="applySortChip('new',this)">🆕 New</button>
+      <button class="sort-chip" data-sort="price-asc" onclick="applySortChip('price-asc',this)">₹ Low→High</button>
+      <button class="sort-chip" data-sort="price-desc" onclick="applySortChip('price-desc',this)">₹ High→Low</button>
+      <button class="sort-chip" data-sort="rating" onclick="applySortChip('rating',this)">★ Top Rated</button>
+      <button class="sort-chip" data-sort="popular" onclick="applySortChip('popular',this)">🔥 Popular</button>
+      <button class="sort-chip" data-sort="discount" onclick="applySortChip('discount',this)">💸 Discount</button>
     </div>
     <div class="products-grid" id="productsGrid">
       <!-- Populated by script.js -->
@@ -154,12 +289,25 @@
   </main>
 </div>
 
+<section class="newsletter-strip">
+  <div class="newsletter-inner">
+    <div class="newsletter-text">
+      <strong>📬 Get Exclusive Deals!</strong>
+      <span>Save up to 15% with coupon codes. Use <b>ELITE10</b> for 10% off your order.</span>
+    </div>
+    <form class="newsletter-form" onsubmit="handleNewsletter(event)">
+      <input type="email" placeholder="Enter your email" class="newsletter-input" required />
+      <button type="submit" class="newsletter-btn">Subscribe</button>
+    </form>
+  </div>
+</section>
+
 <!-- ── FOOTER ─────────────────────────────── -->
 <footer>
   <div class="footer-grid">
     <div class="footer-brand">
       <div class="logo" style="margin-bottom:10px;">
-        <div class="logo-text"><h1>👑 Elite Emporium</h1><span>Explore Plus</span></div>
+        <img src="images/logo.png" class="logo-img" alt="Elite Emporium" />
       </div>
       <p>Your trusted local online store for quality products. GST registered &amp; Udyam certified micro enterprise.</p>
       <div class="gst-box">🏛️ GST: 33DWGPN3169G1ZF<br />🏭 Udyam: UDYAM-TN-26-0090343</div>
@@ -170,6 +318,8 @@
         <li><a href="index.html">🏠 Home</a></li>
         <li><a href="products.html">🛍️ All Products</a></li>
         <li><a href="cart.html">🛒 My Cart</a></li>
+        <li><a href="wishlist.html">❤️ Wishlist</a></li>
+        <li><a href="orders.html">📦 My Orders</a></li>
         <li><a href="index.html#about">ℹ️ About Us</a></li>
       </ul>
     </div>
@@ -189,7 +339,7 @@
       <div class="contact-item"><span class="contact-icon">📍</span><span>183b, Sadukai Street, Kayalpattinam – 628204</span></div>
       <div class="contact-item"><span class="contact-icon">📞</span><span>+91 8072173467</span></div>
       <div class="contact-item"><span class="contact-icon">💬</span><span>+91 7358650774 (WhatsApp)</span></div>
-      <div class="contact-item"><span class="contact-icon">📧</span><span>smnabu36@gmail.com</span></div>
+      <div class="contact-item"><span class="contact-icon">📧</span><span>eliteemporium112024@gmail.com</span></div>
     </div>
   </div>
   <div class="footer-bottom">
@@ -207,9 +357,10 @@
     <span class="bottom-nav-icon">🛍️</span>
     <span class="bottom-nav-label">Products</span>
   </a>
-  <a href="products.html" class="bottom-nav-item">
-    <span class="bottom-nav-icon">📦</span>
-    <span class="bottom-nav-label">Categories</span>
+  <a href="wishlist.html" class="bottom-nav-item">
+    <span class="bottom-nav-icon">❤️</span>
+    <span class="bottom-nav-label">Wishlist</span>
+    <span class="bottom-nav-badge wishlist-count">0</span>
   </a>
   <a href="index.html#about" class="bottom-nav-item">
     <span class="bottom-nav-icon">ℹ️</span>
@@ -222,7 +373,28 @@
   </a>
 </nav>
 
+<!-- Quick View Modal -->
+<div class="qv-backdrop" id="qvBackdrop" onclick="closeQuickView(event)">
+  <div class="qv-modal" id="qvModal">
+    <button class="qv-close" onclick="closeQuickView()">✕</button>
+    <div class="qv-img"><img id="qvImg" src="" alt="" /></div>
+    <div class="qv-body">
+      <div class="qv-category" id="qvCategory"></div>
+      <div class="qv-name" id="qvName"></div>
+      <div class="qv-rating" id="qvRating"></div>
+      <div class="qv-price" id="qvPrice"></div>
+      <div class="qv-mrp" id="qvMrp"></div>
+      <div class="qv-desc" id="qvDesc"></div>
+      <div class="qv-actions">
+        <button class="add-to-cart" id="qvAddBtn">🛒 Add to Cart</button>
+        <a class="qv-view-link" id="qvViewLink" href="#">View Full Details →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <a href="https://wa.me/917358650774" class="whatsapp-float" target="_blank" rel="noopener" title="Chat on WhatsApp">💬</a>
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -230,3 +402,4 @@
 <script src="script.js"></script>
 </body>
 </html>
+

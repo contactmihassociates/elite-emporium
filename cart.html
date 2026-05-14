@@ -1,13 +1,19 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cart & Checkout – Elite Emporium</title>
   <meta name="description" content="Review your cart and place your order via WhatsApp at Elite Emporium." />
+  <meta property="og:title" content="My Cart – Elite Emporium" />
+  <meta property="og:description" content="Review items and order via WhatsApp. Free delivery above ₹499." />
+  <meta property="og:image" content="images/logo.png" />
+  <meta property="og:type" content="website" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#DB3022" />
 </head>
-<body>
+<body><div id="scrollProgress"></div>
 
 <!-- ── HEADER ─────────────────────────────── -->
 <header>
@@ -27,16 +33,43 @@
   </div>
   <nav>
     <a href="index.html">🏠 Home</a>
-    <a href="products.html">🛍️ All Products</a>
-    <a href="products.html?category=Electronics">📱 Electronics</a>
-    <a href="products.html?category=Clothing">👗 Clothing</a>
-    <a href="products.html?category=Home & Kitchen">🏠 Home & Kitchen</a>
-    <a href="products.html?category=Footwear">👟 Footwear</a>
+    <a href="products.html">⭐ All</a>
+    <a href="products.html?category=Clothing">👗 Fashion</a>
+    <a href="products.html?category=Abaiya">🕌 Abaiya</a>
+    <a href="products.html?category=Hijab">🧕 Hijab</a>
+    <a href="products.html?category=Sarees">👘 Sarees</a>
+    <a href="products.html?category=Kurta Sets">🥻 Kurtas</a>
+    <a href="products.html?category=Mens Dress">👔 Mens</a>
+    <a href="products.html?category=Kids Wear">👶 Kids</a>
     <a href="products.html?category=Bags">👜 Bags</a>
-    <a href="products.html?category=Toys & Games">🎮 Toys & Games</a>
-    <a href="index.html#about">ℹ️ About Us</a>
+    <a href="products.html?category=Watches">⌚ Watches</a>
+    <a href="products.html?category=Coolers">🕶️ Sunglasses</a>
+    <a href="products.html?category=Wallets">👛 Wallets</a>
+    <a href="products.html?category=Perfumes">🧴 Perfumes</a>
+    <a href="products.html?category=Cosmetics">💄 Cosmetics</a>
+    <a href="products.html?category=Hair Care">💆 Hair</a>
+    <a href="products.html?category=Home & Kitchen">🍳 Kitchen</a>
+    <a href="products.html?category=Sports">🏃 Sports</a>
+    <a href="products.html?category=Footwear">👟 Footwear</a>
+    <a href="hanii-dhanii.html">💎 Jewellery</a>
   </nav>
 </header>
+
+<!-- ── ANNOUNCEMENT TICKER ───────────────── -->
+<div class="announcement-bar">
+  <div class="announcement-track">
+    <span class="announcement-item">🚚 <span>Free Delivery</span> on orders above ₹499</span>
+    <span class="announcement-item">✅ GST Invoice Available &nbsp;|&nbsp; GST: <span>33DWGPN3169G1ZF</span></span>
+    <span class="announcement-item">💬 WhatsApp Orders: <span>+91 7358650774</span></span>
+    <span class="announcement-item">🏭 Udyam Certified Micro Enterprise</span>
+    <span class="announcement-item">👑 Premium Quality Products at Honest Prices</span>
+    <span class="announcement-item">🚚 <span>Free Delivery</span> on orders above ₹499</span>
+    <span class="announcement-item">✅ GST Invoice Available &nbsp;|&nbsp; GST: <span>33DWGPN3169G1ZF</span></span>
+    <span class="announcement-item">💬 WhatsApp Orders: <span>+91 7358650774</span></span>
+    <span class="announcement-item">🏭 Udyam Certified Micro Enterprise</span>
+    <span class="announcement-item">👑 Premium Quality Products at Honest Prices</span>
+  </div>
+</div>
 
 <!-- ── PAGE HEADER ────────────────────────── -->
 <div class="page-header">
@@ -47,14 +80,14 @@
 <!-- ── HOW IT WORKS ───────────────────────── -->
 <div style="background:white;padding:14px 5%;border-bottom:1px solid #E0E0E0;">
   <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;text-align:center;font-size:13px;color:#878787;">
-    <span style="background:#2874F0;color:white;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;">1</span>
-    <span style="font-weight:600;color:#2874F0;">Add to Cart</span>
+    <span style="background:#DB3022;color:white;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;">1</span>
+    <span style="font-weight:600;color:#DB3022;">Add to Cart</span>
     <span style="color:#ddd;font-size:18px;">→</span>
-    <span style="background:#2874F0;color:white;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;">2</span>
-    <span style="font-weight:600;color:#2874F0;">Fill Delivery Details</span>
+    <span style="background:#DB3022;color:white;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;">2</span>
+    <span style="font-weight:600;color:#DB3022;">Fill Delivery Details</span>
     <span style="color:#ddd;font-size:18px;">→</span>
-    <span style="background:#2874F0;color:white;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;">3</span>
-    <span style="font-weight:600;color:#2874F0;">Place Order via WhatsApp</span>
+    <span style="background:#DB3022;color:white;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;">3</span>
+    <span style="font-weight:600;color:#DB3022;">Place Order via WhatsApp</span>
     <span style="color:#ddd;font-size:18px;">→</span>
     <span style="background:#25D366;color:white;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;">4</span>
     <span style="font-weight:600;color:#25D366;">Order Confirmed! 🎉</span>
@@ -67,12 +100,20 @@
   <!-- Left: Cart Items + Form -->
   <div>
     <div class="cart-items-section">
-      <div class="section-title">🛒 Your Cart Items</div>
+      <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>🛒 Your Cart Items</span>
+        <button onclick="clearCart()" style="font-size:12px;color:var(--text-light);background:none;border:1.5px solid var(--border);padding:4px 10px;border-radius:4px;cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.2s;" onmouseover="this.style.color='var(--red)';this.style.borderColor='var(--red)'" onmouseout="this.style.color='var(--text-light)';this.style.borderColor='var(--border)'">🗑️ Clear All</button>
+      </div>
       <div id="cartItems"><!-- Populated by script.js --></div>
     </div>
 
     <div class="checkout-form" id="checkoutFormSection" style="margin-top:16px;">
       <div class="section-title">📝 Delivery Details</div>
+      <!-- Prefill hint (shown only when order history found) -->
+      <div id="prefillHint" class="prefill-hint" style="display:none;">
+        <span>✅ Details filled from your last order.</span>
+        <button onclick="document.querySelectorAll('.form-input').forEach(el=>el.value='');document.getElementById('prefillHint').style.display='none';" class="prefill-clear">Clear</button>
+      </div>
       <div class="form-body">
         <div class="form-row">
           <div class="form-group">
@@ -134,6 +175,9 @@
           <span style="font-size:22px;">💬</span>
           Place Order via WhatsApp
         </button>
+        <button onclick="printReceipt()" style="display:block;width:100%;margin-top:8px;padding:10px;background:transparent;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:600;color:var(--text-mid);cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-mid)'">
+          🖨️ Print / Save Receipt
+        </button>
         <div class="order-note">
           ✅ Clicking the button will open WhatsApp with your complete order details.<br />
           Simply <strong>send the message</strong> to confirm your order with Elite Emporium.
@@ -144,6 +188,13 @@
 
   <!-- Right: Order Summary + Business Card -->
   <div>
+    <!-- Free Delivery Progress -->
+    <div id="freeDeliveryBar" class="fd-bar" style="display:none;">
+      <div id="freeDeliveryMsg" class="fd-msg">Add more to get FREE delivery 🚚</div>
+      <div class="fd-track">
+        <div id="freeDeliveryFill" class="fd-fill"></div>
+      </div>
+    </div>
     <div class="order-summary">
       <div class="section-title">📊 Order Summary</div>
       <div class="summary-body">
@@ -156,15 +207,79 @@
         <div class="summary-row" id="deliveryRow">
           <span>Delivery</span><strong id="summaryDelivery">—</strong>
         </div>
+        <!-- Coupon -->
+        <div id="couponSection" style="margin:10px 0 2px;">
+          <div class="available-coupons-row">
+            <span class="avail-coupon-label">🎟️ Tap a coupon to apply:</span>
+            <div class="avail-coupon-chips">
+              <button class="avail-coupon-chip" onclick="fillCoupon('ELITE10')">ELITE10 <span>10% off</span></button>
+              <button class="avail-coupon-chip" onclick="fillCoupon('FLAT50')">FLAT50 <span>₹50 off</span></button>
+              <button class="avail-coupon-chip" onclick="fillCoupon('SUMMER15')">SUMMER15 <span>15% off</span></button>
+            </div>
+          </div>
+          <div id="couponApplied" style="display:none;background:#E8F5E9;border:1px solid #C8E6C9;border-radius:4px;padding:8px 12px;font-size:12px;color:#388E3C;display:none;align-items:center;justify-content:space-between;gap:8px;">
+            <span id="couponAppliedText">🎟️ Coupon applied!</span>
+            <button onclick="removeCoupon()" style="background:transparent;border:none;color:#c62828;cursor:pointer;font-size:13px;font-weight:700;padding:0;">✕</button>
+          </div>
+          <div id="couponInput" style="display:flex;gap:6px;">
+            <input id="couponCode" type="text" placeholder="Enter coupon code" style="flex:1;padding:8px 10px;border:1.5px solid #E0E0E0;border-radius:4px;font-size:12px;font-family:'Poppins',sans-serif;outline:none;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()" />
+            <button onclick="applyCoupon()" style="background:#DB3022;color:white;border:none;padding:8px 14px;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;white-space:nowrap;">Apply</button>
+          </div>
+        </div>
+        <div class="summary-row" id="discountRow" style="display:none;">
+          <span>Discount</span><strong id="summaryDiscount" style="color:#388E3C;">–₹0</strong>
+        </div>
         <div class="summary-row total">
           <span>Total</span><span id="summaryTotal">₹0</span>
         </div>
-        <div style="background:#E8F5E9;border:1px solid #C8E6C9;border-radius:4px;padding:10px;margin-top:14px;font-size:12px;color:#388E3C;text-align:center;">
+        <div id="summarySavings" style="display:none;background:linear-gradient(135deg,#E8F5E9,#C8E6C9);border:1px solid #A5D6A7;border-radius:4px;padding:10px;margin-top:10px;font-size:12px;color:#2E7D32;text-align:center;font-weight:600;"></div>
+        <div style="background:#E8F5E9;border:1px solid #C8E6C9;border-radius:4px;padding:10px;margin-top:8px;font-size:12px;color:#388E3C;text-align:center;">
           🚚 <strong>Free Delivery</strong> on orders above ₹499!
         </div>
-        <a href="products.html" style="display:block;text-align:center;margin-top:14px;font-size:13px;color:#2874F0;font-weight:600;">
+        <div id="deliveryEstimate" style="background:#e3f2fd;border:1px solid #90caf9;border-radius:4px;padding:10px;margin-top:8px;font-size:12px;color:#1565c0;text-align:center;display:none;">
+          📅 <strong>Estimated Delivery:</strong> <span id="deliveryEta"></span>
+        </div>
+        <a href="products.html" style="display:block;text-align:center;margin-top:14px;font-size:13px;color:#DB3022;font-weight:600;">
           ← Continue Shopping
         </a>
+        <a href="#" onclick="shareCart(event)" style="display:block;text-align:center;margin-top:8px;font-size:13px;color:#25D366;font-weight:600;text-decoration:none;">
+          💬 Share Cart via WhatsApp
+        </a>
+      </div>
+    </div>
+
+    <!-- Trust Badges -->
+    <div class="cart-trust-badges">
+      <div class="trust-badge-item">🔒<span>Secure Checkout</span></div>
+      <div class="trust-badge-item">🧾<span>GST Invoice</span></div>
+      <div class="trust-badge-item">💬<span>WhatsApp Support</span></div>
+      <div class="trust-badge-item">🔄<span>7-Day Returns</span></div>
+    </div>
+
+    <!-- Available Coupons -->
+    <div style="background:white;border-radius:4px;border:1px solid #E0E0E0;overflow:hidden;margin-top:16px;">
+      <div class="section-title">🎟️ Available Coupons</div>
+      <div style="padding:12px;display:flex;flex-direction:column;gap:8px;">
+        <div class="coupon-card" onclick="fillCoupon('ELITE10')">
+          <div class="coupon-code">ELITE10</div>
+          <div class="coupon-desc">10% off on your entire order</div>
+          <button class="coupon-apply-btn">Tap to Apply</button>
+        </div>
+        <div class="coupon-card" onclick="fillCoupon('FLAT50')">
+          <div class="coupon-code">FLAT50</div>
+          <div class="coupon-desc">Flat ₹50 off — no minimum</div>
+          <button class="coupon-apply-btn">Tap to Apply</button>
+        </div>
+        <div class="coupon-card" onclick="fillCoupon('SUMMER15')">
+          <div class="coupon-code">SUMMER15</div>
+          <div class="coupon-desc">15% off — Summer special!</div>
+          <button class="coupon-apply-btn">Tap to Apply</button>
+        </div>
+        <div class="coupon-card" onclick="fillCoupon('WELCOME')">
+          <div class="coupon-code">WELCOME</div>
+          <div class="coupon-desc">5% off for new customers</div>
+          <button class="coupon-apply-btn">Tap to Apply</button>
+        </div>
       </div>
     </div>
 
@@ -173,7 +288,7 @@
       <div class="section-title">🏪 Order From</div>
       <div style="padding:18px;">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:13px;">
-          <div style="width:44px;height:44px;background:#2874F0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">👑</div>
+          <div style="width:44px;height:44px;background:#DB3022;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">👑</div>
           <div>
             <div style="font-weight:700;color:#212121;font-size:15px;">Elite Emporium</div>
             <div style="font-size:11px;color:#878787;">GST Registered Business</div>
@@ -183,9 +298,9 @@
           📍 183b, Sadukai Street, Kayalpattinam<br />
           📞 +91 8072173467<br />
           💬 WhatsApp: +91 7358650774<br />
-          📧 smnabu36@gmail.com
+          📧 eliteemporium112024@gmail.com
         </div>
-        <div style="margin-top:10px;background:#EEF3FE;border-radius:4px;padding:9px;font-size:11px;color:#1a5dcb;">
+        <div style="margin-top:10px;background:#FFEBEE;border-radius:4px;padding:9px;font-size:11px;color:#B71C1C;">
           🏛️ GST: 33DWGPN3169G1ZF<br />
           🏭 Udyam: UDYAM-TN-26-0090343
         </div>
@@ -198,12 +313,36 @@
   </div>
 </div>
 
+<!-- ── CART UPSELL ─────────────────────────── -->
+<section class="cart-upsell-section" id="cartUpsellSection" style="display:none;">
+  <div style="padding:20px 4% 0;">
+    <div class="section-header">
+      <h2 class="section-title">💡 You Might Also Like</h2>
+      <a href="products.html" class="see-all">Browse All →</a>
+    </div>
+    <div class="horiz-product-strip" id="cartUpsellStrip"></div>
+  </div>
+</section>
+
+<section class="newsletter-strip">
+  <div class="newsletter-inner">
+    <div class="newsletter-text">
+      <strong>📬 Get Exclusive Deals!</strong>
+      <span>Save up to 15% with coupon codes. Use <b>ELITE10</b> for 10% off your order.</span>
+    </div>
+    <form class="newsletter-form" onsubmit="handleNewsletter(event)">
+      <input type="email" placeholder="Enter your email" class="newsletter-input" required />
+      <button type="submit" class="newsletter-btn">Subscribe</button>
+    </form>
+  </div>
+</section>
+
 <!-- ── FOOTER ─────────────────────────────── -->
 <footer>
   <div class="footer-grid">
     <div class="footer-brand">
       <div class="logo" style="margin-bottom:10px;">
-        <div class="logo-text"><h1>👑 Elite Emporium</h1><span>Explore Plus</span></div>
+        <img src="images/logo.png" class="logo-img" alt="Elite Emporium" />
       </div>
       <p>Your trusted local online store. GST registered &amp; Udyam certified micro enterprise serving Kayalpattinam and beyond.</p>
       <div class="gst-box">🏛️ GST: 33DWGPN3169G1ZF<br />🏭 Udyam: UDYAM-TN-26-0090343</div>
@@ -214,6 +353,8 @@
         <li><a href="index.html">🏠 Home</a></li>
         <li><a href="products.html">🛍️ All Products</a></li>
         <li><a href="cart.html">🛒 My Cart</a></li>
+        <li><a href="wishlist.html">❤️ Wishlist</a></li>
+        <li><a href="orders.html">📦 My Orders</a></li>
         <li><a href="index.html#about">ℹ️ About Us</a></li>
       </ul>
     </div>
@@ -233,14 +374,31 @@
       <div class="contact-item"><span class="contact-icon">📍</span><span>183b, Sadukai Street, Kayalpattinam – 628204</span></div>
       <div class="contact-item"><span class="contact-icon">📞</span><span>+91 8072173467</span></div>
       <div class="contact-item"><span class="contact-icon">💬</span><span>+91 7358650774 (WhatsApp Orders)</span></div>
-      <div class="contact-item"><span class="contact-icon">📧</span><span>smnabu36@gmail.com</span></div>
+      <div class="contact-item"><span class="contact-icon">📧</span><span>eliteemporium112024@gmail.com</span></div>
     </div>
+  </div>
+  <div class="footer-social">
+    <span>Connect with us:</span>
+    <a href="https://wa.me/917358650774" target="_blank" rel="noopener" class="social-link whatsapp-s">💬 WhatsApp</a>
+    <a href="mailto:eliteemporium112024@gmail.com" class="social-link email-s">📧 Email</a>
+    <a href="tel:+918072173467" class="social-link phone-s">📞 Call Us</a>
   </div>
   <div class="footer-bottom">
     <span>© 2026 Elite Emporium. All rights reserved. | GST: 33DWGPN3169G1ZF</span>
     <span>Made with ❤️ in Kayalpattinam, Tamil Nadu</span>
   </div>
 </footer>
+
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+
+<!-- Mobile sticky place-order bar -->
+<div class="cart-mobile-bar" id="cartMobileBar">
+  <div class="cart-mobile-bar-info">
+    <span id="cartBarItems">0 items</span>
+    <strong id="cartBarTotal">₹0</strong>
+  </div>
+  <button class="cart-mobile-bar-btn" onclick="document.querySelector('.whatsapp-order-btn')?.scrollIntoView({behavior:'smooth',block:'center'})">Proceed →</button>
+</div>
 
 <nav class="bottom-nav">
   <a href="index.html" class="bottom-nav-item">
@@ -251,9 +409,10 @@
     <span class="bottom-nav-icon">🛍️</span>
     <span class="bottom-nav-label">Products</span>
   </a>
-  <a href="products.html" class="bottom-nav-item">
-    <span class="bottom-nav-icon">📦</span>
-    <span class="bottom-nav-label">Categories</span>
+  <a href="wishlist.html" class="bottom-nav-item">
+    <span class="bottom-nav-icon">❤️</span>
+    <span class="bottom-nav-label">Wishlist</span>
+    <span class="bottom-nav-badge wishlist-count">0</span>
   </a>
   <a href="index.html#about" class="bottom-nav-item">
     <span class="bottom-nav-icon">ℹ️</span>
@@ -268,6 +427,10 @@
 
 <a href="https://wa.me/917358650774" class="whatsapp-float" target="_blank" rel="noopener" title="Chat on WhatsApp">💬</a>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
+

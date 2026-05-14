@@ -1,13 +1,21 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Product – Elite Emporium</title>
   <meta name="description" content="Product details at Elite Emporium – Premium Online Store." />
+  <meta id="ogTitle"       property="og:title"       content="Elite Emporium" />
+  <meta id="ogDesc"        property="og:description"  content="Premium Quality Products at Honest Prices" />
+  <meta id="ogImage"       property="og:image"        content="" />
+  <meta id="ogUrl"         property="og:url"          content="" />
+  <meta property="og:type"        content="product" />
+  <meta property="og:site_name"   content="Elite Emporium" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#DB3022" />
 </head>
-<body>
+<body><div id="scrollProgress"></div>
 
 <!-- ── HEADER ─────────────────────────────── -->
 <header>
@@ -27,16 +35,43 @@
   </div>
   <nav>
     <a href="index.html">🏠 Home</a>
-    <a href="products.html">🛍️ All Products</a>
-    <a href="products.html?category=Electronics">📱 Electronics</a>
-    <a href="products.html?category=Clothing">👗 Clothing</a>
-    <a href="products.html?category=Home & Kitchen">🏠 Home & Kitchen</a>
-    <a href="products.html?category=Footwear">👟 Footwear</a>
+    <a href="products.html">⭐ All</a>
+    <a href="products.html?category=Clothing">👗 Fashion</a>
+    <a href="products.html?category=Abaiya">🕌 Abaiya</a>
+    <a href="products.html?category=Hijab">🧕 Hijab</a>
+    <a href="products.html?category=Sarees">👘 Sarees</a>
+    <a href="products.html?category=Kurta Sets">🥻 Kurtas</a>
+    <a href="products.html?category=Mens Dress">👔 Mens</a>
+    <a href="products.html?category=Kids Wear">👶 Kids</a>
     <a href="products.html?category=Bags">👜 Bags</a>
-    <a href="products.html?category=Toys & Games">🎮 Toys & Games</a>
-    <a href="index.html#about">ℹ️ About Us</a>
+    <a href="products.html?category=Watches">⌚ Watches</a>
+    <a href="products.html?category=Coolers">🕶️ Sunglasses</a>
+    <a href="products.html?category=Wallets">👛 Wallets</a>
+    <a href="products.html?category=Perfumes">🧴 Perfumes</a>
+    <a href="products.html?category=Cosmetics">💄 Cosmetics</a>
+    <a href="products.html?category=Hair Care">💆 Hair</a>
+    <a href="products.html?category=Home & Kitchen">🍳 Kitchen</a>
+    <a href="products.html?category=Sports">🏃 Sports</a>
+    <a href="products.html?category=Footwear">👟 Footwear</a>
+    <a href="hanii-dhanii.html">💎 Jewellery</a>
   </nav>
 </header>
+
+<!-- ── ANNOUNCEMENT TICKER ───────────────── -->
+<div class="announcement-bar">
+  <div class="announcement-track">
+    <span class="announcement-item">🚚 <span>Free Delivery</span> on orders above ₹499</span>
+    <span class="announcement-item">✅ GST Invoice Available &nbsp;|&nbsp; GST: <span>33DWGPN3169G1ZF</span></span>
+    <span class="announcement-item">💬 WhatsApp Orders: <span>+91 7358650774</span></span>
+    <span class="announcement-item">🏭 Udyam Certified Micro Enterprise</span>
+    <span class="announcement-item">👑 Premium Quality Products at Honest Prices</span>
+    <span class="announcement-item">🚚 <span>Free Delivery</span> on orders above ₹499</span>
+    <span class="announcement-item">✅ GST Invoice Available &nbsp;|&nbsp; GST: <span>33DWGPN3169G1ZF</span></span>
+    <span class="announcement-item">💬 WhatsApp Orders: <span>+91 7358650774</span></span>
+    <span class="announcement-item">🏭 Udyam Certified Micro Enterprise</span>
+    <span class="announcement-item">👑 Premium Quality Products at Honest Prices</span>
+  </div>
+</div>
 
 <!-- ── BREADCRUMB ─────────────────────────── -->
 <div class="page-header">
@@ -52,7 +87,7 @@
     <!-- Left: Main Image -->
     <div class="pd-gallery">
       <div class="pd-main-image">
-        <img id="pdMainImage" src="" alt="Product Image" />
+        <img id="pdMainImage" src="" alt="Product Image" onclick="openImageModal(this.src)" style="cursor:zoom-in;" title="Click to zoom" />
       </div>
     </div>
 
@@ -62,37 +97,166 @@
       <div class="pd-category-tag" id="pdCategory"></div>
       <h1 class="pd-title" id="pdTitle">Loading…</h1>
       <div class="pd-rating" id="pdRating"></div>
+      <div class="pd-rating-bars" id="pdRatingBars"></div>
+      <div class="pd-viewer-count" id="pdViewerCount" style="display:none;">
+        <span class="pd-viewer-dot"></span>
+        <span id="pdViewerNum">12</span> people are viewing this right now
+      </div>
       <div class="pd-price" id="pdPrice"></div>
 
       <!-- Color Picker -->
       <div class="pd-color-section" id="pdColorPicker"></div>
 
-      <!-- Description -->
-      <div class="pd-desc" id="pdDesc"></div>
-
       <!-- Action Buttons -->
       <div class="pd-actions">
         <button class="add-to-cart" id="pdAddToCart">🛒 Add to Cart</button>
+        <button class="pd-btn-buy-now" id="pdBuyNow">⚡ Buy Now</button>
         <a class="pd-btn-wa" id="pdWhatsApp" href="#" target="_blank" rel="noopener">💬 Order on WhatsApp</a>
+        <button class="pd-btn-share" id="pdShare" onclick="shareProduct()">🔗 Share</button>
       </div>
 
-      <!-- Info Box -->
-      <div class="pd-info-box">
-        <div>🚚 Free delivery on orders above ₹499</div>
-        <div>✅ GST Invoice Available &nbsp;|&nbsp; 🏛️ GST: 33DWGPN3169G1ZF</div>
-        <div>💬 WhatsApp Orders: +91 7358650774</div>
+      <!-- Product Detail Tabs -->
+      <div class="pd-tabs-nav">
+        <button class="pd-tab active" data-tab="desc" onclick="switchPdTab('desc',this)">📋 Description</button>
+        <button class="pd-tab" data-tab="delivery" onclick="switchPdTab('delivery',this)">🚚 Delivery</button>
+        <button class="pd-tab" data-tab="seller" onclick="switchPdTab('seller',this)">🏪 Seller</button>
+        <div class="pd-tab-ink" id="pdTabInk"></div>
+      </div>
+
+      <div class="pd-tab-panels">
+        <!-- Description Panel -->
+        <div class="pd-tab-panel active" id="pdTabDesc">
+          <div class="pd-desc" id="pdDesc"></div>
+          <div id="sizeGuideAccord" class="pd-size-guide-wrap" style="display:none;">
+            <div class="pd-accord-head" style="padding:10px 0 6px;font-weight:700;font-size:13px;">📏 Size Guide</div>
+            <div class="pd-accord-body" id="sizeGuideBody"></div>
+          </div>
+        </div>
+
+        <!-- Delivery Panel -->
+        <div class="pd-tab-panel" id="pdTabDelivery">
+          <!-- PIN code delivery checker -->
+          <div class="pin-checker">
+            <div class="pin-checker-label">📍 Check delivery to your PIN code</div>
+            <div class="pin-checker-row">
+              <input type="text" id="pinCheckerInput" class="pin-checker-input" placeholder="Enter 6-digit PIN code" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" />
+              <button class="pin-checker-btn" onclick="checkPinDelivery()">Check</button>
+            </div>
+            <div class="pin-checker-result" id="pinCheckerResult"></div>
+          </div>
+          <div class="pd-info-rows">
+            <div class="pd-accord-row"><span>📦 Delivery</span><span>3–7 business days (India)</span></div>
+            <div class="pd-accord-row"><span>💰 Free Delivery</span><span>On orders above ₹499</span></div>
+            <div class="pd-accord-row"><span>🏠 Delivery Charge</span><span>₹60 for orders below ₹499</span></div>
+            <div class="pd-accord-row"><span>📍 Shipped From</span><span>Kayalpattinam, Tamil Nadu</span></div>
+            <div class="pd-accord-row"><span>💬 How to Order</span><span>Add to cart → Fill details → WhatsApp</span></div>
+            <div class="pd-accord-row"><span>💵 Payment</span><span>UPI, Bank Transfer, Cash on WhatsApp</span></div>
+            <div class="pd-accord-row"><span>🧾 GST Invoice</span><span>Available on request</span></div>
+            <div class="pd-accord-row"><span>📦 Return Window</span><span>7 days from delivery</span></div>
+            <div class="pd-accord-row"><span>✅ Eligible Items</span><span>Unused, original packaging, with tags</span></div>
+            <div class="pd-accord-row"><span>❌ Not Eligible</span><span>Worn/washed clothing, opened cosmetics</span></div>
+            <div class="pd-accord-row"><span>💰 Refund</span><span>Store credit or bank transfer (3–5 days)</span></div>
+          </div>
+        </div>
+
+        <!-- Seller Panel -->
+        <div class="pd-tab-panel" id="pdTabSeller">
+          <div class="pd-info-rows">
+            <div class="pd-accord-row"><span>👑 Store</span><span>Elite Emporium</span></div>
+            <div class="pd-accord-row"><span>🏛️ GST</span><span>33DWGPN3169G1ZF</span></div>
+            <div class="pd-accord-row"><span>🏭 Udyam</span><span>UDYAM-TN-26-0090343</span></div>
+            <div class="pd-accord-row"><span>📞 Phone</span><a href="tel:+918072173467">+91 8072173467</a></div>
+            <div class="pd-accord-row"><span>💬 WhatsApp</span><a href="https://wa.me/917358650774" target="_blank" rel="noopener">+91 7358650774</a></div>
+            <div class="pd-accord-row"><span>📧 Email</span><a href="mailto:eliteemporium112024@gmail.com">eliteemporium112024@gmail.com</a></div>
+          </div>
+        </div>
       </div>
     </div>
 
   </div>
 </div>
 
+<!-- ── STICKY MOBILE BAR ──────────────────── -->
+<div class="pd-sticky-bar" id="pdStickyBar">
+  <div class="pd-sticky-info">
+    <div class="pd-sticky-name" id="pdStickyName"></div>
+    <div class="pd-sticky-price" id="pdStickyPrice"></div>
+  </div>
+  <button class="add-to-cart pd-sticky-btn" id="pdStickyBtn">🛒 Add to Cart</button>
+</div>
+
+<!-- ── FREQUENTLY BOUGHT TOGETHER ─────────── -->
+<div class="fbt-section" id="fbtSection" style="display:none;">
+  <div class="fk-section-head"><h2>🧺 Frequently Bought Together</h2></div>
+  <div class="fbt-inner" id="fbtInner"></div>
+</div>
+
+<!-- ── PAIR IT WITH ───────────────────────── -->
+<div class="related-section" id="pairWithSection" style="display:none;">
+  <div class="fk-section-head">
+    <h2 id="pairWithTitle">✨ Pair It With</h2>
+    <a href="products.html">Browse All →</a>
+  </div>
+  <div class="horiz-product-strip" id="pairWithStrip"></div>
+</div>
+
+<!-- ── RELATED PRODUCTS ───────────────────── -->
+<div class="related-section" id="relatedSection" style="display:none;">
+  <div class="fk-section-head">
+    <h2>🛍️ You Might Also Like</h2>
+    <a href="products.html">View All →</a>
+  </div>
+  <div class="products-grid" id="relatedProducts"></div>
+</div>
+
+<!-- ── RECENTLY VIEWED ────────────────────── -->
+<div class="related-section" id="pdRecentlyViewedSection" style="display:none;">
+  <div class="fk-section-head">
+    <h2>👁️ Recently Viewed</h2>
+    <a href="products.html">Browse All →</a>
+  </div>
+  <div class="horiz-product-strip" id="pdRecentlyViewedStrip"></div>
+</div>
+
+<!-- ── WRITE A REVIEW ─────────────────────── -->
+<div class="review-section" id="reviewSection" style="display:none;">
+  <div class="fk-section-head"><h2>✍️ Write a Review</h2></div>
+  <div class="review-form-wrap">
+    <div class="review-star-picker">
+      <span>Your Rating:</span>
+      <div class="star-picker" id="starPicker">
+        <span class="star-pick" data-v="1">★</span>
+        <span class="star-pick" data-v="2">★</span>
+        <span class="star-pick" data-v="3">★</span>
+        <span class="star-pick" data-v="4">★</span>
+        <span class="star-pick" data-v="5">★</span>
+      </div>
+    </div>
+    <input type="text" id="reviewName" placeholder="Your name" class="review-input" />
+    <textarea id="reviewText" placeholder="Share your experience with this product…" class="review-input review-textarea" rows="3"></textarea>
+    <button class="review-submit-btn" onclick="submitReview()">📤 Submit Review via WhatsApp</button>
+  </div>
+</div>
+
+<section class="newsletter-strip">
+  <div class="newsletter-inner">
+    <div class="newsletter-text">
+      <strong>📬 Get Exclusive Deals!</strong>
+      <span>Save up to 15% with coupon codes. Use <b>ELITE10</b> for 10% off your order.</span>
+    </div>
+    <form class="newsletter-form" onsubmit="handleNewsletter(event)">
+      <input type="email" placeholder="Enter your email" class="newsletter-input" required />
+      <button type="submit" class="newsletter-btn">Subscribe</button>
+    </form>
+  </div>
+</section>
+
 <!-- ── FOOTER ─────────────────────────────── -->
 <footer>
   <div class="footer-grid">
     <div class="footer-brand">
       <div class="logo" style="margin-bottom:10px;">
-        <div class="logo-text"><h1>👑 Elite Emporium</h1><span>Explore Plus</span></div>
+        <img src="images/logo.png" class="logo-img" alt="Elite Emporium" />
       </div>
       <p>Your trusted local online store for quality products. GST registered &amp; Udyam certified micro enterprise.</p>
       <div class="gst-box">🏛️ GST: 33DWGPN3169G1ZF<br />🏭 Udyam: UDYAM-TN-26-0090343</div>
@@ -103,6 +267,8 @@
         <li><a href="index.html">🏠 Home</a></li>
         <li><a href="products.html">🛍️ All Products</a></li>
         <li><a href="cart.html">🛒 My Cart</a></li>
+        <li><a href="wishlist.html">❤️ Wishlist</a></li>
+        <li><a href="orders.html">📦 My Orders</a></li>
         <li><a href="index.html#about">ℹ️ About Us</a></li>
       </ul>
     </div>
@@ -122,7 +288,7 @@
       <div class="contact-item"><span class="contact-icon">📍</span><span>183b, Sadukai Street, Kayalpattinam – 628204</span></div>
       <div class="contact-item"><span class="contact-icon">📞</span><span>+91 8072173467</span></div>
       <div class="contact-item"><span class="contact-icon">💬</span><span>+91 7358650774 (WhatsApp)</span></div>
-      <div class="contact-item"><span class="contact-icon">📧</span><span>smnabu36@gmail.com</span></div>
+      <div class="contact-item"><span class="contact-icon">📧</span><span>eliteemporium112024@gmail.com</span></div>
     </div>
   </div>
   <div class="footer-bottom">
@@ -140,9 +306,10 @@
     <span class="bottom-nav-icon">🛍️</span>
     <span class="bottom-nav-label">Products</span>
   </a>
-  <a href="products.html" class="bottom-nav-item">
-    <span class="bottom-nav-icon">📦</span>
-    <span class="bottom-nav-label">Categories</span>
+  <a href="wishlist.html" class="bottom-nav-item">
+    <span class="bottom-nav-icon">❤️</span>
+    <span class="bottom-nav-label">Wishlist</span>
+    <span class="bottom-nav-badge wishlist-count">0</span>
   </a>
   <a href="index.html#about" class="bottom-nav-item">
     <span class="bottom-nav-icon">ℹ️</span>
@@ -155,7 +322,16 @@
   </a>
 </nav>
 
+<!-- ── IMAGE ZOOM MODAL ──────────────────────── -->
+<div class="img-modal" id="imgModal" onclick="closeImageModal()">
+  <div class="img-modal-inner" onclick="event.stopPropagation()">
+    <img id="imgModalImg" src="" alt="Product zoom" />
+    <button class="img-modal-close" onclick="closeImageModal()">✕</button>
+  </div>
+</div>
+
 <a href="https://wa.me/917358650774" class="whatsapp-float" target="_blank" rel="noopener" title="Chat on WhatsApp">💬</a>
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -163,3 +339,4 @@
 <script src="script.js"></script>
 </body>
 </html>
+
