@@ -847,7 +847,7 @@ function renderProducts(list, containerId) {
             ${p.mrp && p.mrp > p.price ? `<s class="product-mrp">₹${p.mrp.toLocaleString('en-IN')}</s><span class="product-save">${Math.round((p.mrp - p.price) / p.mrp * 100)}% off</span>` : ''}
           </div>
           ${isOos
-            ? `<button class="add-to-cart oos-btn" disabled>Out of Stock</button>`
+            ? `<a class="card-notify-btn" href="https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(`Hi! Please notify me when *${p.name}* is back in stock.`)}" target="_blank" rel="noopener" onclick="event.stopPropagation();" title="Notify me when available">🔔 Notify When Back</a>`
             : (() => {
                 const cartItem = cart.find(i => i.id === p.id);
                 if (cartItem) {
