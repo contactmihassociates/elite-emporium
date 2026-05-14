@@ -1755,12 +1755,29 @@ function renderCart() {
            </div>
          </div>`
       : '';
+    const categoryChips = [
+      { c: 'Bags',         e: '👜' },
+      { c: 'Watches',      e: '⌚' },
+      { c: 'Clothing',     e: '👗' },
+      { c: 'Abaiya',       e: '🕌' },
+      { c: 'Sarees',       e: '👘' },
+      { c: 'Home & Kitchen', e: '🍳' },
+      { c: 'Perfumes',     e: '🧴' },
+      { c: 'Cosmetics',    e: '💄' },
+    ];
     container.innerHTML = `
       <div class="empty-cart">
         <div class="empty-icon">🛒</div>
         <h3>Your cart is empty!</h3>
-        <p>Looks like you haven't added anything yet.</p>
-        <a href="products.html" class="btn-primary">Browse Products</a>
+        <p>Looks like you haven't added anything yet. Start with a category below or browse everything.</p>
+        <a href="products.html" class="btn-primary">Browse All Products →</a>
+        <div class="empty-cart-cats">
+          ${categoryChips.map(x =>
+            `<a href="products.html?category=${encodeURIComponent(x.c)}" class="empty-cat-chip">
+               <span class="empty-cat-emoji">${x.e}</span>
+               <span class="empty-cat-name">${x.c}</span>
+             </a>`).join('')}
+        </div>
         ${suggHtml}
       </div>`;
     refreshSummary();

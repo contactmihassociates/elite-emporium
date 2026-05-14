@@ -1675,6 +1675,39 @@ textarea.form-input { resize:vertical; min-height:72px; }
 [data-theme="dark"] .wa-prompt-chip:hover { background: #128C7E; color: #fff; }
 [data-theme="dark"] .wa-chat-alt { color: rgba(255,255,255,0.55); }
 
+/* Empty cart — category quick-jump chips */
+.empty-cart-cats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  max-width: 480px;
+  margin: 18px auto 0;
+}
+@media (max-width: 540px) { .empty-cart-cats { grid-template-columns: repeat(3, 1fr); } }
+.empty-cat-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 8px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text, #1a1a1a);
+  font-size: 11px;
+  font-weight: 600;
+  transition: all 0.18s;
+}
+.empty-cat-chip:hover {
+  border-color: var(--red, #DB3022);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(219,48,34,0.12);
+}
+.empty-cat-emoji { font-size: 26px; line-height: 1; }
+.empty-cat-name { font-weight: 600; }
+[data-theme="dark"] .empty-cat-chip { background: #141821; border-color: #252a37; }
+
 /* Cart 'Why customers trust us' reassurance stack */
 .why-trust-stack {
   background: var(--surface, #fff);
