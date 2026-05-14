@@ -4904,6 +4904,48 @@ kbd {
 [data-theme="dark"] .wl-sort-bar { background: #0d1117; }
 [data-theme="dark"] .wl-sort-select { background: #141821; }
 
+/* ── Footer: Payments + Trust strip ────────────── */
+.footer-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  padding: 16px 24px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  margin-top: 14px;
+}
+@media (max-width: 720px) {
+  .footer-strip { grid-template-columns: 1fr; gap: 12px; padding: 12px 16px; }
+}
+.footer-strip-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 8px;
+}
+.footer-strip-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ft-pill {
+  display: inline-block;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.92);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 14px;
+  white-space: nowrap;
+}
+.ft-pill-trust {
+  background: rgba(76,175,80,0.16);
+  border-color: rgba(76,175,80,0.4);
+  color: #c5e1a5;
+}
+
 /* ── Reduced-motion: respect user preference ─────── */
 @media (prefers-reduced-motion: reduce) {
   *,
