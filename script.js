@@ -639,14 +639,54 @@ function showUndoToast(message, onUndo, duration = 5000) {
 function shareCart(e) {
   if (e) e.preventDefault();
   if (!cart.length) { showToast('⚠️ Your cart is empty!'); return; }
+
+  // Build a compact restorable token: just id, qty, color (everything else is in the catalog)
+  const compact = cart.map(i => ({ i: i.id, q: i.quantity, c: i.selectedColor || '' }));
+  let restoreUrl = '';
+  try {
+    const token = btoa(unescape(encodeURIComponent(JSON.stringify(compact))));
+    restoreUrl = `${window.location.origin}${window.location.pathname.replace(/[^/]*$/, '')}cart.html?restore=${token}`;
+  } catch {}
+
   let msg = `🛍️ *My Shopping List – Elite Emporium*\n━━━━━━━━━━━━━━━━━\n\n`;
   cart.forEach((item, i) => {
     msg += `${i + 1}. *${item.name}*`;
     if (item.selectedColor) msg += ` (${item.selectedColor})`;
     msg += `\n   ₹${item.price.toLocaleString('en-IN')} × ${item.quantity} = ₹${(item.price * item.quantity).toLocaleString('en-IN')}\n\n`;
   });
-  msg += `━━━━━━━━━━━━━━━━━\n💰 *Total: ₹${getTotal().toLocaleString('en-IN')}*\n\nOrder at Elite Emporium 👉 https://wa.me/917358650774`;
+  msg += `━━━━━━━━━━━━━━━━━\n💰 *Total: ₹${getTotal().toLocaleString('en-IN')}*\n\n`;
+  if (restoreUrl) msg += `🔄 *Restore this cart:* ${restoreUrl}\n\n`;
+  msg += `Order at Elite Emporium 👉 https://wa.me/917358650774`;
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// Restore cart from a ?restore=... token (used by shareCart's generated links)
+function restoreCartFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('restore');
+  if (!token) return;
+  try {
+    const compact = JSON.parse(decodeURIComponent(escape(atob(token))));
+    if (!Array.isArray(compact) || !compact.length) return;
+    const replace = !cart.length || confirm(`You have a shared cart link with ${compact.length} item(s).\n\nClick OK to REPLACE your current cart, or Cancel to MERGE.`);
+    if (replace) cart = [];
+    compact.forEach(({ i, q, c }) => {
+      const prod = products.find(p => p.id === i);
+      if (!prod) return;
+      const cartKey = String(i) + '|' + (c || '');
+      const existing = cart.find(x => x.cartKey === cartKey);
+      if (existing) existing.quantity = Math.max(existing.quantity, q);
+      else cart.push({ ...prod, quantity: q || 1, cartKey, selectedColor: c || null, image: prod.image });
+    });
+    saveCart();
+    // Strip the param so the same restore doesn't re-fire on reload
+    const cleanUrl = window.location.pathname + (params.toString().replace(/&?restore=[^&]+/, '').replace(/^&/, '') ? '?' + params.toString().replace(/&?restore=[^&]+/, '').replace(/^&/, '') : '');
+    history.replaceState(null, '', cleanUrl);
+    showToast(`🔄 Cart restored with ${compact.length} item(s).`, 4000, 'success');
+  } catch (e) {
+    console.error('cart restore failed', e);
+    showToast('⚠️ Cart restore link is invalid.', 3500, 'error');
+  }
 }
 
 let _cartSnapshot = null;
@@ -4328,12 +4368,41 @@ function initFlashSaleTimer() {
 }
 
 // ── NEWSLETTER ───────────────────────────────
+// ── NEWSLETTER ─────────────────────────────────
+const NEWSLETTER_KEY = 'eliteEmporiumSubscribers';
 function handleNewsletter(e) {
   e.preventDefault();
   const inp = e.target.querySelector('input[type="email"]');
-  const email = inp ? inp.value.trim() : '';
-  showToast(`🎉 Subscribed! Use code ELITE10 for 10% off your next order.`);
+  const email = (inp ? inp.value.trim() : '').toLowerCase();
+
+  // Validate
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast('⚠️ Please enter a valid email address.', 3500, 'error');
+    return;
+  }
+
+  const subs = JSON.parse(localStorage.getItem(NEWSLETTER_KEY) || '[]');
+  const already = subs.some(s => s.email === email);
+
+  if (already) {
+    showToast(`👋 You're already subscribed — use code ELITE10 for 10% off!`, 4500, 'info');
+    if (inp) inp.value = '';
+    return;
+  }
+
+  subs.push({ email, ts: Date.now() });
+  if (subs.length > 50) subs.length = 50; // cap localStorage
+  localStorage.setItem(NEWSLETTER_KEY, JSON.stringify(subs));
+
+  // Reward modal-style toast with one-click copy of the coupon
+  showToast(`🎉 Subscribed! Code ELITE10 unlocks 10% off your next order.`, 5500, 'success');
+  try { navigator.clipboard.writeText('ELITE10'); } catch {}
   if (inp) inp.value = '';
+
+  // Encourage WhatsApp channel join for the bigger drops
+  setTimeout(() => {
+    showToast('💬 Want flash-sale alerts? Join our WhatsApp channel — tap the green banner.', 5000, 'info');
+  }, 6000);
 }
 
 // ── STATS COUNTER ANIMATION ──────────────────
@@ -4660,6 +4729,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initWelcomeBack();
   if (document.getElementById('productsGrid'))     initProductsPage();
   if (document.getElementById('cartItems')) {
+    restoreCartFromUrl();
     renderCart();
     initPayOnlineButton();
     // Auto-apply coupon from URL: cart.html?coupon=ELITE10
