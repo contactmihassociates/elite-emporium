@@ -53,6 +53,15 @@ A single long session that shipped ~25 batches. Grouped by theme; commit hashes 
 - **Product card OOS → "Notify when back" WhatsApp CTA** (`7efdb1f`).
 - **Native pinch-zoom + zoom-in cursor on image modal** (`64558ca`).
 
+### Product content + commerce-feature wave (current)
+- **Rich HTML descriptions** for all 15 hardcoded products (`7cf5334`) — then **image-accurate rewrites** based on each product photo (`8fd1c9c`). Corrected Marc Jacobs 486 (hexagonal not navigator), Celine logo placement (temples not bridge), Coach Field Tote 30 color block, Tommy Hilfiger skeleton case (silver not navy), and 12 other image-vs-description mismatches.
+- **Side cart drawer** (`2e54264`) — clicking cart icon on any non-cart page slides in a panel from the right with edit-in-place qty/remove, free-delivery progress, and Checkout CTA. Closes on Esc, backdrop, or X.
+- **Seeded reviews** (`ec3aabe`) — 60 curated reviews (4 per product), authentic Indian names, dates computed at module-load as N days ago, references to specific product details. Product detail pages never look empty.
+- **Gift-wrap option** (`ba3048a`) — checkbox in cart form (+₹50), reveals an optional 120-char gift message textarea. Wired through totals, WhatsApp message, and order history.
+- **/track-order.html** (`412869a`) — standalone order lookup page with status card, visual 4-step timeline, ETA, order metadata grid, recent orders chip list, ?id= deep-link support.
+- **Festive auto-theming** (`dd5f2e6`) — calendar-driven banner for 7 festivals (New Year, Pongal, Republic Day, Eid, Independence Day, Diwali, Christmas) with subtle accent tint that persists for the session.
+- **Dynamic favicon with cart count** (`4f618e1`) — 64×64 canvas-rendered favicon with 👑 crown + yellow count badge in top-right, re-serialised on every cart change.
+
 ### Fixes caught along the way
 - Duplicate `const orderBtn` in `placeOrder()` was a hidden SyntaxError.
 - Broken `'\\''` quote escaping in price-alert onclick.

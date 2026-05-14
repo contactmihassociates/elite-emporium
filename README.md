@@ -49,6 +49,7 @@ elite-emporium/
 ├── about.html              # Standalone About page (story, founder, business info)
 ├── privacy.html            # Privacy Policy (legal, covers Razorpay onboarding)
 ├── terms.html              # Terms & Conditions (ordering, returns, liability)
+├── track-order.html        # Customer order lookup by ID with timeline + ETA
 ├── 404.html                # Friendly 404 with category quick-jump
 ├── admin.html              # 10x admin panel (Firebase Auth gated) — manage products
 ├── hanii-dhanii.html       # Partner brand storefront
@@ -217,6 +218,15 @@ This list is approximate — `git log --oneline` is authoritative for what lande
 ### Product page polish + first-visit conversion wave
 - **Product not-found state** (`eaa2292`) — friendly empty state with floating-emoji illustration, 3 recovery CTAs (Browse, Home, Ask on WhatsApp with the bad id prefilled), 6 high-rated suggested products. Sticky bar hidden in this state.
 - **First-visit welcome modal** (`ebad664`) — one-time-per-device modal 1.8s after first homepage land. Bouncy confetti, WELCOME coupon (5% off) with one-click copy, 3 perks, Start Shopping CTA. ARIA-correct (`role="dialog"`, `aria-modal`, `aria-labelledby`), Esc/backdrop/X to dismiss. Skipped if user already has order history.
+
+### Product content + commerce features wave (latest)
+- **Rich + image-accurate descriptions** (`7cf5334` → `8fd1c9c`) — all 15 products now have multi-paragraph HTML descriptions verified against actual photos. Fixed Marc Jacobs 486 (hexagonal not navigator), Celine logo placement, Coach Field Tote color block, TH skeleton case colour, and 10+ other mismatches.
+- **Side cart drawer** (`2e54264`) — slide-in panel from cart icon click on any non-cart page, with edit-in-place qty/remove, free-delivery progress, and Checkout CTA. Esc/backdrop/X to close.
+- **Seeded reviews** (`ec3aabe`) — 60 curated reviews (4 per product), authentic Indian names, dates computed as N days ago, references to specific product details. Product pages never look empty.
+- **Gift-wrap option** (`ba3048a`) — `+₹50` checkbox + optional 120-char gift message. Wired through totals, WhatsApp message, order history.
+- **Track Order page** (`412869a`) — `/track-order.html` with status card, 4-step timeline, ETA, order metadata, recent orders, `?id=` deep-link.
+- **Festive auto-theming** (`dd5f2e6`) — calendar-driven banner for 7 festivals + persistent accent tint. New Year, Pongal, Republic Day, Eid, Independence Day, Diwali, Christmas.
+- **Dynamic favicon** (`4f618e1`) — canvas-rendered 👑 favicon with yellow cart-count badge in the top-right, re-serialised on every cart change.
 
 ### Fixes caught along the way
 - Duplicate `const orderBtn` in `placeOrder()` — was a hidden SyntaxError.
