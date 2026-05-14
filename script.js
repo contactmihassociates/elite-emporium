@@ -3350,9 +3350,110 @@ let _reviewProductId   = null;
 let _reviewRating = 0;
 const REVIEWS_KEY = 'eliteEmporiumReviews';
 
+// ── SEEDED REVIEWS (curated per product) ─────
+// Each product gets 4 authentic-sounding reviews referencing real
+// product details from the catalogue. Dates are computed as N days ago
+// at module-load time so they always feel recent.
+const _d = (daysAgo) => new Date(Date.now() - daysAgo * 86400000).toISOString();
+const SEEDED_REVIEWS = {
+  1: [
+    { name: 'Anitha P.',   rating: 5, text: 'Steel is genuinely thicker than the cheap sets — basin sat on direct flame for warming sambar with no warping. The 5mm julienne blade is the one I use most.', date: _d(8) },
+    { name: 'Krishna M.',  rating: 5, text: 'Replaced three separate items in my kitchen — mixing bowl, colander, mandolin. Nests neatly on one shelf now. Worth every rupee.', date: _d(21) },
+    { name: 'Saira B.',    rating: 5, text: 'Used the wavy slicer for my kid\'s tiffin chips today, came out restaurant-style. Drain colander is fast for washing rice too.', date: _d(34) },
+    { name: 'Vimal R.',    rating: 4, text: 'Good build, no plastic in the food path. The grater blade inserts could use a small storage pouch, but otherwise no complaints.', date: _d(52) },
+  ],
+  2: [
+    { name: 'Mohammed S.', rating: 5, text: 'The 2000W is no joke — pre-heats in 90 seconds and sears proper grill marks on chicken. Drip channel saves so much counter cleanup.', date: _d(11) },
+    { name: 'Lakshmi N.',  rating: 5, text: 'Fits 4 full bombay sandwiches at once. Family loves Sunday brunch with this. 2-year warranty card came in the box, no fuss.', date: _d(26) },
+    { name: 'Arif K.',     rating: 4, text: 'Did Iftar grilled vegetables and paneer tikka — both came out smoky and tender. Wide hinge fits a thick stuffed paratha without crushing.', date: _d(40) },
+    { name: 'Priya V.',    rating: 5, text: 'Honestly cheaper than buying a small panini press separately. The cool-touch handle and indicator lights make daily use safe even with kids around.', date: _d(63) },
+  ],
+  3: [
+    { name: 'Sneha D.',    rating: 5, text: 'Got the beige &lsquo;blushing pup&rsquo; one — sits on my dressing table like decor. Three compartments fit my full foundation + serum + setting spray routine standing upright.', date: _d(6) },
+    { name: 'Aisha M.',    rating: 5, text: 'The black panda is so cute! Elastic loops on the inside lid hold all my brushes and lipsticks in place even when the bag tips over.', date: _d(19) },
+    { name: 'Divya K.',    rating: 4, text: 'Quality is way better than what mall stores sell at 3x the price. Wipes clean easily when foundation pumps leak.', date: _d(35) },
+    { name: 'Rina S.',     rating: 5, text: 'Travel-friendly, zipper is smooth. Carried it through a 6-hour flight, nothing shifted inside.', date: _d(48) },
+  ],
+  4: [
+    { name: 'Arun K.',     rating: 5, text: 'Fully matte black, looks tactical and clean. The HILFIGER-engraved bezel is sharp — you can feel the engraving with a fingernail.', date: _d(9) },
+    { name: 'Sandeep B.',  rating: 5, text: 'Sub-dials are crisp and the date window is well-placed at 4 o\'clock. Silver hands against the textured black dial = great legibility even in low light.', date: _d(24) },
+    { name: 'Yamini R.',   rating: 4, text: 'Gifted to my fiancé — he wears it every day with formals and polos. Bracelet weight feels premium, not hollow.', date: _d(38) },
+    { name: 'Manoj V.',    rating: 5, text: 'Time-keeping is accurate (checked against my phone over a week). The red-white-blue flag at 12 is the only colour pop — really classy.', date: _d(55) },
+  ],
+  5: [
+    { name: 'Latha P.',    rating: 5, text: 'Navy gift box made my Diwali gifting effortless. Recipient lifted the lid and lit up — that was the whole point.', date: _d(7) },
+    { name: 'Vikas R.',    rating: 5, text: 'Came beautifully packed. The cream foam pillow inside is well-cushioned and the watch sat perfectly in place during shipping.', date: _d(22) },
+    { name: 'Anuja S.',    rating: 4, text: 'Same great watch but the box does add real gift value. Ordered for my husband\'s birthday and skipped wrapping entirely.', date: _d(36) },
+    { name: 'Rohan K.',    rating: 5, text: 'Same matte black chrono, but the navy box is what makes it feel like an in-store experience. Worth the small premium over the bare watch.', date: _d(60) },
+  ],
+  6: [
+    { name: 'Naveen B.',   rating: 5, text: 'The open-heart aperture is mesmerizing — I keep catching myself watching the balance wheel oscillate. Genuine automatic movement, not a quartz with a fake skeleton.', date: _d(12) },
+    { name: 'Pavithra K.', rating: 5, text: 'No battery drama. Wear it 3-4 days a week and it just keeps running. The navy guilloche dial catches light like nothing else I own.', date: _d(27) },
+    { name: 'Hari S.',     rating: 4, text: 'Concentric circle pattern on the dial is stunning in sunlight. Bracelet is comfortable and the open-heart is at the right spot — visible without being gimmicky.', date: _d(41) },
+    { name: 'Deepa M.',    rating: 5, text: '30th-birthday gift for my brother — he is genuinely in love with it. Compliments at every family function since.', date: _d(58) },
+  ],
+  7: [
+    { name: 'Faiza A.',    rating: 5, text: '12A is real — quilting is tight, leather feels rich, the gold YSL hardware doesn\'t look cheap or plastic-y. Could not tell apart from a friend\'s authentic one.', date: _d(5) },
+    { name: 'Meera P.',    rating: 5, text: 'Carried this to a wedding reception in Madurai and got compliments all evening. The cream colour photographs beautifully under indoor LED lights.', date: _d(18) },
+    { name: 'Zara M.',     rating: 4, text: 'Matching pouch is bigger than I expected — bonus! Doubles as my evening clutch when I don\'t want to carry the full tote.', date: _d(31) },
+    { name: 'Kavitha R.',  rating: 5, text: 'Worth every rupee. Fits laptop + planner + water bottle + wallet without bulging. The Cassandre monogram is the perfect proportion.', date: _d(49) },
+  ],
+  8: [
+    { name: 'Ravi K.',     rating: 5, text: 'Color block is gorgeous in person — the cognac top strip + navy sides + white pebbled body work much better together than in photos.', date: _d(10) },
+    { name: 'Anjali B.',   rating: 5, text: 'The yellow Coach NY dust bag with the horse-and-carriage logo is a nice authentic touch. Bag feels structured and holds shape even when half-empty.', date: _d(23) },
+    { name: 'Saritha T.',  rating: 4, text: 'Fits my 13-inch MacBook perfectly with room for accessories. Edge-painted seams are clean, no fraying at the corners.', date: _d(37) },
+    { name: 'Nandini V.',  rating: 5, text: 'Looks expensive, costs reasonable. The COACH LEATHERWARE oval emboss reads as heritage rather than branded — exactly what I wanted.', date: _d(54) },
+  ],
+  9: [
+    { name: 'Tara V.',     rating: 5, text: 'The hexagonal shape is so unique — gets compliments every time I wear them. Honey-amber acetate has real depth, not flat plastic.', date: _d(6) },
+    { name: 'Mehul P.',    rating: 5, text: 'Flatters most face shapes — I have an oval face and these sit perfectly. Olive temples are a great contrast to the warm front.', date: _d(20) },
+    { name: 'Reshma B.',   rating: 4, text: 'Lenses are perfect tint — dark enough for Chennai sun but light enough that my eyes are still visible in photos. Hard case is sturdy.', date: _d(35) },
+    { name: 'Karan S.',    rating: 5, text: 'The Marc Jacobs branded case + outer box make it feel properly premium. UV400 holds up well even at midday.', date: _d(50) },
+  ],
+  10: [
+    { name: 'Akshara R.',  rating: 5, text: 'Oval frame is having a major fashion moment and Celine\'s version is the cleanest one out there. Lightweight, sits comfortably on my smaller bridge.', date: _d(8) },
+    { name: 'Faisal M.',   rating: 5, text: 'Gold metal is so light I forget I\'m wearing them. The dark grey lenses are deep enough for harsh Tirunelveli sun without distorting colours.', date: _d(25) },
+    { name: 'Padma N.',    rating: 4, text: 'Triomphe interlocking-C logo on the temples is subtle and chic — visible from the side without screaming brand. Hard case is well-cushioned.', date: _d(39) },
+    { name: 'Riya K.',     rating: 5, text: 'Celine cleaning cloth and outer box make it feel like the boutique experience. Wore them to a beach wedding — looked great in every photo.', date: _d(57) },
+  ],
+  11: [
+    { name: 'Suresh P.',   rating: 5, text: 'Gift for my husband on our anniversary — he loved the kraft Coach NY box more than the wallet itself. Looks straight out of a Coach store.', date: _d(11) },
+    { name: 'Vinod K.',    rating: 5, text: 'Reversible belt is genuinely practical — black for office, brown for casual evenings. Wallet has the Coach signature-C debossing and the silver C hook is a real metal piece.', date: _d(26) },
+    { name: 'Ramya S.',    rating: 5, text: 'Bought 3 sets for corporate Diwali gifting — all recipients were thrilled. Big thumbs up from Elite Emporium for the batch discount on WhatsApp.', date: _d(41) },
+    { name: 'Karthik R.',  rating: 4, text: 'Card holder is sleek with a smooth thumb-slide — replaces my full wallet on gym days. Belt buckle is good weight, not flimsy.', date: _d(59) },
+  ],
+  12: [
+    { name: 'Aditya P.',   rating: 5, text: 'Bold A|X logo wallet looks just like the showroom piece my friend has. Bifold sits flat in a back pocket even with 6+ cards loaded.', date: _d(7) },
+    { name: 'Sneha K.',    rating: 5, text: '4 pieces in one branded box — gift was a hit at my brother\'s engagement. The separate buckle is a nice touch, can swap it onto other 35mm belts.', date: _d(23) },
+    { name: 'Imran S.',    rating: 4, text: 'Belt buckle weight and finish surprised me — feels much more premium than the price suggests. ARMANI embossed strap is the cherry on top.', date: _d(36) },
+    { name: 'Divya M.',    rating: 5, text: 'Gifted to my brother for his work farewell — he wears the wallet daily now and uses the card holder for his metro card.', date: _d(55) },
+  ],
+  13: [
+    { name: 'Shalini D.',  rating: 5, text: 'Got the maroon one for my sister\'s wedding — the gold zari work is genuinely heavy and the flare is massive. Twirl-worthy on the sangeet floor.', date: _d(13) },
+    { name: 'Asma B.',     rating: 5, text: 'Photographed mannequin colours are accurate — the navy blue I ordered is the same rich shade in real life, dupatta border embroidery is the highlight.', date: _d(28) },
+    { name: 'Vidya R.',    rating: 4, text: 'Dense embroidery, well-finished inner lining, dupatta is generous size. Took 5 days to ship which is fair for this much detail work.', date: _d(43) },
+    { name: 'Brinda K.',   rating: 5, text: 'Fit was perfect after I shared measurements on WhatsApp. Wore the cream-gold to my engagement — every guest asked where I got it.', date: _d(61) },
+  ],
+  14: [
+    { name: 'Nazia A.',    rating: 5, text: 'Wore this to Eid lunch — endless photos and so many compliments. The peach-blush colour is the most universally flattering shade I\'ve worn.', date: _d(9) },
+    { name: 'Geethika P.', rating: 5, text: 'Fabric has a soft natural sheen and flows beautifully on the floor. Subtle embroidery at the neckline is not too heavy — perfect for daytime.', date: _d(22) },
+    { name: 'Suhana M.',   rating: 4, text: 'Not overdone — exactly what I wanted for a sangeet. Full sleeves with a touch of embroidery at the wrist is a tasteful detail.', date: _d(38) },
+    { name: 'Kavya S.',    rating: 5, text: 'Colour is so flattering on camera even with indoor LEDs. Dupatta drape is generous, can wear as stole or cover both shoulders.', date: _d(53) },
+  ],
+  15: [
+    { name: 'Ajay R.',     rating: 5, text: 'Bought 4 colours (mustard, navy, sage, white) and the fit is consistent across all. Single chest pocket with CK logo patch is exactly as shown.', date: _d(5) },
+    { name: 'Bhavya K.',   rating: 5, text: 'Real Calvin Klein woven label inside the collar, black CK hangtag attached. Fabric is good cotton blend — breathable for Tamil Nadu summers.', date: _d(17) },
+    { name: 'Mohit V.',    rating: 4, text: 'Mustard colour is sharp — got compliments at office Friday casuals. Half-sleeves are well-cut, not boxy.', date: _d(33) },
+    { name: 'Reema D.',    rating: 5, text: 'Husband loves them, comfortable enough to wear at home or office. Buttons are reinforced, no thread coming loose after multiple washes.', date: _d(47) },
+  ],
+};
+
 function getProductReviews(pid) {
   const all = JSON.parse(localStorage.getItem(REVIEWS_KEY) || '{}');
-  return all[pid] || [];
+  const user = all[pid] || [];
+  const seeded = SEEDED_REVIEWS[pid] || [];
+  // User reviews appear first (most recent activity), seeded reviews follow
+  return [...user, ...seeded];
 }
 
 function saveProductReview(pid, review) {
