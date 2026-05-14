@@ -15,6 +15,8 @@ const STATIC_ASSETS = [
   '/wishlist.html',
   '/orders.html',
   '/about.html',
+  '/privacy.html',
+  '/terms.html',
   '/404.html',
   '/styles.css',
   '/script.js',

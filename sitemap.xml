@@ -35,6 +35,16 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  <url>
+    <loc>https://elite-emporium-one.vercel.app/privacy.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://elite-emporium-one.vercel.app/terms.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
   <!-- Top-level category pages -->
   <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Bags</loc><priority>0.7</priority></url>
   <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Watches</loc><priority>0.7</priority></url>
