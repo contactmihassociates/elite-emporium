@@ -1484,11 +1484,15 @@ function initFormValidation() {
     el.addEventListener('input', () => { if (el.style.borderColor) clearFieldError(id); });
   });
 
-  // Phone: only allow digits, max 10
+  // Phone: only allow digits, max 10, auto-tab to address when complete
   const phoneEl = document.getElementById('custPhone');
   if (phoneEl) {
     phoneEl.addEventListener('input', () => {
       phoneEl.value = phoneEl.value.replace(/\D/g, '').slice(0, 10);
+      if (phoneEl.value.length === 10) {
+        const next = document.getElementById('custAddress');
+        if (next && !next.value) next.focus();
+      }
     });
   }
 
@@ -1529,6 +1533,9 @@ function initFormValidation() {
             showToast(`📍 State auto-filled: ${detectedState}`, 2500, 'info');
           }
         }
+        // Auto-tab to notes when PIN complete (final field of the address group)
+        const notes = document.getElementById('custNotes');
+        if (notes && !notes.value) notes.focus();
       }
     });
   }
