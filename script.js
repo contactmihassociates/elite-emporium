@@ -381,7 +381,18 @@ function updateCartUI(animate) {
   document.title = total > 0 ? `(${total}) ${baseTitle}` : baseTitle;
   updateMiniCart();
   updateAlertBell();
+  // Refresh the side cart drawer if it's currently open
+  if (document.getElementById('sideCartDrawer')?.classList.contains('open')) {
+    renderSideCart();
+  }
 }
+
+// Close side cart on Esc
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('sideCartDrawer')?.classList.contains('open')) {
+    closeSideCart();
+  }
+});
 
 function updateAlertBell() {
   const alerts = getPriceAlerts();
@@ -452,6 +463,122 @@ function updateMiniCart() {
       <a href="cart.html" class="mini-cart-btn">Go to Cart →</a>
     </div>`;
 }
+
+// ── SIDE CART DRAWER ─────────────────────────
+// Click the cart icon on any non-cart page → slide-in panel from right
+// with full edit-in-place (qty +/-/remove) and a Checkout CTA.
+function initSideCartDrawer() {
+  if (window.location.pathname.includes('cart.html')) return;
+  const cartBtn = document.querySelector('.cart-btn');
+  if (!cartBtn) return;
+
+  // Inject drawer + backdrop once
+  if (!document.getElementById('sideCartDrawer')) {
+    const bd = document.createElement('div');
+    bd.id = 'sideCartBackdrop';
+    bd.className = 'side-cart-backdrop';
+    bd.addEventListener('click', closeSideCart);
+    document.body.appendChild(bd);
+
+    const drawer = document.createElement('aside');
+    drawer.id = 'sideCartDrawer';
+    drawer.className = 'side-cart-drawer';
+    drawer.setAttribute('role', 'dialog');
+    drawer.setAttribute('aria-label', 'Shopping cart');
+    drawer.innerHTML = `
+      <header class="side-cart-header">
+        <h3>🛒 Your Cart <span class="side-cart-count-pill" id="sideCartCountPill">0</span></h3>
+        <button class="side-cart-close" onclick="closeSideCart()" aria-label="Close cart">✕</button>
+      </header>
+      <div class="side-cart-body" id="sideCartBody"></div>
+      <footer class="side-cart-footer" id="sideCartFooter"></footer>`;
+    document.body.appendChild(drawer);
+  }
+
+  // Hijack the cart button click
+  cartBtn.addEventListener('click', e => {
+    e.preventDefault();
+    openSideCart();
+  });
+  // Treat cart-btn link as button for a11y
+  cartBtn.setAttribute('role', 'button');
+}
+
+function openSideCart() {
+  renderSideCart();
+  document.getElementById('sideCartBackdrop')?.classList.add('show');
+  document.getElementById('sideCartDrawer')?.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSideCart() {
+  document.getElementById('sideCartBackdrop')?.classList.remove('show');
+  document.getElementById('sideCartDrawer')?.classList.remove('open');
+  document.body.style.overflow = '';
+}
+function renderSideCart() {
+  const body  = document.getElementById('sideCartBody');
+  const foot  = document.getElementById('sideCartFooter');
+  const pill  = document.getElementById('sideCartCountPill');
+  if (!body || !foot) return;
+
+  const totalQty = cart.reduce((s, i) => s + i.quantity, 0);
+  if (pill) {
+    pill.textContent = totalQty;
+    pill.style.display = totalQty > 0 ? 'inline-flex' : 'none';
+  }
+
+  if (!cart.length) {
+    body.innerHTML = `
+      <div class="side-cart-empty">
+        <div class="side-cart-empty-icon">🛒</div>
+        <h4>Your cart is empty</h4>
+        <p>Add a few favourites and they'll show up here.</p>
+        <a href="products.html" class="side-cart-shop-btn" onclick="closeSideCart()">Browse Products →</a>
+      </div>`;
+    foot.innerHTML = '';
+    return;
+  }
+
+  body.innerHTML = cart.map(item => {
+    const key = (item.cartKey || '').replace(/"/g, '&quot;');
+    const lineTotal = (item.price * item.quantity).toLocaleString('en-IN');
+    return `
+      <div class="side-cart-item">
+        ${item.image
+          ? `<img src="${item.image}" alt="${escapeHtml(item.name)}" class="side-cart-img" />`
+          : `<div class="side-cart-img side-cart-img-fallback">🛍️</div>`}
+        <div class="side-cart-item-info">
+          <div class="side-cart-item-name">${escapeHtml(item.name)}</div>
+          ${item.selectedColor ? `<div class="side-cart-item-color">${escapeHtml(item.selectedColor)}</div>` : ''}
+          <div class="side-cart-item-qty">
+            <button class="scq-btn" onclick="updateQuantity('${key}', -1);renderSideCart();" aria-label="Decrease quantity">−</button>
+            <span class="scq-val">${item.quantity}</span>
+            <button class="scq-btn" onclick="updateQuantity('${key}', 1);renderSideCart();" aria-label="Increase quantity">+</button>
+            <button class="scq-remove" onclick="removeFromCart('${key}');renderSideCart();" aria-label="Remove" title="Remove">🗑️</button>
+          </div>
+        </div>
+        <div class="side-cart-item-price">₹${lineTotal}</div>
+      </div>`;
+  }).join('');
+
+  const sub = getSubtotal();
+  const minFree = (typeof CONFIG !== 'undefined' && CONFIG.minFreeDelivery) || 499;
+  const toFree = Math.max(0, minFree - sub);
+  foot.innerHTML = `
+    ${toFree > 0
+      ? `<div class="side-cart-fd">🚚 Add <strong>₹${toFree.toLocaleString('en-IN')}</strong> more for FREE delivery</div>`
+      : `<div class="side-cart-fd side-cart-fd-unlocked">🎉 FREE delivery unlocked!</div>`}
+    <div class="side-cart-total">
+      <span>Subtotal</span>
+      <strong>₹${sub.toLocaleString('en-IN')}</strong>
+    </div>
+    <a href="cart.html" class="side-cart-checkout">Checkout →</a>
+    <button class="side-cart-continue" onclick="closeSideCart()">Continue shopping</button>`;
+}
+
+// Refresh drawer contents whenever cart changes (saveCart calls updateCartUI)
+// Hook in via a small extension that re-renders if the drawer is open.
+const _origUpdateCartUI = typeof updateCartUI === 'function' ? updateCartUI : null;
 
 function initMiniCart() {
   const cartBtnEl = document.querySelector('.cart-btn');
@@ -4818,6 +4945,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initScrollProgress();
   initFlashSaleTimer();
   initMiniCart();
+  initSideCartDrawer();
   initSocialProof();
   initStatsCounter();
 
