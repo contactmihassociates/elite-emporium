@@ -49,6 +49,9 @@ A single long session that shipped ~25 batches. Grouped by theme; commit hashes 
 - **Hanii Dhanii storefront SEO + Brand JSON-LD** (`d9c6629`).
 - **Friendly product-not-found state with suggestions** (`eaa2292`).
 - **First-visit welcome modal with WELCOME coupon** (`ebad664`).
+- **iOS Safari input-zoom fix** (`e7c83c2`).
+- **Product card OOS → "Notify when back" WhatsApp CTA** (`7efdb1f`).
+- **Native pinch-zoom + zoom-in cursor on image modal** (`64558ca`).
 
 ### Fixes caught along the way
 - Duplicate `const orderBtn` in `placeOrder()` was a hidden SyntaxError.
