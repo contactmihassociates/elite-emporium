@@ -5066,6 +5066,77 @@ html { scroll-padding-top: 80px; }
   border-radius: 6px;
 }
 
+/* ── Festive auto-theming banner ──────────────── */
+.festive-banner {
+  position: relative;
+  color: #fff;
+  text-align: center;
+  padding: 9px 44px 9px 16px;
+  font-size: 13px;
+  line-height: 1.4;
+  z-index: 100;
+  animation: fbSlideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+@keyframes fbSlideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+.festive-banner.fb-hide {
+  animation: fbSlideUp 0.24s ease forwards;
+}
+@keyframes fbSlideUp {
+  from { transform: translateY(0); opacity: 1; }
+  to   { transform: translateY(-100%); opacity: 0; }
+}
+.fb-text strong { font-weight: 800; letter-spacing: 0.3px; }
+.fb-text b { background: rgba(255,255,255,0.25); padding: 0 6px; border-radius: 4px; font-weight: 700; }
+.fb-close {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.18);
+  border: none;
+  color: #fff;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, transform 0.12s;
+}
+.fb-close:hover {
+  background: rgba(255,255,255,0.32);
+  transform: translateY(-50%) scale(1.08);
+}
+@media (max-width: 600px) {
+  .festive-banner { font-size: 12px; padding: 8px 38px 8px 12px; }
+  .fb-text strong { display: block; }
+  .fb-text > span { font-size: 11px; opacity: 0.95; }
+}
+
+/* Subtle accent — left border of fk-section, product cards */
+body.festive-on .fk-section::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--festive-tint, transparent);
+  border-radius: 0 4px 4px 0;
+  opacity: 0.4;
+}
+body.festive-on .fk-section { position: relative; }
+body.festive-on .product-badge.new {
+  background: var(--festive-tint, var(--green)) !important;
+}
+
 /* ── Gift wrap option in cart form ──────────── */
 .gift-wrap-row {
   display: flex;

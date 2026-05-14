@@ -4194,6 +4194,74 @@ function initDarkMode() {
 }
 
 // ── CART REMINDER BANNER (homepage) ──────────
+// ── FESTIVE AUTO-THEMING ─────────────────────
+// Applies a subtle banner + theme accent based on the current month/date.
+// Festivals included: Diwali (mid-Oct to mid-Nov), Ramadan/Eid (variable —
+// we approximate to Mar+Apr 2026), Christmas (mid-Dec to Dec 31),
+// New Year (Jan 1-5), Pongal (Jan 13-16), Independence Day (Aug 11-16),
+// Republic Day (Jan 23-27). Customers can dismiss the banner; the
+// theme tint stays for the duration.
+function initFestiveTheming() {
+  const now = new Date();
+  const m   = now.getMonth(); // 0-11
+  const d   = now.getDate();
+
+  let theme = null;
+
+  if (m === 0 && d >= 1 && d <= 5)        theme = { id: 'new-year', label: '🎆 Happy New Year!', subtitle: 'Use code <b>WELCOME</b> for 5% off your first order of the year.', tint: '#ffd700' };
+  else if (m === 0 && d >= 13 && d <= 16) theme = { id: 'pongal', label: '🌾 Happy Pongal!', subtitle: 'Wishing your home a year of harvest & abundance from Elite Emporium.', tint: '#ff9800' };
+  else if (m === 0 && d >= 23 && d <= 27) theme = { id: 'republic-day', label: '🇮🇳 Happy Republic Day!', subtitle: 'Made in India, delivered all over India.', tint: '#ff9933' };
+  else if (m === 2 || m === 3)            theme = { id: 'ramadan-eid', label: '🌙 Ramadan & Eid Mubarak', subtitle: 'Browse our Abaya, Hijab & Perfume collections curated for the season.', tint: '#1a4ea3' };
+  else if (m === 7 && d >= 11 && d <= 16) theme = { id: 'independence-day', label: '🇮🇳 Happy Independence Day', subtitle: 'Proudly serving customers across India.', tint: '#ff9933' };
+  else if ((m === 9 && d >= 15) || (m === 10 && d <= 15)) theme = { id: 'diwali', label: '🪔 Happy Diwali!', subtitle: 'Light up your home with our Kitchen & Home Decor picks.', tint: '#ffb300' };
+  else if (m === 11 && d >= 15)           theme = { id: 'christmas', label: '🎄 Merry Christmas!', subtitle: 'Use code <b>ELITE10</b> for 10% off gift sets &amp; watches.', tint: '#c62828' };
+
+  if (!theme) return;
+  if (sessionStorage.getItem('festiveBannerDismissed_' + theme.id)) {
+    applyFestiveTint(theme.tint);
+    return;
+  }
+
+  // Inject the festive banner at the very top of the body
+  const banner = document.createElement('div');
+  banner.id = 'festiveBanner';
+  banner.className = 'festive-banner';
+  banner.style.background = `linear-gradient(135deg, ${theme.tint}, ${shadeColor(theme.tint, -15)})`;
+  banner.innerHTML = `
+    <span class="fb-text"><strong>${theme.label}</strong> &middot; <span>${theme.subtitle}</span></span>
+    <button class="fb-close" onclick="dismissFestive('${theme.id}')" aria-label="Dismiss">✕</button>`;
+  // Insert as the very first element of body so it sits above the header
+  document.body.insertBefore(banner, document.body.firstChild);
+  applyFestiveTint(theme.tint);
+}
+
+function dismissFestive(id) {
+  const b = document.getElementById('festiveBanner');
+  if (b) { b.classList.add('fb-hide'); setTimeout(() => b.remove(), 240); }
+  sessionStorage.setItem('festiveBannerDismissed_' + id, '1');
+}
+
+// Apply a subtle accent tint (left border of cards, small accents) — purely cosmetic.
+function applyFestiveTint(hex) {
+  document.documentElement.style.setProperty('--festive-tint', hex);
+  document.body.classList.add('festive-on');
+}
+
+// Tiny helper to darken/lighten a hex color
+function shadeColor(hex, percent) {
+  let c = hex.replace('#', '');
+  if (c.length === 3) c = c.split('').map(x => x + x).join('');
+  let r = parseInt(c.slice(0, 2), 16);
+  let g = parseInt(c.slice(2, 4), 16);
+  let b = parseInt(c.slice(4, 6), 16);
+  const t = percent < 0 ? 0 : 255;
+  const p = Math.abs(percent) / 100;
+  r = Math.round((t - r) * p + r);
+  g = Math.round((t - g) * p + g);
+  b = Math.round((t - b) * p + b);
+  return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+
 // ── FIRST-VISIT WELCOME MODAL ────────────────
 // Brand-new visitors get a one-time modal with a 5% WELCOME coupon.
 // Only on homepage, only if there's no order history and no localStorage flag.
@@ -5112,6 +5180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (document.getElementById('featuredProducts')) initHomePage();
   initWelcomeBack();
   initFirstVisitModal();
+  initFestiveTheming();
   if (document.getElementById('productsGrid'))     initProductsPage();
   if (document.getElementById('cartItems')) {
     restoreCartFromUrl();
