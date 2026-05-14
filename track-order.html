@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track Your Order – Elite Emporium</title>
+  <meta name="description" content="Enter your Elite Emporium order ID to see status, tracking and estimated delivery." />
+  <link rel="canonical" href="https://elite-emporium-one.vercel.app/track-order.html" />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#DB3022" />
+  <style>
+    .track-page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 4% 80px;
+    }
+    .track-card {
+      background: var(--surface, #fff);
+      border: 1px solid var(--border, #e8eaf0);
+      border-radius: 16px;
+      padding: 26px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+    .track-card h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text, #1a1a1a);
+      margin: 0 0 6px;
+    }
+    .track-card > p {
+      font-size: 13px;
+      color: var(--text2, #6c757d);
+      margin-bottom: 18px;
+    }
+    .track-form {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .track-form input {
+      flex: 1;
+      min-width: 200px;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border, #e0e0e0);
+      border-radius: 22px;
+      font-size: 14px;
+      font-family: inherit;
+      letter-spacing: 1px;
+      background: var(--surface, #fff);
+      color: var(--text, #1a1a1a);
+      text-transform: uppercase;
+    }
+    .track-form input:focus {
+      outline: none;
+      border-color: var(--red, #DB3022);
+      box-shadow: 0 0 0 3px rgba(219,48,34,0.15);
+    }
+    .track-form button {
+      background: var(--red, #DB3022);
+      color: #fff;
+      border: none;
+      padding: 11px 22px;
+      border-radius: 22px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      transition: transform 0.15s, box-shadow 0.18s;
+    }
+    .track-form button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(219,48,34,0.25);
+    }
+    .track-hint {
+      font-size: 12px;
+      color: var(--text-3, #9aa3b2);
+      background: var(--bg, #f6f7fb);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 18px;
+    }
+    .track-result {
+      margin-top: 20px;
+      display: none;
+    }
+    .track-result.show { display: block; animation: pageFadeIn 0.3s ease; }
+    @keyframes pageFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .track-status-card {
+      background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+      border: 1px solid #66bb6a;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    .track-status-card .ts-id {
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #2e7d32;
+      font-weight: 700;
+    }
+    .track-status-card .ts-status {
+      font-size: 22px;
+      font-weight: 800;
+      color: #1b5e20;
+      margin: 4px 0 6px;
+    }
+    .track-status-card .ts-eta {
+      font-size: 13px;
+      color: #2e7d32;
+    }
+    [data-theme="dark"] .track-status-card {
+      background: rgba(76,175,80,0.16);
+      border-color: #2e7d32;
+    }
+    [data-theme="dark"] .track-status-card .ts-status { color: #c5e1a5; }
+
+    .track-timeline {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin: 20px 0 14px;
+      position: relative;
+    }
+    .track-timeline::before {
+      content: '';
+      position: absolute;
+      top: 14px; left: 12px; right: 12px;
+      height: 2px;
+      background: var(--border, #e0e0e0);
+      z-index: 0;
+    }
+    .tt-step {
+      flex: 1;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .tt-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg, #f6f7fb);
+      border: 2px solid var(--border, #e0e0e0);
+      margin: 0 auto 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    .tt-step.done .tt-dot {
+      background: var(--green, #27ae60);
+      border-color: var(--green, #27ae60);
+      color: #fff;
+    }
+    .tt-step.current .tt-dot {
+      background: var(--red, #DB3022);
+      border-color: var(--red, #DB3022);
+      color: #fff;
+      box-shadow: 0 0 0 4px rgba(219,48,34,0.18);
+    }
+    .tt-step.current .tt-dot::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 50%;
+      border: 2px solid rgba(219,48,34,0.4);
+      animation: pulse 1.6s infinite;
+    }
+    .tt-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text2, #6c757d);
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    .tt-step.done .tt-label,
+    .tt-step.current .tt-label {
+      color: var(--text, #1a1a1a);
+    }
+
+    .track-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    @media (max-width: 480px) { .track-meta { grid-template-columns: 1fr; } }
+    .tm-cell {
+      background: var(--bg, #f6f7fb);
+      border-radius: 8px;
+      padding: 9px 11px;
+    }
+    [data-theme="dark"] .tm-cell { background: #0d1117; }
+    .tm-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-3, #9aa3b2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+    .tm-val {
+      font-size: 13px;
+      color: var(--text, #1a1a1a);
+      font-weight: 600;
+    }
+
+    .track-err {
+      background: rgba(231,76,60,0.10);
+      border: 1px solid rgba(231,76,60,0.3);
+      color: #c62828;
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .track-err strong { display: block; margin-bottom: 4px; font-weight: 800; }
+    .track-err a { color: #c62828; font-weight: 700; }
+
+    .track-recent {
+      margin-top: 26px;
+      padding-top: 22px;
+      border-top: 1px dashed var(--border, #e0e0e0);
+    }
+    .track-recent h3 {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text, #1a1a1a);
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .track-recent-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .trl-chip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--bg, #f6f7fb);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.12s;
+      border: 1px solid transparent;
+    }
+    .trl-chip:hover {
+      background: var(--surface-2, #fff);
+      border-color: var(--red, #DB3022);
+      transform: translateX(2px);
+    }
+    [data-theme="dark"] .trl-chip { background: #0d1117; }
+    .trl-id { font-family: 'SF Mono', monospace; font-size: 12px; color: var(--text2, #6c757d); }
+    .trl-status { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+
+    .track-help {
+      background: rgba(40,116,240,0.08);
+      border: 1px solid rgba(40,116,240,0.25);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 12.5px;
+      color: #0d47a1;
+      margin-top: 18px;
+      line-height: 1.5;
+    }
+    [data-theme="dark"] .track-help { background: rgba(40,116,240,0.10); color: #90caf9; border-color: #1a4ea3; }
+    .track-help a { color: #0d47a1; font-weight: 700; }
+    [data-theme="dark"] .track-help a { color: #90caf9; }
+  </style>
+</head>
+<body><div id="scrollProgress"></div>
+
+<header>
+  <div class="header-main">
+    <a href="index.html" class="logo">
+      <img src="images/logo.png" class="logo-img" alt="Elite Emporium" />
+    </a>
+    <div class="header-search">
+      <form id="headerSearchForm">
+        <input type="text" id="headerSearchInput" placeholder="Search products, brands and more" autocomplete="off" />
+        <button type="submit">🔍</button>
+      </form>
+    </div>
+    <div class="header-actions">
+      <a href="cart.html" class="cart-btn">🛒 Cart <span class="cart-count">0</span></a>
+    </div>
+  </div>
+</header>
+
+<div class="page-header">
+  <h1>📦 Track Your Order</h1>
+  <p class="breadcrumb"><a href="index.html">Home</a> › Track Order</p>
+</div>
+
+<main class="track-page" id="main">
+  <div class="track-card">
+    <h1>Where's my order?</h1>
+    <p>Enter the order ID we sent on WhatsApp (or copied from your <a href="orders.html" style="color:var(--red);">My Orders</a> page). We'll show you the latest status and estimated delivery window.</p>
+
+    <form class="track-form" onsubmit="lookupOrder(event)">
+      <input type="text" id="trackInput" placeholder="EE-XXXXXXXX" autocomplete="off" autofocus />
+      <button type="submit">Track Order</button>
+    </form>
+
+    <div class="track-hint">
+      💡 Tip: Order IDs look like <code>EE-1A2B3C4D</code>. You can also click any order on the <a href="orders.html" style="color:var(--red);font-weight:600;">My Orders</a> page to track it.
+    </div>
+
+    <div id="trackResult" class="track-result"></div>
+
+    <div id="trackRecent" class="track-recent" style="display:none;">
+      <h3>🕐 Your recent orders</h3>
+      <div class="track-recent-list" id="trackRecentList"></div>
+    </div>
+
+    <div class="track-help">
+      <strong>Can't find your order?</strong>
+      WhatsApp us at <a href="https://wa.me/917358650774" target="_blank" rel="noopener">+91 73586 50774</a> with your name and phone number — we'll look it up on our side and get back within minutes.
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-bottom">
+    <span>© 2026 Elite Emporium. All rights reserved.</span>
+    <span><a href="orders.html" style="color:inherit;">My Orders</a> · <a href="about.html" style="color:inherit;">About</a></span>
+  </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="script.js"></script>
+<script>
+  // Pull order from localStorage by ID (orders are stored client-side)
+  const ORDER_STAGES = ['Ordered', 'Confirmed', 'Shipped', 'Delivered'];
+  const STAGE_EMOJI  = ['📝',     '✅',         '🚚',     '📦'];
+
+  function getOrderById(id) {
+    const orders = JSON.parse(localStorage.getItem('eliteEmporiumOrders') || '[]');
+    return orders.find(o => (o.id || '').toUpperCase() === id.toUpperCase()) || null;
+  }
+
+  function lookupOrder(e) {
+    if (e) e.preventDefault();
+    const raw = document.getElementById('trackInput').value.trim().toUpperCase();
+    const resultEl = document.getElementById('trackResult');
+    if (!raw) {
+      resultEl.classList.remove('show');
+      return;
+    }
+    const order = getOrderById(raw);
+    if (!order) {
+      resultEl.innerHTML = `
+        <div class="track-err">
+          <strong>We couldn't find order ${raw}</strong>
+          Order records live in this browser — if you ordered from another device, they won't appear here. WhatsApp us at <a href="https://wa.me/917358650774?text=${encodeURIComponent('Hi! Please help me track order ' + raw)}" target="_blank" rel="noopener">+91 73586 50774</a> and we'll look it up on our side.
+        </div>`;
+      resultEl.classList.add('show');
+      return;
+    }
+    renderOrderStatus(order);
+  }
+
+  function renderOrderStatus(order) {
+    const date  = new Date(order.date);
+    const hoursAgo = (Date.now() - date.getTime()) / 3600000;
+    // Same staging logic as the orders page
+    const stageIdx = hoursAgo < 6 ? 0 : hoursAgo < 24 ? 1 : hoursAgo < 72 ? 2 : 3;
+    const currentStage = ORDER_STAGES[stageIdx];
+
+    // ETA: 3-7 business days from confirmation
+    const fmt = d => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', weekday: 'short' });
+    const addDays = (d, n) => { const r = new Date(d); for (let i = 0; i < n;) { r.setDate(r.getDate()+1); if (r.getDay() !== 0 && r.getDay() !== 6) i++; } return r; };
+    const eta = stageIdx < 3
+      ? `${fmt(addDays(date, 3 - Math.min(stageIdx, 2)))} – ${fmt(addDays(date, 7 - Math.min(stageIdx, 2)))}`
+      : 'Delivered';
+
+    const items = order.items || [];
+    const itemCount = items.reduce((s, i) => s + (i.quantity || 1), 0);
+
+    const resultEl = document.getElementById('trackResult');
+    resultEl.innerHTML = `
+      <div class="track-status-card">
+        <div class="ts-id">Order ${order.id}</div>
+        <div class="ts-status">${STAGE_EMOJI[stageIdx]} ${currentStage}</div>
+        <div class="ts-eta">${stageIdx < 3 ? `Estimated delivery: <strong>${eta}</strong>` : `Delivered on ${fmt(addDays(date, 7))}`}</div>
+      </div>
+
+      <div class="track-timeline">
+        ${ORDER_STAGES.map((s, i) => `
+          <div class="tt-step ${i < stageIdx ? 'done' : i === stageIdx ? 'current' : ''}">
+            <div class="tt-dot">${i <= stageIdx ? '✓' : ''}</div>
+            <div class="tt-label">${s}</div>
+          </div>`).join('')}
+      </div>
+
+      <div class="track-meta">
+        <div class="tm-cell"><div class="tm-label">📅 Placed on</div><div class="tm-val">${date.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' })}</div></div>
+        <div class="tm-cell"><div class="tm-label">📦 Items</div><div class="tm-val">${itemCount} item${itemCount !== 1 ? 's' : ''}</div></div>
+        <div class="tm-cell"><div class="tm-label">💰 Total</div><div class="tm-val">₹${(order.total || 0).toLocaleString('en-IN')}</div></div>
+        <div class="tm-cell"><div class="tm-label">📍 Ship to</div><div class="tm-val">${(order.customer?.city || '—')}, ${order.customer?.state || ''}</div></div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+        <a href="orders.html" style="flex:1;min-width:140px;text-align:center;padding:10px;background:transparent;border:1.5px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;color:var(--text);text-decoration:none;">View full order →</a>
+        <a href="https://wa.me/917358650774?text=${encodeURIComponent('Hi! Quick question about my order ' + order.id)}" target="_blank" rel="noopener" style="flex:1;min-width:140px;text-align:center;padding:10px;background:#25D366;color:#fff;border-radius:20px;font-size:12px;font-weight:700;text-decoration:none;">💬 Ask on WhatsApp</a>
+      </div>`;
+    resultEl.classList.add('show');
+  }
+
+  function renderRecentList() {
+    const orders = JSON.parse(localStorage.getItem('eliteEmporiumOrders') || '[]');
+    if (!orders.length) return;
+    const wrap = document.getElementById('trackRecent');
+    const list = document.getElementById('trackRecentList');
+    list.innerHTML = orders.slice(0, 5).map(o => {
+      const hoursAgo = (Date.now() - new Date(o.date).getTime()) / 3600000;
+      const stageIdx = hoursAgo < 6 ? 0 : hoursAgo < 24 ? 1 : hoursAgo < 72 ? 2 : 3;
+      const stage = ORDER_STAGES[stageIdx];
+      const stageColor = stageIdx === 3 ? 'background:rgba(39,174,96,0.15);color:#1b5e20;'
+                       : stageIdx === 0 ? 'background:rgba(255,152,0,0.15);color:#e65100;'
+                       : 'background:rgba(40,116,240,0.15);color:#0d47a1;';
+      return `<div class="trl-chip" onclick="document.getElementById('trackInput').value='${o.id}';lookupOrder();">
+        <span class="trl-id">${o.id}</span>
+        <span class="trl-status" style="${stageColor}">${stage}</span>
+      </div>`;
+    }).join('');
+    wrap.style.display = 'block';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    renderRecentList();
+    // Auto-look-up from ?id= URL param (so 'My Orders' page can deep-link)
+    const urlId = new URLSearchParams(window.location.search).get('id');
+    if (urlId) {
+      document.getElementById('trackInput').value = urlId.toUpperCase();
+      lookupOrder();
+    }
+  });
+</script>
+</body>
+</html>

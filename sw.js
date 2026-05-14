@@ -17,6 +17,7 @@ const STATIC_ASSETS = [
   '/about.html',
   '/privacy.html',
   '/terms.html',
+  '/track-order.html',
   '/404.html',
   '/styles.css',
   '/script.js',
