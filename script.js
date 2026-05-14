@@ -3424,18 +3424,58 @@ function initWishlistPage() {
   const totalVal  = wishlisted.reduce((s, p) => s + p.price, 0);
   const totalMrp  = wishlisted.reduce((s, p) => s + (p.mrp || p.price), 0);
   const totalSave = totalMrp - totalVal;
+  const oosCount  = wishlisted.filter(p => p.inStock === false).length;
+  const avgDisc   = totalMrp > totalVal ? Math.round((totalMrp - totalVal) / totalMrp * 100) : 0;
   const valueBar  = document.createElement('div');
   valueBar.className = 'wl-value-bar';
   valueBar.innerHTML = `
     <div>
       <div class="wl-value-label">Total Wishlist Value</div>
       <div class="wl-value-amount">₹${totalVal.toLocaleString('en-IN')}</div>
-      ${totalSave > 0 ? `<div class="wl-value-savings">You'd save ₹${totalSave.toLocaleString('en-IN')} vs MRP!</div>` : ''}
+      <div class="wl-value-meta">
+        ${totalSave > 0 ? `<span class="wl-value-savings">💸 Save ₹${totalSave.toLocaleString('en-IN')} (${avgDisc}% off MRP)</span>` : ''}
+        ${oosCount > 0 ? `<span class="wl-value-oos">⚠️ ${oosCount} out of stock</span>` : ''}
+      </div>
     </div>
     <button class="wl-move-all-btn" onclick="addAllWishlistToCart()">🛒 Add All to Cart</button>`;
   grid.parentElement.insertBefore(valueBar, grid);
 
-  renderProducts(wishlisted, 'wishlistGrid');
+  // Sort dropdown
+  const sortBar = document.createElement('div');
+  sortBar.className = 'wl-sort-bar';
+  sortBar.innerHTML = `
+    <span class="wl-sort-label">Sort by:</span>
+    <select id="wlSortSelect" class="wl-sort-select">
+      <option value="recent">🕐 Recently added</option>
+      <option value="price-asc">₹ Price: Low → High</option>
+      <option value="price-desc">₹ Price: High → Low</option>
+      <option value="discount">💸 Best discount</option>
+      <option value="name">A → Z</option>
+    </select>`;
+  grid.parentElement.insertBefore(sortBar, grid);
+
+  const sortBy = (mode) => {
+    let list = [...wishlisted];
+    switch (mode) {
+      case 'price-asc':  list.sort((a,b) => a.price - b.price); break;
+      case 'price-desc': list.sort((a,b) => b.price - a.price); break;
+      case 'discount':   list.sort((a,b) => {
+        const da = a.mrp && a.mrp > a.price ? (a.mrp - a.price) / a.mrp : 0;
+        const db = b.mrp && b.mrp > b.price ? (b.mrp - b.price) / b.mrp : 0;
+        return db - da;
+      }); break;
+      case 'name':       list.sort((a,b) => a.name.localeCompare(b.name)); break;
+      // 'recent' is the natural insertion order (most-recent first via wishlist.indexOf)
+      case 'recent':
+      default:
+        list.sort((a,b) => rv.indexOf(b.id) - rv.indexOf(a.id));
+        break;
+    }
+    renderProducts(list, 'wishlistGrid');
+  };
+
+  document.getElementById('wlSortSelect').addEventListener('change', e => sortBy(e.target.value));
+  sortBy('recent');
 }
 
 function shareWishlist() {
