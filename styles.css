@@ -1675,6 +1675,46 @@ textarea.form-input { resize:vertical; min-height:72px; }
 [data-theme="dark"] .wa-prompt-chip:hover { background: #128C7E; color: #fff; }
 [data-theme="dark"] .wa-chat-alt { color: rgba(255,255,255,0.55); }
 
+/* Trending searches in header search dropdown */
+.sh-header-trending {
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2) !important;
+  color: #e65100 !important;
+  border-top: 1px dashed #ff9800;
+}
+[data-theme="dark"] .sh-header-trending {
+  background: rgba(255,152,0,0.10) !important;
+  color: #ffb74d !important;
+}
+.sh-trending-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 14px 12px;
+}
+.sh-trend-chip {
+  background: var(--bg, #fdfaf3);
+  border: 1px solid #ffb74d;
+  color: #bf360c;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.sh-trend-chip:hover {
+  background: #ff9800;
+  color: #fff;
+  border-color: #ff9800;
+  transform: translateY(-1px);
+}
+[data-theme="dark"] .sh-trend-chip {
+  background: rgba(255,152,0,0.10);
+  color: #ffb74d;
+  border-color: #f57c00;
+}
+
 /* Empty cart — category quick-jump chips */
 .empty-cart-cats {
   display: grid;

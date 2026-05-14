@@ -2572,17 +2572,42 @@ function initHeaderSearch() {
   inp.parentElement.style.position = 'relative';
   inp.parentElement.appendChild(dropdown);
 
+  // Trending = top 6 product terms by review count (proxy for popularity).
+  // Computed once per page load from the merged products array.
+  function getTrendingTerms() {
+    if (!Array.isArray(products) || !products.length) return [];
+    const topByReviews = [...products]
+      .filter(p => p.inStock !== false && p.name)
+      .sort((a, b) => (b.reviews || 0) - (a.reviews || 0))
+      .slice(0, 12);
+    // Use the most distinctive 1-2 words of each name as a search term
+    const terms = topByReviews.map(p => {
+      const words = (p.name || '').split(/\s+/).filter(w => w.length > 3 && !/^(the|with|and|set|piece|men|men's|women)$/i.test(w));
+      return words.slice(0, 2).join(' ') || p.name;
+    });
+    // De-duplicate, cap at 6
+    return [...new Set(terms)].slice(0, 6);
+  }
+
   function showHistory() {
-    const history = getSearchHistory();
-    if (!history.length) { dropdown.style.display = 'none'; return; }
-    dropdown.innerHTML = `
-      <div class="sh-header">
-        <span>Recent Searches</span>
-        <button onclick="clearSearchHistory()" class="sh-clear">Clear</button>
-      </div>
-      ${history.map(t =>
+    const history  = getSearchHistory();
+    const trending = getTrendingTerms();
+    if (!history.length && !trending.length) { dropdown.style.display = 'none'; return; }
+
+    let html = '';
+    if (history.length) {
+      html += `<div class="sh-header"><span>Recent Searches</span><button onclick="clearSearchHistory()" class="sh-clear">Clear</button></div>`;
+      html += history.map(t =>
         `<div class="sh-item" onclick="useSearchTerm('${t.replace(/'/g,"\\'")}')">🕐 ${t}</div>`
-      ).join('')}`;
+      ).join('');
+    }
+    if (trending.length) {
+      html += `<div class="sh-header sh-header-trending"><span>🔥 Trending Searches</span></div>`;
+      html += `<div class="sh-trending-chips">` + trending.map(t =>
+        `<button type="button" class="sh-trend-chip" onclick="useSearchTerm('${t.replace(/'/g,"\\'")}')">${t}</button>`
+      ).join('') + `</div>`;
+    }
+    dropdown.innerHTML = html;
     dropdown.style.display = 'block';
   }
 
