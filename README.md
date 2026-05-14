@@ -40,22 +40,26 @@ Treat this as the default for autonomous sessions: pick high-impact UX improveme
 
 ```
 elite-emporium/
-├── index.html              # Homepage: hero slideshow, category grid, flash sale, featured, testimonials
-├── products.html           # Product listing: filters (category/price/rating/stock), sort chips, grid/list view
-├── product.html            # Product detail: gallery, variants, price, qty, reviews, tabs (desc/delivery/seller), pin checker
-├── cart.html               # Cart + checkout form + coupon + delivery progress + WhatsApp order
-├── wishlist.html           # Saved items, "Add all to cart", "Share wishlist"
-├── orders.html             # Local order history (from localStorage) with timeline + GST invoice print
-├── admin.html              # Admin panel (Firebase Auth gated) — manage products
+├── index.html              # Homepage: hero, categories, FAQ, testimonials, trust strip, partner brand
+├── products.html           # Product listing with full URL-persisted filter state
+├── product.html            # Product detail: hover-pan zoom, variants, qty, reviews, related categories
+├── cart.html               # Cart + checkout form + Razorpay Pay Online (opt-in) + WhatsApp order
+├── wishlist.html           # Saved items: sort dropdown, value bar with avg-discount + OOS counts
+├── orders.html             # Local order history with stats dashboard (tier, total spent, fav category)
+├── about.html              # Standalone About page (story, founder, business info)
+├── 404.html                # Friendly 404 with category quick-jump
+├── admin.html              # 10x admin panel (Firebase Auth gated) — manage products
 ├── hanii-dhanii.html       # Partner brand storefront
-├── hanii-dhanii-admin.html # Partner brand admin panel
-├── script.js               # ALL frontend JS (~4150 lines after recent additions)
-├── styles.css              # ALL styles (~4500 lines)
+├── hanii-dhanii-admin.html # Partner brand admin panel (parity with main admin)
+├── script.js               # ALL frontend JS (~4400 lines)
+├── styles.css              # ALL styles (~4900 lines)
 ├── firebase-config.js      # Firebase web config (committed; key is public)
 ├── manifest.json           # PWA manifest
-├── sw.js                   # Service worker (basic)
+├── sw.js                   # Service worker (v2) with network→cache→404 navigation chain
+├── sitemap.xml             # Sitemap with category landing pages
+├── robots.txt              # Allow everything except admin panels + firebase-config
 ├── serve.bat / serve.ps1   # Local dev: `python -m http.server` shortcut
-├── images/                 # Logo + product assets (most products use Cloudinary URLs)
+├── images/                 # Logo + a few legacy product assets (most products use Cloudinary)
 ├── telegram-bot/           # Separate Node project — Telegram order notifications (independent)
 └── README.md               # ← this file
 ```
@@ -172,6 +176,18 @@ This list is approximate — `git log --oneline` is authoritative for what lande
 - `initWelcomeBack()` — toast on return after >1h, contextual: cart items / recently viewed / fresh welcome.
 - Product detail: "You might also love" chip strip with curated `RELATED_MAP` per category.
 - Product detail: "Have a question about this product?" WhatsApp CTA card (green, hover-arrow).
+
+### Orders + Wishlist + Footer + Filters wave
+- **Orders stats dashboard** (`a6f5c35`): 4-card strip above order list — total spent, items ordered, favourite category, customer tier (Bronze/Silver/Gold).
+- **Wishlist enhancements** (`c46e3e0`): sort dropdown (Recently added / Price / Discount / A-Z), value-bar with avg-discount-% pill, OOS count pill.
+- **Footer trust strip** (`31bd80f`): two-column row with payment methods (UPI/GPay/PhonePe/Paytm/Bank/WA Cash) + trust seals (GST/Udyam/Privacy/Returns) as pills.
+- **URL filter persistence** (`237cf0e`): products page reads & writes 7 filter params (category, search, sort, minPrice, maxPrice, rating, inStock) via `history.replaceState`. Any filter combination = shareable link.
+
+### FAQ + 404 + offline + About wave
+- **FAQ section** (`f36ffa5`): 8-question accordion on homepage between promo banner and partner brand, with FAQPage JSON-LD for SERP rich snippets.
+- **404 page** (`a05439b`): `/404.html` with floating-emoji illustration, 3 primary CTAs, 10-category quick-jump grid.
+- **Service worker v2** (`a05439b`): bumped to v2, precaches `/404.html`, navigation chain now network → cache → /404.html → /index.html.
+- **About page** (`4e04a84`): standalone `/about.html` with hero pillars, founder card, business info grid, WhatsApp CTA. Added to sitemap + sw cache.
 
 ### Fixes caught along the way
 - Duplicate `const orderBtn` in `placeOrder()` — was a hidden SyntaxError.
