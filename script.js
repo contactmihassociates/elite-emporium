@@ -607,6 +607,9 @@ function showUndoToast(message, onUndo, duration = 5000) {
     stack = document.createElement('div');
     stack.id = 'toastStack';
     stack.className = 'toast-stack';
+    stack.setAttribute('role', 'status');
+    stack.setAttribute('aria-live', 'polite');
+    stack.setAttribute('aria-atomic', 'true');
     document.body.appendChild(stack);
   }
   const toast = document.createElement('div');
@@ -1652,6 +1655,9 @@ function showToast(message, duration = 3200, type = 'default') {
     stack = document.createElement('div');
     stack.id = 'toastStack';
     stack.className = 'toast-stack';
+    stack.setAttribute('role', 'status');
+    stack.setAttribute('aria-live', 'polite');
+    stack.setAttribute('aria-atomic', 'true');
     document.body.appendChild(stack);
   }
 
@@ -3666,6 +3672,21 @@ window.addEventListener('appinstalled', () => {
 
 // ── SCROLL REVEAL ─────────────────────────────
 function initAccessibility() {
+  // Inject a "Skip to main content" link for keyboard users (once)
+  if (!document.getElementById('skipToMain')) {
+    const skip = document.createElement('a');
+    skip.id = 'skipToMain';
+    skip.href = '#main';
+    skip.className = 'skip-link';
+    skip.textContent = 'Skip to main content';
+    document.body.insertBefore(skip, document.body.firstChild);
+    // Make sure there's a target — fall back to the first <main>, <section>, or .fk-main
+    if (!document.getElementById('main')) {
+      const target = document.querySelector('main, [role="main"], .fk-main, .products-layout');
+      if (target) target.id = 'main';
+    }
+  }
+
   // Add aria-labels to icon-only buttons
   const labelMap = [
     ['.back-to-top',     'Back to top'],

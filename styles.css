@@ -4628,3 +4628,40 @@ kbd {
   .img-modal-nav.prev { left: 8px; }
   .img-modal-nav.next { right: 8px; }
 }
+
+/* ── Skip-to-content link (a11y) ─────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 8px;
+  background: var(--red);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 13px;
+  text-decoration: none;
+  z-index: 99999;
+  transition: top 0.18s;
+}
+.skip-link:focus {
+  top: 8px;
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ── Reduced-motion: respect user preference ─────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .announcement-track,
+  .hero-slides,
+  .compare-bar,
+  .pd-zoom-hint { animation: none !important; }
+}
