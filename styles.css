@@ -5293,6 +5293,134 @@ html { scroll-padding-top: 80px; }
   .pd-notfound h1 { font-size: 20px; }
 }
 
+/* ── First-visit welcome modal ─────────────────── */
+.fv-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 9500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.24s ease;
+}
+.fv-backdrop.show { opacity: 1; }
+.fv-modal {
+  background: var(--surface, #fff);
+  border-radius: 22px;
+  padding: 32px 28px 24px;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+  transform: scale(0.92) translateY(20px);
+  transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+.fv-backdrop.show .fv-modal { transform: scale(1) translateY(0); }
+.fv-close {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--text2, #6c757d);
+  cursor: pointer;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.fv-close:hover { background: var(--bg, #f0f0f0); }
+.fv-confetti {
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: 10px;
+  animation: fvBounce 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes fvBounce {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.fv-modal h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text, #1a1a1a);
+  margin-bottom: 6px;
+}
+.fv-modal > p {
+  font-size: 14px;
+  color: var(--text2, #6c757d);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.fv-modal > p b { color: var(--red, #DB3022); }
+.fv-coupon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  border: 1px dashed #ff9800;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin: 0 0 16px;
+}
+.fv-coupon code {
+  flex: 1;
+  font-family: 'SF Mono', monospace;
+  font-size: 18px;
+  font-weight: 800;
+  color: #bf360c;
+  letter-spacing: 2px;
+}
+.fv-copy {
+  background: #e65100;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.fv-copy:hover { background: #bf360c; }
+.fv-perks {
+  font-size: 12.5px;
+  color: var(--text2, #6c757d);
+  text-align: left;
+  line-height: 1.7;
+  background: var(--bg, #f6f7fb);
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+.fv-cta {
+  display: block;
+  background: var(--red, #DB3022);
+  color: #fff;
+  text-decoration: none;
+  padding: 12px;
+  border-radius: 22px;
+  font-weight: 700;
+  font-size: 14px;
+  transition: transform 0.15s, box-shadow 0.18s;
+}
+.fv-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(219,48,34,0.3);
+}
+[data-theme="dark"] .fv-modal { background: #141821; }
+[data-theme="dark"] .fv-perks { background: #0d1117; }
+[data-theme="dark"] .fv-coupon { background: rgba(255,152,0,0.12); border-color: #f57c00; }
+[data-theme="dark"] .fv-coupon code { color: #ffb74d; }
+
 /* ── Reduced-motion: respect user preference ─────── */
 @media (prefers-reduced-motion: reduce) {
   *,

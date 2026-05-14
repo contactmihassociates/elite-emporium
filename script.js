@@ -3920,6 +3920,62 @@ function initDarkMode() {
 }
 
 // ── CART REMINDER BANNER (homepage) ──────────
+// ── FIRST-VISIT WELCOME MODAL ────────────────
+// Brand-new visitors get a one-time modal with a 5% WELCOME coupon.
+// Only on homepage, only if there's no order history and no localStorage flag.
+const FIRST_VISIT_KEY = 'eliteEmporiumFirstVisitDone';
+function initFirstVisitModal() {
+  if (!document.getElementById('featuredProducts')) return; // homepage only
+  if (localStorage.getItem(FIRST_VISIT_KEY)) return;
+  if (JSON.parse(localStorage.getItem('eliteEmporiumOrders') || '[]').length) {
+    localStorage.setItem(FIRST_VISIT_KEY, '1');
+    return;
+  }
+
+  setTimeout(() => {
+    const modal = document.createElement('div');
+    modal.className = 'fv-backdrop';
+    modal.innerHTML = `
+      <div class="fv-modal" role="dialog" aria-labelledby="fvTitle" aria-modal="true">
+        <button class="fv-close" aria-label="Close">✕</button>
+        <div class="fv-confetti">🎉</div>
+        <h2 id="fvTitle">Welcome to Elite Emporium!</h2>
+        <p>Use code <strong>WELCOME</strong> to get <b>5% off your first order</b>.</p>
+        <div class="fv-coupon">
+          <code>WELCOME</code>
+          <button class="fv-copy" type="button">Copy</button>
+        </div>
+        <p class="fv-perks">
+          ✅ Free delivery over ₹499<br />
+          ✅ GST invoice on every order<br />
+          ✅ 7-day easy returns
+        </p>
+        <a href="products.html" class="fv-cta">Start Shopping →</a>
+      </div>`;
+    document.body.appendChild(modal);
+    requestAnimationFrame(() => modal.classList.add('show'));
+
+    const dismiss = () => {
+      modal.classList.remove('show');
+      setTimeout(() => modal.remove(), 240);
+      localStorage.setItem(FIRST_VISIT_KEY, '1');
+    };
+    modal.querySelector('.fv-close').addEventListener('click', dismiss);
+    modal.addEventListener('click', e => { if (e.target === modal) dismiss(); });
+    modal.querySelector('.fv-copy').addEventListener('click', e => {
+      try { navigator.clipboard.writeText('WELCOME'); } catch {}
+      e.target.textContent = '✅ Copied!';
+      setTimeout(() => { if (e.target.textContent !== 'Copy') e.target.textContent = 'Copy'; }, 2000);
+    });
+    modal.querySelector('.fv-cta').addEventListener('click', () => {
+      localStorage.setItem(FIRST_VISIT_KEY, '1');
+    });
+    document.addEventListener('keydown', function esc(e) {
+      if (e.key === 'Escape') { dismiss(); document.removeEventListener('keydown', esc); }
+    });
+  }, 1800);
+}
+
 // ── WELCOME-BACK NUDGE ───────────────────────
 // Stores last visit timestamp. If the user returns after >1h with a non-empty
 // cart, show a single contextual toast. Runs once per session to avoid noise.
@@ -4780,6 +4836,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (document.getElementById('featuredProducts')) initHomePage();
   initWelcomeBack();
+  initFirstVisitModal();
   if (document.getElementById('productsGrid'))     initProductsPage();
   if (document.getElementById('cartItems')) {
     restoreCartFromUrl();
