@@ -729,6 +729,20 @@ function addToCart(productId, selectedColor, selectedImage, qty = 1) {
   const colorStr = selectedColor ? ` (${selectedColor})` : '';
   showToast(`✅ ${product.name}${colorStr} added to cart!`);
 
+  // Auto-open the side cart drawer on the FIRST add-to-cart per session.
+  // Subsequent adds keep the unobtrusive fly-to-cart + toast UX.
+  if (
+    document.getElementById('sideCartDrawer') &&
+    !sessionStorage.getItem('sideCartHinted') &&
+    !window.location.pathname.includes('cart.html') &&
+    !window.location.pathname.includes('product.html')
+  ) {
+    sessionStorage.setItem('sideCartHinted', '1');
+    setTimeout(() => {
+      if (typeof openSideCart === 'function') openSideCart();
+    }, 700); // wait for fly-to-cart to land
+  }
+
   // Suggest a coupon when subtotal crosses ₹200 and no coupon is active
   const sub = getSubtotal();
   if (!_activeCoupon && sub >= 200 && sub < 500) {
