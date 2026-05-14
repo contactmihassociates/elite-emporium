@@ -1193,6 +1193,42 @@ function refreshSummary() {
     }
   }
 
+  // Smart coupon suggestion — show the most valuable coupon for the current subtotal
+  let smartCouponEl = document.getElementById('smartCouponSuggest');
+  const canSuggest = !_activeCoupon && cart.length > 0 && !sessionStorage.getItem('smartCouponDismissed');
+  if (canSuggest) {
+    // Pick best: highest discount value at this subtotal, ignoring SUMMER15 if sub < 500
+    let best = null, bestSave = 0;
+    Object.entries(COUPONS).forEach(([code, c]) => {
+      const save = c.type === 'percent' ? Math.round(sub * c.value / 100) : Math.min(c.value, sub);
+      // SUMMER15 only suggested at higher carts to feel "earned"
+      if (code === 'SUMMER15' && sub < 500) return;
+      if (save > bestSave) { best = { code, c, save }; bestSave = save; }
+    });
+    if (best && bestSave >= 10) {
+      if (!smartCouponEl) {
+        smartCouponEl = document.createElement('div');
+        smartCouponEl.id = 'smartCouponSuggest';
+        smartCouponEl.className = 'smart-coupon-suggest';
+        const savingsEl2 = document.getElementById('summarySavings');
+        (savingsEl2?.parentElement || document.querySelector('.summary-body'))?.insertBefore(smartCouponEl, savingsEl2 || null);
+      }
+      smartCouponEl.innerHTML = `
+        <div class="scs-icon">🎯</div>
+        <div class="scs-body">
+          <strong>Save ₹${best.save.toLocaleString('en-IN')} on this order</strong>
+          <span>Apply code <b>${best.code}</b> — ${best.c.label}</span>
+        </div>
+        <button class="scs-apply" onclick="document.getElementById('couponCode').value='${best.code}';applyCoupon();" type="button">Apply</button>
+        <button class="scs-dismiss" onclick="sessionStorage.setItem('smartCouponDismissed','1');this.parentElement.remove();" type="button" aria-label="Dismiss">✕</button>`;
+      smartCouponEl.style.display = 'flex';
+    } else if (smartCouponEl) {
+      smartCouponEl.remove();
+    }
+  } else if (smartCouponEl) {
+    smartCouponEl.remove();
+  }
+
   // Bulk order CTA — show when subtotal ≥ ₹2000
   let bulkCtaEl = document.getElementById('bulkOrderCta');
   if (sub >= 2000 && cart.length) {
