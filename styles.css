@@ -3206,6 +3206,42 @@ footer { background:#172337; color:#9b9b9b; padding:40px 4% 18px; }
   transition: background 0.2s, transform 0.15s;
 }
 .oh-reorder-btn:hover { background: #1da851; transform: translateY(-1px); }
+
+.oh-track-btn {
+  background: transparent;
+  color: #1565c0;
+  border: 1.5px solid #90caf9;
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.18s, transform 0.15s;
+}
+.oh-track-btn:hover { background: rgba(40,116,240,0.08); transform: translateY(-1px); }
+[data-theme="dark"] .oh-track-btn { color: #90caf9; border-color: #1e3a5f; }
+
+.oh-reorder-now-btn {
+  background: linear-gradient(135deg, #c9a84c, #a0832f);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  white-space: nowrap;
+  transition: transform 0.15s, box-shadow 0.18s, opacity 0.15s;
+}
+.oh-reorder-now-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(201,168,76,0.35);
+  opacity: 0.95;
+}
+
 .oh-footer-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .oh-invoice-btn {
   background: transparent;

@@ -5212,6 +5212,52 @@ function printGSTInvoice(orderId) {
   win.document.close();
 }
 
+// ── REORDER NOW ──────────────────────────────
+// One-click rebuild of an old order's cart contents. Falls back gracefully
+// when the original product no longer exists in the catalogue.
+function reorderNow(orderId) {
+  const orders = getOrderHistory();
+  const order  = orders.find(o => o.id === orderId);
+  if (!order) { showToast('⚠️ Order not found.', 3000, 'error'); return; }
+  if (!order.items || !order.items.length) { showToast('⚠️ No items to re-add.', 3000, 'error'); return; }
+
+  let added = 0, missing = 0, oos = 0;
+  order.items.forEach(item => {
+    const prod = products.find(p => p.id === item.id);
+    if (!prod) { missing++; return; }
+    if (prod.inStock === false) { oos++; return; }
+
+    const cartKey  = String(item.id) + '|' + (item.selectedColor || '');
+    const existing = cart.find(c => c.cartKey === cartKey);
+    if (existing) {
+      existing.quantity += (item.quantity || 1);
+    } else {
+      cart.push({
+        ...prod,
+        quantity:      item.quantity || 1,
+        cartKey,
+        selectedColor: item.selectedColor || null,
+        image:         item.image || prod.image,
+      });
+    }
+    added++;
+  });
+
+  saveCart(true);
+
+  if (added === 0) {
+    showToast('⚠️ None of these items are available anymore.', 4500, 'error');
+    return;
+  }
+  let msg = `🔁 ${added} item${added > 1 ? 's' : ''} added to cart!`;
+  if (missing > 0) msg += ` ${missing} discontinued.`;
+  if (oos > 0)     msg += ` ${oos} out of stock — skipped.`;
+  showToast(msg, 4500, 'success');
+
+  // After a beat, redirect to cart for review
+  setTimeout(() => { window.location.href = 'cart.html'; }, 1400);
+}
+
 function initOrdersPage() {
   const container = document.getElementById('ordersContainer');
   const countEl   = document.getElementById('ordersCount');
@@ -5340,7 +5386,9 @@ function initOrdersPage() {
           <div class="oh-address">📍 ${order.customer.address}, ${order.customer.city}, ${order.customer.state} – ${order.customer.pincode}</div>
           <div class="oh-footer-actions">
             <button class="oh-invoice-btn" onclick="printGSTInvoice('${order.id}')">🧾 GST Invoice</button>
-            <a class="oh-reorder-btn" href="https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent('Hi! I want to reorder my order ' + order.id + ' placed on ' + dStr)}" target="_blank" rel="noopener">💬 Reorder via WhatsApp</a>
+            <a class="oh-track-btn" href="track-order.html?id=${order.id}">🔎 Track</a>
+            <button class="oh-reorder-now-btn" onclick="reorderNow('${order.id}')" title="Add these items back to your cart">🔁 Order Again</button>
+            <a class="oh-reorder-btn" href="https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent('Hi! I want to reorder my order ' + order.id + ' placed on ' + dStr)}" target="_blank" rel="noopener">💬 WhatsApp</a>
           </div>
         </div>
       </div>`;
