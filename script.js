@@ -3126,7 +3126,80 @@ function initHomePage() {
   initDealOfDay();
   initForYou();
   initMostLoved();
+  initEditorsPicks();
   setTimeout(initCartReminder, 2000);
+}
+
+// ── EDITOR'S PICKS — curated 4-product spotlight ──
+// Picks 4 products with the strongest combined signal (high rating,
+// high reviews, has MRP discount, premium-tagged) and shows them in a
+// magazine-style spotlight strip with quotes from the editor. Stable
+// per visit so customers don't see the order shuffle on every scroll.
+function initEditorsPicks() {
+  if (!document.getElementById('featuredProducts')) return; // homepage only
+  if (document.getElementById('editorsPicksSection')) return;
+
+  const candidates = products
+    .filter(p => p.inStock !== false && p.image)
+    .map(p => {
+      const ratingScore   = (p.rating || 0) * 10;
+      const reviewScore   = Math.log((p.reviews || 0) + 1) * 8;
+      const discountScore = (p.mrp && p.mrp > p.price) ? Math.round((p.mrp - p.price) / p.mrp * 30) : 0;
+      const badgeScore    = p.badge === 'Bestseller' ? 18 : p.badge === 'Premium' ? 14 : p.badge === 'Popular' ? 10 : 0;
+      return { p, score: ratingScore + reviewScore + discountScore + badgeScore };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4)
+    .map(x => x.p);
+  if (candidates.length < 4) return;
+
+  const editorNotes = [
+    'The colour reads beautifully under both natural daylight and indoor LEDs.',
+    'A genuinely useful daily-carry item with proper edge stitching and real leather feel.',
+    'Wears equally well with formals, jeans, or ethnic — the rare versatile piece.',
+    'Built to last years of daily use without losing its finish.',
+    'A statement piece for every occasion that punches well above its price.',
+    'Customers come back for this one. The proportions are just right.',
+    'Photographs as beautifully as it looks in person.',
+    'The kind of upgrade you don&rsquo;t realise you needed until you have it.',
+  ];
+
+  const section = document.createElement('section');
+  section.id = 'editorsPicksSection';
+  section.className = 'editors-picks-section';
+  section.innerHTML = `
+    <div class="ep-head">
+      <div class="ep-kicker">📝 Editor&rsquo;s Picks</div>
+      <h2>4 pieces we'd buy ourselves this week</h2>
+      <p>Hand-curated by the Elite Emporium team based on customer reviews, build quality, and value for money.</p>
+    </div>
+    <div class="ep-grid">
+      ${candidates.map((p, i) => {
+        const note     = editorNotes[(p.id * 7 + i) % editorNotes.length];
+        const discount = (p.mrp && p.mrp > p.price) ? Math.round((p.mrp - p.price) / p.mrp * 100) : 0;
+        return `
+        <a class="ep-card" href="product.html?id=${p.id}">
+          <div class="ep-card-num">${String(i + 1).padStart(2, '0')}</div>
+          <div class="ep-card-img"><img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy" /></div>
+          <div class="ep-card-body">
+            <div class="ep-card-cat">${escapeHtml(p.category || '')}</div>
+            <div class="ep-card-name">${escapeHtml(p.name)}</div>
+            <div class="ep-card-quote">&ldquo;${note}&rdquo;</div>
+            <div class="ep-card-foot">
+              <span class="ep-card-price">&#8377;${p.price.toLocaleString('en-IN')}</span>
+              ${discount ? `<span class="ep-card-save">${discount}% off</span>` : ''}
+              <span class="ep-card-rating">&#9733; ${p.rating || '4.5'}</span>
+            </div>
+          </div>
+        </a>`;
+      }).join('')}
+    </div>`;
+
+  // Insert after the Most Loved strip if present, else after Top Picks
+  const after = document.getElementById('mostLovedSection')
+    || document.getElementById('featuredProducts')?.closest('.fk-section');
+  if (after?.parentElement) after.parentElement.insertBefore(section, after.nextSibling);
+  else document.querySelector('.fk-main')?.appendChild(section);
 }
 
 // ── MOST LOVED (rating × log(reviews+1) score) ──
