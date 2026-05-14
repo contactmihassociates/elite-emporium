@@ -5085,6 +5085,23 @@ kbd {
 .faq-item p b { color: var(--text); }
 [data-theme="dark"] .faq-item { background: #141821; }
 
+/* ── Global smooth scrolling (respects reduced-motion) ── */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* ── Focus-visible polish (keyboard navigation only) ── */
+body.kbd-nav a:focus-visible,
+body.kbd-nav button:focus-visible,
+body.kbd-nav input:focus-visible,
+body.kbd-nav select:focus-visible,
+body.kbd-nav textarea:focus-visible,
+body.kbd-nav [role="button"]:focus-visible,
+body.kbd-nav [role="tab"]:focus-visible {
+  outline: 2px solid var(--red, #DB3022);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 /* ── Anchor scroll offset so sticky header doesn't clip jump targets ── */
 html { scroll-padding-top: 80px; }
 :target { scroll-margin-top: 80px; }
@@ -5115,6 +5132,42 @@ html { scroll-padding-top: 80px; }
   outline: 2px solid var(--red);
   outline-offset: 2px;
   border-radius: 6px;
+}
+
+/* ── Back-to-category pill on product detail ─── */
+.back-to-cat-pill {
+  position: fixed;
+  bottom: 80px;
+  left: 16px;
+  background: var(--surface, #fff);
+  color: var(--text, #1a1a1a);
+  border: 1.5px solid var(--border, #e0e0e0);
+  border-radius: 22px;
+  padding: 9px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+  z-index: 900;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s;
+  pointer-events: none;
+}
+.back-to-cat-pill.show {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+.back-to-cat-pill:hover {
+  background: var(--red, #DB3022);
+  color: #fff;
+  border-color: var(--red, #DB3022);
+}
+.back-to-cat-pill strong { font-weight: 800; }
+[data-theme="dark"] .back-to-cat-pill { background: #141821; border-color: #252a37; }
+@media (max-width: 600px) {
+  .back-to-cat-pill { bottom: 70px; left: 10px; font-size: 11px; padding: 7px 12px; }
 }
 
 /* ── Hero scroll-down cue ─────────────────────── */

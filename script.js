@@ -2879,6 +2879,7 @@ function initProductDetailPage() {
   initSizeGuide(p);
   initViewerCount();
   initPdTabInk();
+  initBackToCategoryPill(p);
   document.title = `${p.name} – ₹${p.price.toLocaleString('en-IN')} | Elite Emporium`;
 
   // Dynamic OG tags for social sharing of product links
@@ -5210,6 +5211,29 @@ function printGSTInvoice(orderId) {
   </div>
   </body></html>`);
   win.document.close();
+}
+
+// ── BACK TO CATEGORY PILL (product detail) ───
+// If the customer came from a category-filtered listing, show a floating
+// pill bottom-left that lets them jump back with one click. We detect via
+// document.referrer to avoid relying on session storage.
+function initBackToCategoryPill(product) {
+  if (!product?.category) return;
+  if (document.getElementById('backToCategoryPill')) return;
+  const ref = document.referrer;
+  if (!ref || !ref.includes(window.location.host)) return;
+  // Show only if user came from products.html (any filter) or a category page
+  if (!ref.includes('products.html')) return;
+
+  const pill = document.createElement('a');
+  pill.id = 'backToCategoryPill';
+  pill.className = 'back-to-cat-pill';
+  pill.href = `products.html?category=${encodeURIComponent(product.category)}`;
+  pill.innerHTML = `<span>← Back to <strong>${escapeHtml(product.category)}</strong></span>`;
+  document.body.appendChild(pill);
+
+  // Slide in after a beat so it doesn't fight with the page load
+  setTimeout(() => pill.classList.add('show'), 600);
 }
 
 // ── REORDER NOW ──────────────────────────────
