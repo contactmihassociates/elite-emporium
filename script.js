@@ -11,7 +11,7 @@ const CONFIG = {
   gst: "33DWGPN3169G1ZF",
   udyam: "UDYAM-TN-26-0090343",
   email: "eliteemporium112024@gmail.com",
-  phone: "8072173467",
+  phone: "",
   minFreeDelivery: 499,
   deliveryCharge: 60,
 
@@ -4019,7 +4019,7 @@ function printReceipt() {
       ${discount > 0 ? `<tr><td colspan="3">Coupon (${_activeCoupon})</td><td style="text-align:right;color:#388E3C;">–₹${discount.toLocaleString('en-IN')}</td></tr>` : ''}
       <tr class="total-row"><td colspan="3">TOTAL</td><td style="text-align:right">₹${tot.toLocaleString('en-IN')}</td></tr>
     </table>
-    <div class="footer">Elite Emporium · 183b Sadukai Street, Kayalpattinam · +91 8072173467<br/>Order via WhatsApp: +91 7358650774 · eliteemporium112024@gmail.com</div>
+    <div class="footer">Elite Emporium · 183b Sadukai Street, Kayalpattinam<br/>Order via WhatsApp: +91 7358650774 · eliteemporium112024@gmail.com</div>
   </body></html>`;
 
   const win = window.open('', '_blank');
