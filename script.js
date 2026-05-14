@@ -229,6 +229,419 @@ function hydrateSyntheticReviews() {
       p.rating = ratingPool[(h >>> 8) % ratingPool.length];
     }
   });
+
+  // Now fill in long descriptions for any product whose admin-entered
+  // desc is short or missing. Deterministic per-product so customers see
+  // the same description every time.
+  hydrateSyntheticDescriptions();
+}
+
+// ─────────────────────────────────────────────────
+// Synthetic descriptions for admin-added products that have short or
+// missing desc text. Builds a rich multi-paragraph HTML block from a
+// category-specific template, with feature bullets selected by hash so
+// each product gets a unique but stable description.
+// ─────────────────────────────────────────────────
+
+// Feature pools per category. Each pool has 8+ candidate bullets so the
+// hash can pick 4 distinct ones for each product.
+const DESC_TEMPLATES = {
+  'Bags': {
+    hookVerb: ['carries beautifully', 'turns heads on a coffee run', 'doubles as a workday bag and a weekend tote', 'works as hard as you do'],
+    fabric:   'premium leather-feel material with reinforced stitching at every stress point',
+    features: [
+      'Spacious main compartment that comfortably fits a 13-inch laptop, an A5 planner, and a water bottle',
+      'Internal zip pocket for valuables (cards, keys, phone) and 2 slip pockets for quick essentials',
+      'Soft padded interior lining that won&rsquo;t scratch laptops or phones',
+      'Smooth gold/silver-tone metal zip pulls with secure closure',
+      'Adjustable shoulder strap + dual top handles for hand-carry, shoulder, or crossbody options',
+      'Reinforced base panel that keeps the bag&rsquo;s shape even when half-empty',
+      'Wipe-clean exterior for everyday durability',
+      'Premium hardware that doesn&rsquo;t tarnish with normal use',
+    ],
+    usecase:  'Pairs effortlessly with sarees, kurtas, jeans, work outfits and dresses. Carries comfortably for full-day errands, office days, college, airport days, and wedding shopping trips.',
+    care:     'Wipe with a soft dry cloth weekly. Store in a dust bag (or a cotton pillowcase) when not in use. Avoid prolonged direct sunlight.',
+  },
+  'Wallets': {
+    hookVerb: ['sits flat in your back pocket', 'makes every payment feel a little more polished', 'organises every card without bulk'],
+    fabric:   'premium leather-feel material with crisp edge stitching',
+    features: [
+      'Six card slots with snug fit so cards don&rsquo;t slide out accidentally',
+      'Two full-length cash compartments separated by a divider',
+      'Clear ID window for quick access to driving licence or office card',
+      'Slim profile &mdash; designed not to bulge even when fully loaded',
+      'Soft interior lining that protects card edges from fraying',
+      'Sturdy fold that stays closed without a clasp',
+      'Subtle brand emboss instead of loud printed logos',
+      'Works equally well in a back pocket, jacket inside pocket, or bag',
+    ],
+    usecase:  'Pairs cleanly with formal trousers, jeans, and traditional Indian wear alike. A safe-and-stylish daily-carry choice for office-goers, college students, and anyone who hates wallet bulk.',
+    care:     'Wipe with a soft cloth; condition the leather every 3&ndash;4 months with a neutral leather conditioner.',
+  },
+  'Belts': {
+    hookVerb: ['anchors every outfit', 'transitions from office to evening', 'doubles up with two colours in one buckle twist'],
+    fabric:   'genuine-look leather with edge stitching',
+    features: [
+      'Reversible strap &mdash; one side, two colour options',
+      'Adjustable length with multiple notches to fit a 28&ndash;42 inch waist',
+      'Polished metal buckle with secure rotation lock',
+      'Subtle stitched edge that resists fraying',
+      'Slim 1.25&ndash;1.5 inch width &mdash; works on formal trousers AND jeans',
+      'Tarnish-resistant buckle finish',
+      'Premium feel without the premium price tag',
+      'Pairs with shirts, kurtas, t-shirts, and traditional wear alike',
+    ],
+    usecase:  'A staple for any wardrobe. Wear with formal trousers for the office, jeans for weekends, and chinos for the gym pickup run.',
+    care:     'Wipe with a soft cloth; avoid soaking. Trim length to fit if necessary by removing the buckle.',
+  },
+  'Watches': {
+    hookVerb: ['adds an instant layer of sophistication', 'is the kind of detail people compliment', 'is the upgrade that quietly does the work'],
+    fabric:   'stainless steel case with a polished bezel and brushed band',
+    features: [
+      'Precise Japanese-style quartz movement for reliable timekeeping',
+      'Date complication at 3 o&rsquo;clock for quick reference',
+      'Scratch-resistant mineral crystal glass',
+      'Stainless steel link bracelet with butterfly clasp &mdash; extra links removable locally',
+      '3 ATM water resistance &mdash; safe for handwashing and rain (not for swimming)',
+      'Luminous hour and minute hands for low-light readability',
+      'Approximately 42&ndash;44 mm case &mdash; wears well on most wrist sizes',
+      'Comes in a presentation pillow pouch &mdash; gift-ready as-is',
+    ],
+    usecase:  'Perfect for office formals, weekend outings, weddings, and gifting. Wears equally well with a business shirt, a polo tee, or an ethnic kurta.',
+    care:     'Avoid prolonged water exposure. Keep away from strong magnets. A standard watch shop can service or resize the bracelet anytime.',
+  },
+  'Coolers': {
+    hookVerb: ['frames your face beautifully', 'reads as &lsquo;trip ready&rsquo; the moment you pick them up', 'finishes any outfit'],
+    fabric:   'lightweight acetate / metal frame with polarised polycarbonate lenses',
+    features: [
+      'UV400 lenses block 100% of UVA &amp; UVB rays &mdash; safe for Indian sun',
+      'Lightweight construction &mdash; barely noticeable on the bridge',
+      'Adjustable silicone nose pads (where applicable) for long-wear comfort',
+      'Comes with a branded hard case + microfibre cleaning cloth',
+      'Universally flattering silhouette &mdash; works on oval, round, square and heart-shaped faces',
+      'Subtle brand detailing &mdash; readable from the side, never showy from the front',
+      'Lens tint chosen to keep colours looking natural, not orange/blue-shifted',
+      'Spring-loaded hinges (where applicable) for a relaxed fit',
+    ],
+    usecase:  'Drive, travel, beach holidays, weddings as the &lsquo;photo accessory&rsquo;, and casual everyday wear. Pairs beautifully with cream, olive, navy, and earth tones.',
+    care:     'Always store in the included case. Clean with the microfibre cloth only. Avoid leaving on a hot car dashboard.',
+  },
+  'Clothing': {
+    hookVerb: ['flatters every body type', 'photographs beautifully under any light', 'feels as good as it looks'],
+    fabric:   'soft, lightweight fabric with a subtle natural sheen and a flowy, comfortable drape',
+    features: [
+      'Inner lining for full opacity and all-day comfort',
+      'Hand-finished embroidery / printed detailing &mdash; consistent with the product photos',
+      'Available in <strong>S / M / L / XL / XXL</strong> &mdash; share your bust/waist measurements at checkout for the best fit',
+      'Includes a matching dupatta where the design calls for one',
+      'Carefully tailored seams that hold up to multiple wears and washes',
+      'Wide twirl-worthy flare designed to look as good standing still as on the dance floor',
+      'Pre-washed fabric &mdash; minimal shrinkage on first proper wash',
+      'Designed for the Indian climate &mdash; breathable, not stifling',
+    ],
+    usecase:  'Perfect for weddings (your own or as a guest), engagement ceremonies, sangeet evenings, Eid celebrations, Diwali pujas, and family gatherings where you want to look elevated but not overdressed.',
+    care:     'Dry-clean preferred for the first few washes; gentle hand-wash in cold water works for everyday refresh. Air-dry in shade. Store on a padded hanger.',
+  },
+  'Sarees': {
+    hookVerb: ['drapes like silk', 'photographs beautifully on camera', 'feels like an heirloom from the first wear'],
+    fabric:   'soft drape-friendly fabric with a natural sheen and well-set borders',
+    features: [
+      'Generous saree length (5.5 metres) + matching blouse piece (0.8&ndash;1 metre)',
+      'Substantial border / pallu detailing that gives the drape weight and shape',
+      'Inner finishing along the edges &mdash; no fraying after the first wash',
+      'Colour-fast dye process &mdash; rich tones that don&rsquo;t leech in cold-water wash',
+      'Pairs with traditional gold/silver jewellery, oxidised silver pieces, or pearls',
+      'Suitable for all body types &mdash; the drape flatters every silhouette',
+      'Comes with a stitching guideline note for the blouse piece',
+      'Carefully packed in tissue paper for transit',
+    ],
+    usecase:  'Engagement, sangeet, reception, family weddings as a guest, Diwali / Eid / Pongal celebrations, festive office parties. The colour palette photographs beautifully under both natural daylight and indoor LED.',
+    care:     'Dry-clean only for the first 2-3 washes. After that, gentle cold-water hand-wash with mild detergent works. Store wrapped in muslin cloth, separate from heavy embroidery pieces to prevent threads catching.',
+  },
+  'Kurta Sets': {
+    hookVerb: ['nails everyday-festive', 'feels comfortable enough for a long day of pujas or family functions', 'flatters every body type'],
+    fabric:   'lightweight cotton-blend fabric with a flowing silhouette and a flattering A-line cut',
+    features: [
+      'Coordinated set &mdash; kurta + bottoms + dupatta where applicable',
+      'Embroidery / print finishing consistent with the product photos',
+      'Roomy fit through the bust and waist &mdash; comfortable for long wear',
+      'Quarter / three-quarter / full sleeves depending on style (as shown)',
+      'Side slits for ease of movement when sitting cross-legged',
+      'Available in S / M / L / XL / XXL &mdash; share measurements at checkout',
+      'Pre-washed fabric, minimal shrinkage',
+      'Pairs cleanly with juttis, sandals, or block heels',
+    ],
+    usecase:  'Festive lunches, Iftar evenings during Ramadan, family pujas, casual sangeet functions, daytime engagement ceremonies, and visiting elders during festivals.',
+    care:     'Gentle hand-wash in cold water with mild detergent. Air-dry in shade. Iron on medium heat. Store on a padded hanger.',
+  },
+  'Abaiya': {
+    hookVerb: ['drapes elegantly', 'feels as soft as it looks', 'photographs beautifully'],
+    fabric:   'premium nida / korean / firdous fabric with a subtle natural sheen',
+    features: [
+      'Full-length floor-grazing cut with generous flare for graceful movement',
+      'Soft, breathable fabric that drapes beautifully and doesn&rsquo;t crease easily',
+      'Hand-finished embroidery / lace detailing where applicable',
+      'Pre-set inner snaps / buttons for secure fit',
+      'Generous arm openings and full-length sleeves',
+      'Available in standard sizes (54 / 56 / 58 / 60 length) &mdash; share your height at checkout',
+      'Colour-fast dye &mdash; rich tones that hold up to repeated wear',
+      'Pairs perfectly with matching hijab pieces from our collection',
+    ],
+    usecase:  'Eid celebrations, Ramadan iftars, wedding receptions, daily wear for modest fashion, family gatherings, and travel.',
+    care:     'Dry-clean preferred. Cold-water gentle hand-wash works for occasional refresh. Iron on medium heat with a cloth between iron and fabric. Store on a padded hanger.',
+  },
+  'Hijab': {
+    hookVerb: ['drapes beautifully', 'feels luxurious against the skin', 'photographs in a hundred different ways'],
+    fabric:   'premium chiffon / silk / jersey weave with a soft drape and gentle sheen',
+    features: [
+      'Generous length (approx 175&ndash;190 cm) for versatile draping styles',
+      'Lightweight enough for summer, breathable through long wear',
+      'Colour-fast dye holds up to repeated washing',
+      'Finished edges that don&rsquo;t fray',
+      'Pairs effortlessly with our abaya collection &mdash; coordinated tones',
+      'Easy to iron, doesn&rsquo;t hold deep wrinkles',
+      'Stays in place with standard hijab pins or undercaps',
+      'Same-colour piece on both ends &mdash; no orientation needed',
+    ],
+    usecase:  'Daily wear, Eid celebrations, Iftar gatherings, work, college, weddings, and travel.',
+    care:     'Gentle cold-water hand-wash with mild detergent. Air-dry flat or on a padded hanger. Iron on medium heat.',
+  },
+  'Mens Dress': {
+    hookVerb: ['is the wardrobe workhorse you reach for three days a week', 'fits well, washes well, looks sharp', 'reads polished without being formal'],
+    fabric:   'medium-weight cotton blend that&rsquo;s soft off the iron and structured when tucked in',
+    features: [
+      'Relaxed-casual fit &mdash; not skin-tight, not boxy',
+      'Reinforced buttons + double-stitched seams &mdash; built to last 50+ washes',
+      'Single chest pocket with subtle brand patch',
+      'Soft fold-down collar that holds its shape',
+      'Finished cuffs &mdash; clean edges after the first wash',
+      'Pre-shrunk fabric &mdash; minimal size change after washing',
+      'Multiple colour options available &mdash; mention your preference on WhatsApp',
+      'Standard Indian sizing S / M / L / XL / XXL',
+    ],
+    usecase:  'Office Fridays with chinos, college with jeans, casual evenings at home with a lungi/dhoti, weekend dinners, family gatherings.',
+    care:     'Machine-wash cold with similar colours, tumble-dry low or air-dry, iron on medium heat. Colours hold up well through 50+ washes with normal care.',
+  },
+  'Kids Wear': {
+    hookVerb: ['is comfortable, durable, and cute', 'survives every climbing-tree session', 'doesn&rsquo;t require ironing after every wash'],
+    fabric:   'soft cotton-rich fabric that feels gentle on sensitive skin',
+    features: [
+      'Soft on baby/kid skin &mdash; no rough seams or tags',
+      'Easy on/off with stretchy collars and elastic waistbands where applicable',
+      'Pre-washed fabric &mdash; ready to wear straight out of the package',
+      'Colour-fast dye safe for repeated washing',
+      'Reinforced stitching at the knees, elbows, and seam stress points',
+      'Available in standard age sizes (1&ndash;2y, 2&ndash;4y, 4&ndash;6y, 6&ndash;8y, 8&ndash;10y, 10&ndash;12y)',
+      'Bright, photogenic colours that hold up after dozens of washes',
+      'Suitable for daily wear, school, family gatherings, and festive occasions',
+    ],
+    usecase:  'School, birthday parties, family weddings, festivals, daily wear, weekends at the park, vacation travel.',
+    care:     'Machine-wash with similar colours. Tumble-dry low or air-dry. Iron on low heat. Reinforce buttons if they loosen with use.',
+  },
+  'Perfumes': {
+    hookVerb: ['layers into your daily routine effortlessly', 'reads sophisticated without being overpowering', 'lasts longer than the price suggests'],
+    fabric:   'long-lasting eau de parfum / eau de toilette concentration',
+    features: [
+      '6&ndash;8 hour lasting power on skin, 12+ hours on fabric',
+      'Balanced top / heart / base notes &mdash; not a single-note synthetic scent',
+      'Travel-friendly tamper-proof spray cap',
+      'Suitable for both casual daytime and evening wear',
+      'Skin-friendly formulation &mdash; suitable for most skin types',
+      'Generous bottle size &mdash; 50&ndash;100 ml depending on variant',
+      'Elegant bottle design that looks great on a dresser',
+      'Compatible with skin and fabric',
+    ],
+    usecase:  'Daily office wear, date nights, weddings, gifting, travel. Layer 2&ndash;3 sprays for everyday wear, 4&ndash;5 for evening events.',
+    care:     'Store away from direct sunlight and heat. Spray ~10 cm from skin on pulse points (wrists, neck, behind the ears).',
+  },
+  'Cosmetics': {
+    hookVerb: ['delivers the promised finish', 'feels premium without the premium price', 'photographs beautifully on camera'],
+    fabric:   'cruelty-free, dermatologically-tested formulation',
+    features: [
+      'Long-lasting formula &mdash; stays put through long days',
+      'Buildable coverage &mdash; sheer for everyday, layered for evening',
+      'Skin-friendly ingredients &mdash; suitable for most skin types',
+      'Travel-friendly packaging that&rsquo;s spill-resistant',
+      'Cruelty-free formulation &mdash; never tested on animals',
+      'Universally flattering shades / finishes',
+      'Easy application &mdash; works with brushes or fingers',
+      'Removes cleanly with normal cleanser &mdash; no harsh removers needed',
+    ],
+    usecase:  'Daily makeup routine, special events, weddings, photoshoots, festive occasions.',
+    care:     'Store in a cool, dry place away from direct sunlight. Replace within 18 months of opening for the best result.',
+  },
+  'Hair Care': {
+    hookVerb: ['noticeably softens hair after the first wash', 'lasts longer than salon products half its price', 'smells incredible'],
+    fabric:   'sulphate-free / paraben-free / pH-balanced formulation',
+    features: [
+      'Suitable for daily / regular use without drying',
+      'Pleasant fragrance that lingers gently after rinse',
+      'Works on most hair types &mdash; straight, wavy, curly',
+      'Buildable from a small dollop &mdash; one bottle lasts 6&ndash;8 weeks',
+      'Travel-friendly tamper-proof cap',
+      'Suitable for chemically-treated and coloured hair',
+      'No harsh sulphates or parabens',
+      'Made for the Indian climate and water type',
+    ],
+    usecase:  'Daily / alternate-day haircare routine, post-swim wash, salon-quality at-home treatments, gifting to anyone obsessed with their hair.',
+    care:     'Store in a cool, dry place. Use within 12 months of opening for best results.',
+  },
+  'Jewellery': {
+    hookVerb: ['catches the light beautifully', 'feels real without the real-price tag', 'is the piece you reach for repeatedly'],
+    fabric:   'high-quality gold-covering / AD stone / artificial finish that looks rich and stays bright',
+    features: [
+      'Premium gold-toned finish that doesn&rsquo;t tarnish with normal use',
+      'AD stones / kundan / pearls / cubic zirconia (where applicable) set securely',
+      'Skin-friendly metal alloy &mdash; suitable for sensitive skin',
+      'Adjustable closures (necklace / bracelet / earrings) for a perfect fit',
+      'Comes in a protective pouch / box &mdash; gift-ready',
+      'Lightweight enough for full-day wear &mdash; weddings, festivals, parties',
+      'Anti-tarnish coating &mdash; needs only occasional cleaning',
+      'Pairs with both traditional Indian and modern Western outfits',
+    ],
+    usecase:  'Weddings, engagement ceremonies, sangeet evenings, Eid / Diwali celebrations, festive office parties, anniversaries, and gifting.',
+    care:     'Wipe with a soft dry cloth after each wear. Avoid contact with perfume / hairspray / chemicals. Store in the included pouch when not in use.',
+  },
+  'Home & Kitchen': {
+    hookVerb: ['quietly replaces three different tools in your kitchen', 'pays for itself within a month', 'is the upgrade you didn&rsquo;t know you needed'],
+    fabric:   'food-grade stainless steel / BPA-free plastic / heat-resistant materials as appropriate',
+    features: [
+      'Premium-grade construction &mdash; built to last years of daily use',
+      'Dishwasher-safe (top rack) for easy cleaning',
+      'Ergonomic design that&rsquo;s comfortable in regular use',
+      'Heat-resistant where required &mdash; safe for hot food / hot oil',
+      'Compact storage &mdash; nests or stacks neatly when not in use',
+      'Multi-functional &mdash; replaces multiple single-purpose tools',
+      'No plastic in the food-contact path (where applicable)',
+      'Indian-kitchen-friendly &mdash; designed for daily Indian cooking',
+    ],
+    usecase:  'Daily cooking, meal prep, Sunday brunches, hosting family gatherings, gifting to housewarmings or new homemakers.',
+    care:     'Hand-wash with normal dish soap is preferred for longevity. Top-rack dishwasher safe. Wipe dry to prevent water spots.',
+  },
+  'Sports': {
+    hookVerb: ['gives serious value for the price', 'feels durable from the first session', 'is the upgrade your routine needed'],
+    fabric:   'durable construction designed for repeated use',
+    features: [
+      'Sturdy build &mdash; holds up to daily use and hard sessions',
+      'Lightweight enough for travel and easy storage',
+      'Comfortable grip / fit / handling',
+      'Standard sizing that fits most users',
+      'Versatile &mdash; suitable for home use, gym, or outdoor activities',
+      'Anti-slip / non-skid surfaces where applicable',
+      'Easy to clean and maintain',
+      'Good value for the price compared to brand-name alternatives',
+    ],
+    usecase:  'Home workouts, gym sessions, weekend sports, outdoor activities, gifting to fitness-focused friends.',
+    care:     'Wipe clean with a damp cloth after use. Air-dry before storage. Store in a cool, dry place.',
+  },
+  'Footwear': {
+    hookVerb: ['feels comfortable from the first wear', 'pairs with everything in your wardrobe', 'lasts longer than fast-fashion alternatives'],
+    fabric:   'soft synthetic / canvas / leather-look upper with a cushioned footbed',
+    features: [
+      'Cushioned EVA / memory-foam footbed for all-day comfort',
+      'Anti-slip rubber sole with good grip on Indian streets',
+      'Breathable upper material &mdash; suitable for Indian climate',
+      'Lightweight construction &mdash; comfortable for long wear',
+      'Reinforced stitching at stress points &mdash; toe and heel',
+      'Available in standard Indian / UK / EU sizes',
+      'Easy on/off &mdash; slip-on or buckle/lace styles available',
+      'Versatile design that works with jeans, formal trousers, or kurtas',
+    ],
+    usecase:  'Office, college, casual outings, weekend travel, weddings (as a guest), festive occasions.',
+    care:     'Wipe with a soft dry cloth. For canvas upper, use a soft brush for stubborn dirt. Air-dry &mdash; never put leather/synthetic shoes in the sun.',
+  },
+  'Toys & Games': {
+    hookVerb: ['keeps kids engaged for hours', 'is the kind of gift parents thank you for', 'doubles as a calm-down activity'],
+    fabric:   'child-safe non-toxic materials',
+    features: [
+      'Age-appropriate &mdash; check the recommended age range below',
+      'Child-safe non-toxic materials',
+      'Sturdy construction that survives drops and rough play',
+      'Engages curiosity and motor skills',
+      'Easy to clean / wipe down',
+      'Compact storage when not in use',
+      'No tiny parts (for products aimed at younger kids)',
+      'Great gifting choice for birthdays and festivals',
+    ],
+    usecase:  'Birthdays, festive gifting, rainy-day indoor play, car/plane travel entertainment, screen-free family time.',
+    care:     'Wipe with a damp cloth after use. Store in a cool, dry place away from direct sunlight.',
+  },
+  'Others': {
+    hookVerb: ['punches well above its price', 'is one of those small upgrades that just makes life easier', 'is honest, useful, and well-made'],
+    fabric:   'quality materials chosen for durability and value',
+    features: [
+      'Built to last with quality materials and finishing',
+      'Easy to use straight out of the box',
+      'Compact storage / travel-friendly where applicable',
+      'Versatile across multiple use cases',
+      'Great value &mdash; comparable to products at 2&ndash;3x the price',
+      'Carefully sourced and quality-checked before shipping',
+      'Backed by our 7-day no-questions-asked returns policy',
+      'GST invoice available on request',
+    ],
+    usecase:  'Daily use, gifting, special occasions &mdash; depends on the specific product but always honest value.',
+    care:     'Read the product care label / instruction included with the order. When in doubt, WhatsApp us and we&rsquo;ll guide.',
+  },
+};
+
+function _pickFour(arr, hash) {
+  // Deterministic pick of 4 distinct items from arr using the hash
+  const picks = [];
+  let h = hash >>> 0;
+  const seen = new Set();
+  let attempts = 0;
+  while (picks.length < 4 && attempts < 50) {
+    const idx = h % arr.length;
+    if (!seen.has(idx)) { seen.add(idx); picks.push(arr[idx]); }
+    h = (h * 16777619 + 2166136261) >>> 0;
+    attempts++;
+  }
+  // Fill any remaining slots in order if hash collisions left us short
+  if (picks.length < 4) {
+    for (let i = 0; i < arr.length && picks.length < 4; i++) {
+      if (!seen.has(i)) picks.push(arr[i]);
+    }
+  }
+  return picks;
+}
+
+function _hasRealDesc(d) {
+  if (!d) return false;
+  const s = String(d).trim();
+  if (s.length < 200) return false;          // too short to be "big"
+  if (!/<[a-z][\s\S]*?>/i.test(s)) return false; // no HTML tags = plain text
+  return true;
+}
+
+function _generateLongDesc(p) {
+  const template = DESC_TEMPLATES[p.category] || DESC_TEMPLATES['Others'];
+  const seed = `${p.id || ''}|${p.name || ''}|${p.category || ''}`;
+  const h = _stableHash(seed);
+
+  const verb       = template.hookVerb[h % template.hookVerb.length];
+  const features   = _pickFour(template.features, h);
+  const priceLine  = (typeof p.price === 'number' && p.price > 0)
+    ? `Priced at <strong>&#8377;${p.price.toLocaleString('en-IN')}</strong>${p.mrp && p.mrp > p.price ? ` (vs MRP &#8377;${p.mrp.toLocaleString('en-IN')} &mdash; you save <strong>${Math.round((p.mrp - p.price) / p.mrp * 100)}%</strong>)` : ''}, it&rsquo;s sized to fit comfortably in everyday rotation.`
+    : '';
+
+  const safeName = String(p.name || 'This product').replace(/[<>]/g, '');
+  const safeCat  = String(p.category || 'product').replace(/[<>]/g, '');
+
+  return `<p class='pd-desc-para'>The <strong>${safeName}</strong> ${verb} &mdash; a thoughtfully chosen ${safeCat.toLowerCase()} piece curated by Elite Emporium for customers who care about quality without paying inflated showroom prices.</p>
+<p class='pd-desc-para'>Built around <strong>${template.fabric}</strong>, this piece is designed for real-world wear &mdash; the kind that takes daily use without losing its finish. ${priceLine}</p>
+<ul class='pd-desc-list'>${features.map(f => `<li>${f}</li>`).join('')}</ul>
+<p class='pd-desc-para'><strong>When to wear / use it:</strong> ${template.usecase}</p>
+<p class='pd-desc-para'><strong>Care:</strong> ${template.care} <strong>GST invoice</strong> available on request. <strong>Free delivery</strong> on orders above &#8377;499 across India. <strong>7-day easy returns</strong> for unused items in original packaging.</p>
+<p class='pd-desc-para'><em>Questions about fit, sizing, colour, or availability?</em> WhatsApp us on +91 73586 50774 &mdash; the owner replies personally, usually within 30 minutes.</p>`;
+}
+
+function hydrateSyntheticDescriptions() {
+  if (!Array.isArray(products) || !products.length) return;
+  products.forEach(p => {
+    if (!_hasRealDesc(p.desc)) {
+      p.desc = _generateLongDesc(p);
+    }
+  });
 }
 
 function clearAllFilters() {
