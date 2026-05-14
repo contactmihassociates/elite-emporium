@@ -3910,6 +3910,52 @@ function initStickyBar(p) {
 }
 
 // ── PRINT RECEIPT ────────────────────────────
+// ── TESTIMONIALS ROTATOR ─────────────────────────
+// Highlights one customer card at a time inside #testimonialsRotator.
+// Cards fade through with a subtle scale. Pauses on hover (desktop)
+// and respects prefers-reduced-motion.
+function initTestimonialsRotator() {
+  const wrap = document.getElementById('testimonialsRotator');
+  if (!wrap) return;
+  const cards = [...wrap.querySelectorAll('.testimonial-card')];
+  if (cards.length < 2) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  wrap.classList.add('tr-rotating');
+
+  // Inject indicator dots
+  const dotsWrap = document.createElement('div');
+  dotsWrap.className = 'tr-dots';
+  cards.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'tr-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', `Show testimonial ${i + 1}`);
+    dot.addEventListener('click', () => go(i, true));
+    dotsWrap.appendChild(dot);
+  });
+  wrap.parentElement.appendChild(dotsWrap);
+
+  let current = 0;
+  let timer  = null;
+
+  function go(idx, manual) {
+    current = (idx + cards.length) % cards.length;
+    cards.forEach((c, i) => c.classList.toggle('tr-active', i === current));
+    dotsWrap.querySelectorAll('.tr-dot').forEach((d, i) =>
+      d.classList.toggle('active', i === current));
+    if (manual) restart();
+  }
+  function restart() { clearInterval(timer); timer = setInterval(() => go(current + 1), 5500); }
+
+  go(0);
+  restart();
+
+  // Pause on hover (desktop only)
+  wrap.addEventListener('mouseenter', () => clearInterval(timer));
+  wrap.addEventListener('mouseleave', restart);
+}
+
 // ── WHATSAPP FLOAT → POPUP CHAT CARD ─────────────
 // Converts the .whatsapp-float button from a direct wa.me link to a
 // "chat card" trigger. Opens a small popup with quick-prompt chips
@@ -6492,6 +6538,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initMiniCart();
   initSideCartDrawer();
   initWhatsAppChatCard();
+  initTestimonialsRotator();
   initSocialProof();
   initStatsCounter();
 
