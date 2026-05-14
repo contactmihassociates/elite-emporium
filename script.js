@@ -1808,10 +1808,14 @@ function clearSearchHistory() {
 function initProductsPage() {
   const params      = new URLSearchParams(window.location.search);
   let activeCat     = params.get('category') || 'All';
-  let activeSort    = 'default';
-  let searchQuery   = params.get('search') || '';
-  let minRating     = 0;
-  let inStockOnly   = false;
+  let activeSort    = params.get('sort')     || 'default';
+  let searchQuery   = params.get('search')   || '';
+  let minRating     = parseFloat(params.get('rating')) || 0;
+  let inStockOnly   = params.get('inStock')  === '1';
+  const minPriceP   = parseInt(params.get('minPrice'));
+  const maxPriceP   = parseInt(params.get('maxPrice'));
+  if (!isNaN(minPriceP)) _priceMin = minPriceP;
+  if (!isNaN(maxPriceP)) _priceMax = maxPriceP;
 
   // Pre-fill search input & save term to history
   const searchInp = document.getElementById('productSearchInput');
@@ -1904,6 +1908,22 @@ function initProductsPage() {
     if (countEl) countEl.textContent = `Showing ${list.length} of ${products.length} products`;
     renderCategoryBanner(activeCat, list.length);
     renderFilterChips();
+    syncStateToURL();
+  }
+
+  // Persist the full filter state to the URL via replaceState so links are shareable
+  function syncStateToURL() {
+    const params = new URLSearchParams();
+    if (activeCat   !== 'All')      params.set('category', activeCat);
+    if (searchQuery)                params.set('search',   searchQuery);
+    if (activeSort  !== 'default')  params.set('sort',     activeSort);
+    if (_priceMin   !== null)       params.set('minPrice', _priceMin);
+    if (_priceMax   !== null)       params.set('maxPrice', _priceMax);
+    if (minRating   > 0)            params.set('rating',   minRating);
+    if (inStockOnly)                params.set('inStock',  '1');
+    const qs = params.toString();
+    const newUrl = window.location.pathname + (qs ? '?' + qs : '');
+    history.replaceState(null, '', newUrl);
   }
 
   function renderFilterChips() {
@@ -2108,6 +2128,26 @@ function initProductsPage() {
   if (inStockEl) inStockEl.addEventListener('change', e => { inStockOnly = e.target.checked; refresh(); });
 
   _priceRefresh = refresh;
+
+  // Sync UI controls to URL-restored state (so the sidebar reflects the actual filters)
+  (() => {
+    const sortSel  = document.getElementById('sortSelect');
+    const sortSelM = document.getElementById('sortSelectMobile');
+    if (sortSel)  sortSel.value  = activeSort;
+    if (sortSelM) sortSelM.value = activeSort;
+    document.querySelectorAll('.sort-chip').forEach(c => c.classList.toggle('active', c.dataset.sort === activeSort));
+
+    const inStockUI = document.getElementById('inStockOnly');
+    if (inStockUI) inStockUI.checked = inStockOnly;
+
+    const ratingUI = document.querySelector(`input[name="ratingFilter"][value="${minRating}"]`);
+    if (ratingUI) ratingUI.checked = true;
+
+    const minEl = document.getElementById('priceMin');
+    const maxEl = document.getElementById('priceMax');
+    if (minEl && _priceMin !== null) minEl.value = _priceMin;
+    if (maxEl && _priceMax !== null) maxEl.value = _priceMax;
+  })();
 
   _resetFilters = function() {
     activeCat   = 'All';
