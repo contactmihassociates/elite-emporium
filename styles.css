@@ -1675,6 +1675,106 @@ textarea.form-input { resize:vertical; min-height:72px; }
 [data-theme="dark"] .wa-prompt-chip:hover { background: #128C7E; color: #fff; }
 [data-theme="dark"] .wa-chat-alt { color: rgba(255,255,255,0.55); }
 
+/* Just Landed — recently added products strip */
+.just-landed-section { padding: 12px 4% 8px; }
+.just-landed-strip {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 8px 4px 16px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.just-landed-strip::-webkit-scrollbar { height: 6px; }
+.just-landed-strip::-webkit-scrollbar-thumb { background: var(--border, #e0e0e0); border-radius: 3px; }
+.jl-card {
+  position: relative;
+  flex: 0 0 auto;
+  width: 180px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 14px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  scroll-snap-align: start;
+  transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
+  display: flex;
+  flex-direction: column;
+}
+[data-theme="dark"] .jl-card { background: #141821; border-color: #252a37; }
+.jl-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--red, #DB3022);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+.jl-ribbon {
+  position: absolute;
+  top: 8px; left: 8px;
+  background: linear-gradient(135deg, #DB3022, #B71C1C);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  z-index: 2;
+  box-shadow: 0 2px 6px rgba(219,48,34,0.35);
+  animation: jl-shine 2.4s ease-in-out infinite;
+}
+@keyframes jl-shine {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+.jl-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--bg, #fafafa);
+  overflow: hidden;
+}
+.jl-img img {
+  width: 100%; height: 100%; object-fit: contain;
+  transition: transform 0.4s ease;
+}
+.jl-card:hover .jl-img img { transform: scale(1.05); }
+.jl-info { padding: 10px 12px 12px; }
+.jl-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text, #1a1a1a);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 6px;
+  min-height: 34px;
+}
+.jl-price-row { display: flex; align-items: center; gap: 6px; }
+.jl-price {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--red, #DB3022);
+}
+.jl-save {
+  background: rgba(39,174,96,0.12);
+  color: var(--green, #27ae60);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.jl-ago {
+  font-size: 10px;
+  color: var(--text-2, #6c757d);
+  margin-top: 4px;
+}
+@media (max-width: 480px) {
+  .jl-card { width: 150px; }
+  .jl-name { font-size: 12px; min-height: 32px; }
+}
+
 /* Editor's Picks magazine spotlight */
 .editors-picks-section {
   padding: 28px 4%;

@@ -3127,7 +3127,77 @@ function initHomePage() {
   initForYou();
   initMostLoved();
   initEditorsPicks();
+  initJustLandedStrip();
   setTimeout(initCartReminder, 2000);
+}
+
+// ── 'JUST LANDED' — most recently added Firestore products ──
+// Shows the 10 most recent products in a horizontal scroll strip with
+// a 'New' visual treatment. Sorts by Firestore createdAt; for products
+// without that field (hardcoded), uses negative id so they sort to the
+// end. Hidden if fewer than 4 candidate products are recent.
+function initJustLandedStrip() {
+  if (!document.getElementById('featuredProducts')) return; // homepage only
+  if (document.getElementById('justLandedSection')) return;
+
+  // Sort by createdAt (Firestore timestamp) desc; fallback to id desc
+  const recent = [...products]
+    .filter(p => p.inStock !== false && p.image)
+    .sort((a, b) => {
+      const ta = a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || 0;
+      const tb = b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || 0;
+      if (tb !== ta) return tb - ta;
+      return (b.id || 0) - (a.id || 0);
+    })
+    .slice(0, 10);
+  if (recent.length < 4) return;
+
+  const section = document.createElement('section');
+  section.id = 'justLandedSection';
+  section.className = 'just-landed-section fk-section';
+  section.innerHTML = `
+    <div class="fk-section-head">
+      <h2>✨ Just Landed</h2>
+      <a href="products.html?sort=new">View All →</a>
+    </div>
+    <div class="just-landed-strip" id="justLandedStrip"></div>`;
+
+  // Insert before the Most Loved section if present, else early on the page
+  const before = document.getElementById('mostLovedSection')
+    || document.getElementById('featuredProducts')?.closest('.fk-section');
+  if (before?.parentElement) before.parentElement.insertBefore(section, before);
+  else document.querySelector('.fk-main')?.appendChild(section);
+
+  // Render cards with a 'NEW' ribbon and a relative-time line
+  const fmtAgo = (ts) => {
+    if (!ts) return '';
+    const ms = typeof ts.toMillis === 'function' ? ts.toMillis() : (ts.seconds ? ts.seconds * 1000 : ts);
+    const days = Math.floor((Date.now() - ms) / 86400000);
+    if (days < 1) return 'Added today';
+    if (days < 2) return 'Added yesterday';
+    if (days < 14) return `${days} days ago`;
+    if (days < 60) return `${Math.floor(days / 7)} weeks ago`;
+    return `${Math.floor(days / 30)} months ago`;
+  };
+
+  const strip = section.querySelector('#justLandedStrip');
+  strip.innerHTML = recent.map(p => {
+    const discount = (p.mrp && p.mrp > p.price) ? Math.round((p.mrp - p.price) / p.mrp * 100) : 0;
+    const ago = fmtAgo(p.createdAt);
+    return `
+      <a class="jl-card" href="product.html?id=${p.id}">
+        <div class="jl-ribbon">NEW</div>
+        <div class="jl-img"><img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy" /></div>
+        <div class="jl-info">
+          <div class="jl-name">${escapeHtml(p.name)}</div>
+          <div class="jl-price-row">
+            <span class="jl-price">&#8377;${(p.price || 0).toLocaleString('en-IN')}</span>
+            ${discount ? `<span class="jl-save">${discount}% off</span>` : ''}
+          </div>
+          ${ago ? `<div class="jl-ago">⏰ ${ago}</div>` : ''}
+        </div>
+      </a>`;
+  }).join('');
 }
 
 // ── EDITOR'S PICKS — curated 4-product spotlight ──
