@@ -2116,6 +2116,9 @@ function initProductsPage() {
 
   refresh();
 
+  // Recently Viewed strip on products page
+  injectProductsPageRecentStrip();
+
   // Scroll restoration: restore Y position when user presses Back from a product page
   const _SCROLL_KEY = 'ee_products_scroll';
   const _savedY = sessionStorage.getItem(_SCROLL_KEY);
@@ -2131,6 +2134,46 @@ function initProductsPage() {
       sessionStorage.setItem(_SCROLL_KEY, window.scrollY);
     }
   });
+}
+
+// ── PRODUCTS PAGE: RECENTLY VIEWED STRIP ──────
+function injectProductsPageRecentStrip() {
+  if (document.getElementById('ppRecentSection')) return;
+  const rv = JSON.parse(localStorage.getItem(RV_KEY) || '[]');
+  if (rv.length < 2) return; // hide until they've looked at 2+ products
+
+  const main = document.querySelector('.products-layout main') || document.querySelector('main');
+  if (!main) return;
+
+  const section = document.createElement('section');
+  section.id = 'ppRecentSection';
+  section.className = 'pp-recent-section';
+  section.innerHTML = `
+    <div class="pp-recent-head">
+      <h3>👁️ Recently Viewed</h3>
+      <button class="pp-recent-clear" onclick="clearRecentlyViewed()">Clear</button>
+    </div>
+    <div class="pp-recent-strip">
+      ${rv.map(item => `
+        <a class="pp-recent-card" href="product.html?id=${item.id}">
+          ${item.image ? `<img src="${item.image}" alt="${(item.name || '').replace(/"/g, '&quot;')}" loading="lazy" />` : `<div style="width:92px;height:92px;border-radius:10px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:32px;">🛍️</div>`}
+          <div class="pp-recent-card-name">${item.name || ''}</div>
+          <div class="pp-recent-card-price">₹${(item.price || 0).toLocaleString('en-IN')}</div>
+        </a>`).join('')}
+    </div>`;
+
+  // Insert above the products grid header
+  const grid = document.getElementById('productsGrid');
+  if (grid && grid.parentElement) grid.parentElement.insertBefore(section, grid.parentElement.firstChild);
+  else main.insertBefore(section, main.firstChild);
+}
+
+function clearRecentlyViewed() {
+  localStorage.removeItem(RV_KEY);
+  document.getElementById('ppRecentSection')?.remove();
+  document.getElementById('recentlyViewedSection') && (document.getElementById('recentlyViewedSection').style.display = 'none');
+  document.getElementById('pdRecentlyViewedSection') && (document.getElementById('pdRecentlyViewedSection').style.display = 'none');
+  showToast('🗑️ Recently viewed cleared.', 2500, 'info');
 }
 
 // ── NEW ARRIVALS STRIP ────────────────────────
@@ -2709,6 +2752,41 @@ function initProductDetailPage() {
     }
   }
 
+  // Hover-pan zoom on the main product image (desktop only)
+  (() => {
+    const wrap = document.querySelector('.pd-main-image');
+    const img  = document.getElementById('pdMainImage');
+    if (!wrap || !img) return;
+    if (window.matchMedia('(hover: none)').matches) return; // skip on touch
+
+    wrap.classList.add('pd-zoomable');
+
+    let lens; // floating zoom hint overlay
+    wrap.addEventListener('mouseenter', () => {
+      img.style.transition = 'transform 0.15s ease-out';
+      img.style.transform  = 'scale(2.2)';
+      if (!lens) {
+        lens = document.createElement('div');
+        lens.className = 'pd-zoom-hint';
+        lens.textContent = '🔍 Move to pan · click to zoom in fullscreen';
+        wrap.appendChild(lens);
+      }
+      lens.style.opacity = '1';
+    });
+    wrap.addEventListener('mousemove', e => {
+      const rect = wrap.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width)  * 100;
+      const y = ((e.clientY - rect.top)  / rect.height) * 100;
+      img.style.transformOrigin = `${x}% ${y}%`;
+    });
+    wrap.addEventListener('mouseleave', () => {
+      img.style.transition = 'transform 0.2s ease-out';
+      img.style.transform  = 'scale(1)';
+      img.style.transformOrigin = 'center center';
+      if (lens) lens.style.opacity = '0';
+    });
+  })();
+
   // Swipe gesture on main product image to cycle through variants
   if (p.variants && p.variants.length > 1) {
     const mainImgWrap = document.querySelector('.pd-main-image');
@@ -3148,19 +3226,65 @@ function copyToClipboard(text) {
 }
 
 // ── IMAGE ZOOM MODAL ──────────────────────────
+let _imgModalGallery = []; // list of src strings (current product variants)
+let _imgModalIndex   = 0;
+
 function openImageModal(src) {
   if (!src) return;
   const modal = document.getElementById('imgModal');
   const img   = document.getElementById('imgModalImg');
   if (!modal || !img) return;
-  img.src = src;
+
+  // Build a gallery from the product detail thumbs if present, else single image
+  const thumbs = [...document.querySelectorAll('.pd-thumb')];
+  _imgModalGallery = thumbs.length
+    ? thumbs.map(t => t.dataset?.img).filter(Boolean)
+    : [src];
+  _imgModalIndex = Math.max(0, _imgModalGallery.indexOf(src));
+  if (_imgModalIndex < 0) _imgModalIndex = 0;
+
+  img.src = _imgModalGallery[_imgModalIndex] || src;
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
+
+  // Inject prev/next buttons + counter once
+  if (!document.getElementById('imgModalPrev') && _imgModalGallery.length > 1) {
+    const inner = modal.querySelector('.img-modal-inner') || modal;
+    inner.insertAdjacentHTML('beforeend', `
+      <button id="imgModalPrev" class="img-modal-nav prev" onclick="imgModalStep(-1)" aria-label="Previous">‹</button>
+      <button id="imgModalNext" class="img-modal-nav next" onclick="imgModalStep(1)" aria-label="Next">›</button>
+      <div id="imgModalCounter" class="img-modal-counter"></div>
+    `);
+  }
+  updateImgModalCounter();
+}
+function imgModalStep(delta) {
+  if (!_imgModalGallery.length) return;
+  _imgModalIndex = (_imgModalIndex + delta + _imgModalGallery.length) % _imgModalGallery.length;
+  const img = document.getElementById('imgModalImg');
+  if (img) img.src = _imgModalGallery[_imgModalIndex];
+  updateImgModalCounter();
+}
+function updateImgModalCounter() {
+  const c = document.getElementById('imgModalCounter');
+  const prev = document.getElementById('imgModalPrev');
+  const next = document.getElementById('imgModalNext');
+  const show = _imgModalGallery.length > 1;
+  if (c) { c.textContent = `${_imgModalIndex + 1} / ${_imgModalGallery.length}`; c.style.display = show ? 'block' : 'none'; }
+  if (prev) prev.style.display = show ? 'flex' : 'none';
+  if (next) next.style.display = show ? 'flex' : 'none';
 }
 function closeImageModal() {
   const modal = document.getElementById('imgModal');
   if (modal) { modal.classList.remove('open'); document.body.style.overflow = ''; }
 }
+// Arrow-key nav while modal is open
+document.addEventListener('keydown', e => {
+  const open = document.getElementById('imgModal')?.classList.contains('open');
+  if (!open) return;
+  if (e.key === 'ArrowLeft')  imgModalStep(-1);
+  if (e.key === 'ArrowRight') imgModalStep(1);
+});
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeImageModal(); closeQuickView(); closeCompareModal(); } });
 
 // ── RECENTLY VIEWED ───────────────────────────
