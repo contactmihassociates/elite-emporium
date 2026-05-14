@@ -498,6 +498,13 @@ function flyToCart(imgSrc) {
   }));
 
   setTimeout(() => fly.remove(), 650);
+
+  // Cart icon bounce when the flying image arrives
+  setTimeout(() => {
+    cartIcon.classList.remove('cart-bounce');
+    void cartIcon.offsetWidth;
+    cartIcon.classList.add('cart-bounce');
+  }, 540);
 }
 
 function addToCart(productId, selectedColor, selectedImage, qty = 1) {
@@ -4025,7 +4032,10 @@ function initScrollReveal() {
   const targets = document.querySelectorAll(
     '.fk-section-head, .stats-strip, .testimonials-grid, .fbt-section, ' +
     '.related-section, .review-section, .newsletter-strip, .cart-trust-badges, ' +
-    '.deal-of-day-section, .oh-card'
+    '.deal-of-day-section, .oh-card, ' +
+    '.faq-section, .faq-item, .footer-strip, .wa-channel-cta, ' +
+    '.fk-deal-row, .promo-banner, .about-section, .about-hero, .about-cta, ' +
+    '.oh-stats'
   );
 
   const obs = new IntersectionObserver(entries => {

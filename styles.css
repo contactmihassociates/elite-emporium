@@ -5018,6 +5018,19 @@ html { scroll-padding-top: 80px; }
   border-radius: 6px;
 }
 
+/* ── Cart icon bounce when an item lands ─────────── */
+@keyframes cartBounceKf {
+  0%   { transform: scale(1);   }
+  20%  { transform: scale(1.18) rotate(-4deg); }
+  40%  { transform: scale(0.94) rotate(3deg); }
+  60%  { transform: scale(1.08) rotate(-2deg); }
+  100% { transform: scale(1)    rotate(0); }
+}
+.cart-btn.cart-bounce { animation: cartBounceKf 0.55s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .cart-btn.cart-bounce { animation: none; }
+}
+
 /* ── Reduced-motion: respect user preference ─────── */
 @media (prefers-reduced-motion: reduce) {
   *,
