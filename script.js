@@ -2451,6 +2451,26 @@ function initProductDetailPage() {
   setOgById('ogDesc',  `${p.category} · ${p.mrp && p.mrp > p.price ? Math.round((p.mrp - p.price) / p.mrp * 100) + '% off · ' : ''}Rated ★${p.rating}. Free delivery above ₹499.`);
   setOgById('ogImage', ogImg.startsWith('http') ? ogImg : `https://elite-emporium-one.vercel.app/${ogImg}`);
   setOgById('ogUrl',   window.location.href);
+
+  // Update canonical URL to the actual ?id=... permalink
+  const canonical = document.getElementById('canonicalLink');
+  if (canonical) canonical.href = window.location.href;
+
+  // BreadcrumbList JSON-LD for SERP rich breadcrumbs
+  const bcScript = document.getElementById('productBreadcrumbLd') || document.createElement('script');
+  bcScript.id = 'productBreadcrumbLd';
+  bcScript.type = 'application/ld+json';
+  bcScript.text = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      { '@type': 'ListItem', position: 1, name: 'Home',         item: 'https://elite-emporium-one.vercel.app/' },
+      { '@type': 'ListItem', position: 2, name: 'All Products', item: 'https://elite-emporium-one.vercel.app/products.html' },
+      { '@type': 'ListItem', position: 3, name: p.category,     item: `https://elite-emporium-one.vercel.app/products.html?category=${encodeURIComponent(p.category)}` },
+      { '@type': 'ListItem', position: 4, name: p.name,         item: window.location.href },
+    ],
+  });
+  if (!document.getElementById('productBreadcrumbLd')) document.head.appendChild(bcScript);
   document.querySelector('meta[name="description"]')?.setAttribute('content', `Buy ${p.name} at ₹${p.price.toLocaleString('en-IN')} on Elite Emporium. ${p.category}. Free delivery above ₹499.`);
 
   // Breadcrumb

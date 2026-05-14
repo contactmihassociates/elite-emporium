@@ -13,6 +13,7 @@
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Elite Emporium – Premium Online Store" />
   <meta name="twitter:description" content="Shop Bags, Watches, Fashion & more. Order via WhatsApp!" />
+  <link rel="canonical" href="https://elite-emporium-one.vercel.app/" />
   <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
   <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
@@ -23,6 +24,87 @@
   <meta name="theme-color" content="#DB3022" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <!-- LocalBusiness + Organization JSON-LD for local SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": ["LocalBusiness", "Store"],
+        "@id": "https://elite-emporium-one.vercel.app/#business",
+        "name": "Elite Emporium",
+        "description": "Premium retail store in Kayalpattinam — clothing, bags, watches, jewellery, kitchen & more. GST-registered, Udyam-certified. Order via WhatsApp.",
+        "image": "https://elite-emporium-one.vercel.app/images/logo.png",
+        "logo": "https://elite-emporium-one.vercel.app/images/logo.png",
+        "url": "https://elite-emporium-one.vercel.app/",
+        "telephone": "+91-80721-73467",
+        "email": "eliteemporium112024@gmail.com",
+        "priceRange": "₹₹",
+        "currenciesAccepted": "INR",
+        "paymentAccepted": "Cash, UPI, Bank Transfer, WhatsApp Pay",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "183b, Sadukai Street",
+          "addressLocality": "Kayalpattinam",
+          "addressRegion": "Tamil Nadu",
+          "postalCode": "628204",
+          "addressCountry": "IN"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": "8.5680",
+          "longitude": "78.1330"
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+          "opens": "09:00",
+          "closes": "21:00"
+        },
+        "sameAs": [
+          "https://wa.me/917358650774"
+        ],
+        "areaServed": { "@type": "Country", "name": "India" },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "reviewCount": "500",
+          "bestRating": "5",
+          "worstRating": "1"
+        }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://elite-emporium-one.vercel.app/#org",
+        "name": "Elite Emporium",
+        "url": "https://elite-emporium-one.vercel.app/",
+        "logo": "https://elite-emporium-one.vercel.app/images/logo.png",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+91-7358-650774",
+          "contactType": "customer service",
+          "areaServed": "IN",
+          "availableLanguage": ["en","ta"]
+        },
+        "vatID": "33DWGPN3169G1ZF",
+        "identifier": "UDYAM-TN-26-0090343"
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://elite-emporium-one.vercel.app/#website",
+        "url": "https://elite-emporium-one.vercel.app/",
+        "name": "Elite Emporium",
+        "publisher": { "@id": "https://elite-emporium-one.vercel.app/#org" },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://elite-emporium-one.vercel.app/products.html?search={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body><div id="scrollProgress"></div>
 
