@@ -52,8 +52,8 @@ const CONFIG = {
   // To find your UPI ID: open your UPI app (GPay/PhonePe/Paytm/BHIM) →
   // 'My UPI ID' / 'Profile'. Looks like 'name@oksbi', 'mobile@paytm', etc.
   //
-  upiId:        "",                  // e.g. "eliteemporium@oksbi"
-  upiPayeeName: "Elite Emporium",    // shows up in customer's UPI app
+  upiId:        "7358650774@okbizaxis", // Elite Emporium Google Pay (Axis Bank)
+  upiPayeeName: "Elite Emporium",       // shows up in customer's UPI app
 };
 
 // ── PRODUCT CATALOG (base / hardcoded) ───────
