@@ -205,6 +205,19 @@ This list is approximate — `git log --oneline` is authoritative for what lande
 - **`/terms.html`** — ordering, payment, shipping, returns, product accuracy, IP, liability cap, governing law (Thoothukudi jurisdiction).
 - Both added to sitemap, sw cache, and footer Quick Links. Cross-linked from each other's footer.
 
+### Docs + print + newsletter + cart-share wave
+- **CHANGELOG.md** (`f71dfbe`) — single-day timeline of all batches, grouped by theme, with commit hashes.
+- **Print styles** (`f71dfbe`) — full `@media print` rules: hides chrome (header, footer, nav, toasts, CTAs), forces serif/black-on-white, page-break-inside on order cards. Orders.html now prints as a clean multi-order receipt.
+- **Newsletter handler** (`44fe04d`) — `handleNewsletter()` now validates email regex, stores subscribers in localStorage (capped 50), detects duplicates, auto-copies ELITE10 coupon to clipboard, fires a delayed WA-channel invite toast.
+- **Cart save & restore** (`44fe04d`) — `shareCart()` embeds a base64 cart token into the WA message as a `?restore=...` link. `restoreCartFromUrl()` decodes it on cart page load with REPLACE/MERGE prompt. Enables cross-device cart handoff.
+
+### Hanii Dhanii storefront SEO parity (`d9c6629`)
+- Added canonical, OG tags, preconnect hints, manifest, theme-color, and Brand JSON-LD (declaring HD with `parentOrganization = Elite Emporium`) to the partner brand page.
+
+### Product page polish + first-visit conversion wave
+- **Product not-found state** (`eaa2292`) — friendly empty state with floating-emoji illustration, 3 recovery CTAs (Browse, Home, Ask on WhatsApp with the bad id prefilled), 6 high-rated suggested products. Sticky bar hidden in this state.
+- **First-visit welcome modal** (`ebad664`) — one-time-per-device modal 1.8s after first homepage land. Bouncy confetti, WELCOME coupon (5% off) with one-click copy, 3 perks, Start Shopping CTA. ARIA-correct (`role="dialog"`, `aria-modal`, `aria-labelledby`), Esc/backdrop/X to dismiss. Skipped if user already has order history.
+
 ### Fixes caught along the way
 - Duplicate `const orderBtn` in `placeOrder()` — was a hidden SyntaxError.
 - Broken `'\\''` quote escaping in price-alert onclick.

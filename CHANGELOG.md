@@ -43,6 +43,13 @@ A single long session that shipped ~25 batches. Grouped by theme; commit hashes 
 ### Footer + branding
 - **Footer payment + trust strip** (`31bd80f`): 2-column row with payment methods + trust seals as pills.
 
+### Late batches (docs + cross-device + welcome flow)
+- **CHANGELOG.md + print stylesheet** (`f71dfbe`).
+- **Newsletter form (real handler) + cart save/restore via URL** (`44fe04d`).
+- **Hanii Dhanii storefront SEO + Brand JSON-LD** (`d9c6629`).
+- **Friendly product-not-found state with suggestions** (`eaa2292`).
+- **First-visit welcome modal with WELCOME coupon** (`ebad664`).
+
 ### Fixes caught along the way
 - Duplicate `const orderBtn` in `placeOrder()` was a hidden SyntaxError.
 - Broken `'\\''` quote escaping in price-alert onclick.
