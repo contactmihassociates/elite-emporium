@@ -15,11 +15,30 @@ const CONFIG = {
   minFreeDelivery: 499,
   deliveryCharge: 60,
 
-  // Razorpay Payment Link — drop a public link here to enable "Pay Online".
-  // 1. Sign in to Razorpay → Payment Pages → create a "Customer-amount" page.
-  // 2. Paste the public URL (e.g. https://razorpay.com/payment-link/...).
-  // 3. The "Pay Online" button on the cart will then open it in a new tab.
-  // Leave empty to keep the cart WhatsApp-only.
+  // ── RAZORPAY PAYMENT GATEWAY ────────────────────
+  //
+  // Option A (RECOMMENDED): Embedded Checkout — modern in-page modal.
+  // 1. Sign in to https://dashboard.razorpay.com/
+  // 2. Settings → API Keys → Generate Key (test mode is free, instant)
+  // 3. Copy the Key ID — it starts with "rzp_test_" or "rzp_live_"
+  // 4. Paste it below into razorpayKeyId. That's it.
+  //
+  // Key IDs are public — safe to commit. Never put the SECRET here.
+  // Test mode uses card 4111 1111 1111 1111 / any future expiry / CVV 123.
+  //
+  // For PRODUCTION reconciliation, ideally create order_id server-side
+  // (Razorpay's recommended flow). This frontend-only mode works fine
+  // for small volumes — payments still appear in your Razorpay dashboard
+  // with the order reference in the "notes" field.
+  //
+  razorpayKeyId: "",     // e.g. "rzp_test_AbCdEf123XYZ" or "rzp_live_..."
+  razorpayLiveMode: false, // set true once you've tested with a few real payments
+
+  //
+  // Option B (FALLBACK): Hosted Payment Link / Payment Page.
+  // Used automatically if Key ID isn't configured. Paste the public URL
+  // of a Razorpay Payment Page (Customer-amount type) here.
+  // e.g. https://razorpay.com/payment-link/plink_XXXXXXXX
   razorpayPaymentLink: "",
 };
 
@@ -3413,16 +3432,29 @@ function initStickyBar(p) {
 }
 
 // ── PRINT RECEIPT ────────────────────────────
-// ── RAZORPAY: open hosted Payment Link ─────
-function payOnline() {
-  const link = CONFIG.razorpayPaymentLink;
-  if (!link) {
-    showToast('💳 Online payment not configured yet — please order via WhatsApp.', 4000, 'info');
-    return;
-  }
+// ── RAZORPAY: embedded Checkout (preferred) or hosted link (fallback) ─
+//
+// Loads checkout.js on demand (saves ~85KB on every other page).
+let _rzpScriptPromise = null;
+function loadRazorpayCheckout() {
+  if (_rzpScriptPromise) return _rzpScriptPromise;
+  _rzpScriptPromise = new Promise((resolve, reject) => {
+    if (typeof Razorpay !== 'undefined') { resolve(); return; }
+    const s = document.createElement('script');
+    s.src   = 'https://checkout.razorpay.com/v1/checkout.js';
+    s.async = true;
+    s.onload  = () => resolve();
+    s.onerror = () => { _rzpScriptPromise = null; reject(new Error('checkout.js failed to load')); };
+    document.head.appendChild(s);
+  });
+  return _rzpScriptPromise;
+}
+
+async function payOnline() {
+  // Gate
   if (!cart.length) { showToast('⚠️ Your cart is empty!'); return; }
 
-  // Validate required customer fields before sending them off-site
+  // Validate required customer fields before charging
   const get = id => (document.getElementById(id) || {}).value?.trim() || '';
   const name  = get('custName');
   const phone = get('custPhone');
@@ -3434,39 +3466,154 @@ function payOnline() {
 
   const sub      = getSubtotal();
   const del      = getDelivery();
+  const giftWrap = (typeof getGiftWrap === 'function') ? getGiftWrap() : 0;
   const discount = getCouponDiscount(sub);
-  const total    = Math.max(0, sub + del - discount);
+  const total    = Math.max(0, sub + del + giftWrap - discount);
+  const orderId  = generateOrderId();
+  const customer = { name, phone, address: get('custAddress'), city: get('custCity'), state: get('custState'), pincode: get('custPincode'), notes: get('custNotes') };
 
-  // Save order to history before redirecting off-site
-  const orderId = generateOrderId();
-  saveOrderToHistory({
-    id: orderId,
-    date: new Date().toISOString(),
-    status: 'Awaiting payment',
-    customer: { name, phone, address: get('custAddress'), city: get('custCity'), state: get('custState'), pincode: get('custPincode'), notes: get('custNotes') },
-    items: cart.map(i => ({ id: i.id, name: i.name, image: i.image, price: i.price, quantity: i.quantity, selectedColor: i.selectedColor || null })),
-    subtotal: sub, delivery: del, discount, coupon: _activeCoupon || null, total,
-  });
+  // Mode A — Embedded Razorpay Checkout (preferred)
+  if (CONFIG.razorpayKeyId && CONFIG.razorpayKeyId.startsWith('rzp_')) {
+    try {
+      const btn = document.getElementById('payOnlineBtn');
+      if (btn) { btn.disabled = true; btn.innerHTML = '⏳ Loading payment…'; }
+      await loadRazorpayCheckout();
+      if (btn) { btn.disabled = false; btn.innerHTML = `<span style="font-size:18px;">💳</span> Pay Online (UPI / Cards / Netbanking)`; }
 
-  // Append prefill params if the link supports them (Razorpay Payment Pages accept name/email/contact)
-  const url = new URL(link);
-  url.searchParams.set('amount', String(total));
-  url.searchParams.set('prefill[name]', name);
-  url.searchParams.set('prefill[contact]', phone);
-  url.searchParams.set('reference', orderId);
+      // Razorpay expects amount in paise (₹1 = 100 paise)
+      const giftMsg = (document.getElementById('giftMessage')?.value || '').trim();
+      const options = {
+        key:      CONFIG.razorpayKeyId,
+        amount:   total * 100,
+        currency: 'INR',
+        name:     'Elite Emporium',
+        description: `Order ${orderId} · ${cart.reduce((s,i)=>s+i.quantity,0)} item(s)`,
+        image:    'https://elite-emporium-one.vercel.app/images/logo.png',
+        prefill:  { name, contact: phone, email: get('custEmail') },
+        notes: {
+          order_id:    orderId,
+          items_count: String(cart.reduce((s,i)=>s+i.quantity,0)),
+          address:     `${customer.address}, ${customer.city}, ${customer.state} - ${customer.pincode}`,
+          gift_wrap:   giftWrap > 0 ? 'yes' : 'no',
+          gift_msg:    giftMsg || '',
+          coupon:      _activeCoupon || '',
+        },
+        theme: { color: '#DB3022' },
+        handler: function (response) {
+          // Payment succeeded — save to local order history with payment id
+          saveOrderToHistory({
+            id: orderId,
+            date: new Date().toISOString(),
+            status: 'Paid online ✅',
+            payment: {
+              provider: 'razorpay',
+              paymentId: response.razorpay_payment_id || null,
+              orderId:   response.razorpay_order_id   || null,
+              signature: response.razorpay_signature  || null,
+            },
+            customer,
+            items: cart.map(i => ({ id: i.id, name: i.name, image: i.image, price: i.price, quantity: i.quantity, selectedColor: i.selectedColor || null })),
+            subtotal: sub, delivery: del,
+            giftWrap, giftMessage: giftWrap > 0 ? giftMsg : null,
+            discount, coupon: _activeCoupon || null, total,
+          });
 
-  window.open(url.toString(), '_blank');
-  showToast('💳 Opening secure payment page…', 3000, 'info');
+          // Clear cart, ping the merchant on WhatsApp with payment ID, redirect to orders
+          const successMsg = encodeURIComponent(
+            `✅ *PAYMENT RECEIVED — Elite Emporium*\n` +
+            `━━━━━━━━━━━━━━━━━━━━━━━\n` +
+            `Order: *${orderId}*\n` +
+            `Amount: *₹${total.toLocaleString('en-IN')}*\n` +
+            `Payment ID: ${response.razorpay_payment_id}\n` +
+            `Customer: ${name} (${phone})\n` +
+            `Address: ${customer.address}, ${customer.city}, ${customer.state} - ${customer.pincode}\n\n` +
+            `Please confirm dispatch on WhatsApp.`
+          );
+          cart = [];
+          saveCart();
+          launchConfetti?.();
+          showToast(`🎉 Payment successful! Redirecting…`, 4000, 'success');
+          // Background: open WA with the payment confirmation message (merchant gets a notice)
+          try { window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${successMsg}`, '_blank'); } catch {}
+          setTimeout(() => { window.location.href = 'orders.html'; }, 2200);
+        },
+        modal: {
+          ondismiss: function () {
+            showToast('Payment cancelled. Your cart is preserved.', 3500, 'info');
+          },
+          escape: true,
+          backdropclose: false,
+        },
+      };
+
+      // Save the order to history with 'Awaiting payment' BEFORE opening checkout,
+      // so if the customer closes the modal and comes back, the order exists.
+      saveOrderToHistory({
+        id: orderId,
+        date: new Date().toISOString(),
+        status: 'Awaiting payment',
+        customer,
+        items: cart.map(i => ({ id: i.id, name: i.name, image: i.image, price: i.price, quantity: i.quantity, selectedColor: i.selectedColor || null })),
+        subtotal: sub, delivery: del,
+        giftWrap, giftMessage: giftWrap > 0 ? giftMsg : null,
+        discount, coupon: _activeCoupon || null, total,
+      });
+
+      const rzp = new Razorpay(options);
+      rzp.on('payment.failed', function (resp) {
+        console.error('Razorpay payment failed:', resp.error);
+        showToast(`❌ Payment failed: ${resp.error?.description || 'please try again'}`, 5000, 'error');
+      });
+      rzp.open();
+      return;
+    } catch (err) {
+      console.error(err);
+      showToast('⚠️ Couldn\'t load Razorpay. Falling back to hosted page…', 4000, 'error');
+      // fall through to Payment Link mode
+    }
+  }
+
+  // Mode B — Hosted Payment Link (fallback / unconfigured Key ID)
+  if (CONFIG.razorpayPaymentLink && CONFIG.razorpayPaymentLink.startsWith('http')) {
+    saveOrderToHistory({
+      id: orderId, date: new Date().toISOString(), status: 'Awaiting payment',
+      customer,
+      items: cart.map(i => ({ id: i.id, name: i.name, image: i.image, price: i.price, quantity: i.quantity, selectedColor: i.selectedColor || null })),
+      subtotal: sub, delivery: del,
+      giftWrap, giftMessage: giftWrap > 0 ? (document.getElementById('giftMessage')?.value || '').trim() : null,
+      discount, coupon: _activeCoupon || null, total,
+    });
+    const url = new URL(CONFIG.razorpayPaymentLink);
+    url.searchParams.set('amount', String(total));
+    url.searchParams.set('prefill[name]', name);
+    url.searchParams.set('prefill[contact]', phone);
+    url.searchParams.set('reference', orderId);
+    window.open(url.toString(), '_blank');
+    showToast('💳 Opening secure payment page…', 3000, 'info');
+    return;
+  }
+
+  // Mode C — Nothing configured
+  showToast('💳 Online payment not configured yet — please order via WhatsApp.', 4500, 'info');
 }
 
-// Show Pay Online button when configured
+// Show Pay Online button if EITHER Key ID OR Payment Link is configured
 function initPayOnlineButton() {
   const btn = document.getElementById('payOnlineBtn');
   const note = document.getElementById('payOnlineNote');
   if (!btn) return;
-  const enabled = !!(CONFIG.razorpayPaymentLink && CONFIG.razorpayPaymentLink.startsWith('http'));
+  const hasKey  = !!(CONFIG.razorpayKeyId && CONFIG.razorpayKeyId.startsWith('rzp_'));
+  const hasLink = !!(CONFIG.razorpayPaymentLink && CONFIG.razorpayPaymentLink.startsWith('http'));
+  const enabled = hasKey || hasLink;
   btn.style.display  = enabled ? 'flex' : 'none';
-  if (note) note.style.display = enabled ? 'block' : 'none';
+  if (note) {
+    note.style.display = enabled ? 'block' : 'none';
+    if (hasKey && !CONFIG.razorpayLiveMode) {
+      note.innerHTML = `🧪 <strong>Test mode</strong> — use card <code style="background:rgba(0,0,0,0.1);padding:1px 6px;border-radius:4px;">4111 1111 1111 1111</code>, any future expiry, CVV <code style="background:rgba(0,0,0,0.1);padding:1px 6px;border-radius:4px;">123</code>. Real payments come live the moment you flip <code>razorpayLiveMode</code> to true.`;
+    } else if (hasKey) {
+      note.innerHTML = `🔒 Secure payment powered by <strong>Razorpay</strong> — UPI · Cards · Netbanking · Wallets · GST invoice.`;
+    }
+  }
 }
 
 function printReceipt() {
