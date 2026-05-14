@@ -843,7 +843,15 @@ function updateQuantity(cartKey, delta) {
 function getSubtotal() { return cart.reduce((s, i) => s + i.price * i.quantity, 0); }
 function getItemCount() { return cart.reduce((s, i) => s + i.quantity, 0); }
 function getDelivery()  { const st = getSubtotal(); return st === 0 ? 0 : st < CONFIG.minFreeDelivery ? CONFIG.deliveryCharge : 0; }
-function getTotal()     { return getSubtotal() + getDelivery(); }
+function getGiftWrap()  { return document.getElementById('giftWrap')?.checked ? 50 : 0; }
+function getTotal()     { return getSubtotal() + getDelivery() + getGiftWrap(); }
+
+function toggleGiftWrap() {
+  const checked = document.getElementById('giftWrap')?.checked;
+  const row = document.getElementById('giftMsgRow');
+  if (row) row.style.display = checked ? 'block' : 'none';
+  if (typeof refreshSummary === 'function') refreshSummary();
+}
 
 // ── RENDER STARS ─────────────────────────────
 function generateRatingDist(rating, total) {
@@ -1307,14 +1315,31 @@ function removeCoupon() {
 function refreshSummary() {
   const sub      = getSubtotal();
   const del      = getDelivery();
+  const giftWrap = getGiftWrap();
   const discount = getCouponDiscount(sub);
-  const tot      = Math.max(0, sub + del - discount);
+  const tot      = Math.max(0, sub + del + giftWrap - discount);
 
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   set('summaryItems',    getItemCount() + ' item(s)');
   set('summarySubtotal', '₹' + sub.toLocaleString('en-IN'));
   set('summaryDelivery', del === 0 ? (sub > 0 ? 'FREE 🎉' : '—') : '₹' + del);
   set('summaryTotal',    '₹' + tot.toLocaleString('en-IN'));
+
+  // Gift-wrap row (inserted dynamically into the summary)
+  let giftRow = document.getElementById('giftWrapRow');
+  if (giftWrap > 0) {
+    if (!giftRow) {
+      giftRow = document.createElement('div');
+      giftRow.id = 'giftWrapRow';
+      giftRow.className = 'summary-row';
+      giftRow.innerHTML = `<span>🎁 Gift wrap</span><strong style="color:#e65100;">+₹${giftWrap}</strong>`;
+      const deliveryRowEl = document.getElementById('deliveryRow');
+      if (deliveryRowEl?.parentElement) deliveryRowEl.parentElement.insertBefore(giftRow, deliveryRowEl.nextSibling);
+    }
+    giftRow.style.display = 'flex';
+  } else if (giftRow) {
+    giftRow.style.display = 'none';
+  }
 
   const discountRow = document.getElementById('discountRow');
   const discountEl  = document.getElementById('summaryDiscount');
@@ -1465,12 +1490,15 @@ function buildWhatsAppMessage(details) {
 
   const sub      = getSubtotal();
   const del      = getDelivery();
+  const giftWrap = getGiftWrap();
   const discount = getCouponDiscount(sub);
-  const tot      = Math.max(0, sub + del - discount);
+  const tot      = Math.max(0, sub + del + giftWrap - discount);
+  const giftMsg  = (document.getElementById('giftMessage')?.value || '').trim();
 
   msg += `━━━━━━━━━━━━━━━━━━━━━━━\n`;
   msg += `💰 Subtotal : ₹${sub.toLocaleString('en-IN')}\n`;
   msg += `🚚 Delivery : ${del === 0 ? 'FREE' : '₹' + del}\n`;
+  if (giftWrap > 0) msg += `🎁 Gift wrap : +₹${giftWrap}\n`;
   if (discount > 0) msg += `🎟️ Coupon (${_activeCoupon}) : –₹${discount.toLocaleString('en-IN')}\n`;
   msg += `✅ *TOTAL   : ₹${tot.toLocaleString('en-IN')}*\n`;
   msg += `━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
@@ -1483,6 +1511,10 @@ function buildWhatsAppMessage(details) {
   msg += `State   : ${details.state}\n`;
   msg += `PIN     : ${details.pincode}\n`;
   if (details.notes) msg += `Notes   : ${details.notes}\n`;
+  if (giftWrap > 0) {
+    msg += `\n🎁 *GIFT WRAP REQUESTED* (+₹50)\n`;
+    if (giftMsg) msg += `Gift message: "${giftMsg}"\n`;
+  }
 
   msg += `\n📅 Order Time: ${date}, ${time}\n`;
   msg += `━━━━━━━━━━━━━━━━━━━━━━━\n`;
@@ -1734,6 +1766,16 @@ function initFormValidation() {
       counter.style.color = len > MAX * 0.9 ? 'var(--red)' : 'var(--text-light)';
     });
   }
+
+  // Gift message character counter
+  const giftMsg = document.getElementById('giftMessage');
+  const giftCount = document.getElementById('giftMsgCount');
+  if (giftMsg && giftCount) {
+    giftMsg.addEventListener('input', () => {
+      giftCount.textContent = giftMsg.value.length;
+      giftCount.style.color = giftMsg.value.length > 100 ? 'var(--red)' : '';
+    });
+  }
 }
 
 function launchConfetti() {
@@ -1822,8 +1864,10 @@ function placeOrder() {
 
   const sub      = getSubtotal();
   const del      = getDelivery();
+  const giftWrap = getGiftWrap();
   const discount = getCouponDiscount(sub);
-  const tot      = Math.max(0, sub + del - discount);
+  const tot      = Math.max(0, sub + del + giftWrap - discount);
+  const giftMsg  = (document.getElementById('giftMessage')?.value || '').trim();
   const now      = new Date();
 
   // Save to order history before clearing cart
@@ -1835,6 +1879,8 @@ function placeOrder() {
     items:     cart.map(i => ({ id: i.id, name: i.name, image: i.image, price: i.price, quantity: i.quantity, selectedColor: i.selectedColor || null })),
     subtotal:  sub,
     delivery:  del,
+    giftWrap:  giftWrap,
+    giftMessage: giftWrap > 0 ? giftMsg : null,
     discount:  discount,
     coupon:    _activeCoupon || null,
     total:     tot,

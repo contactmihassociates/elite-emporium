@@ -174,6 +174,20 @@
           </div>
         </div>
 
+        <!-- Gift wrap option -->
+        <label class="gift-wrap-row" for="giftWrap">
+          <input type="checkbox" id="giftWrap" onchange="toggleGiftWrap()" />
+          <div class="gift-wrap-info">
+            <div class="gift-wrap-title">🎁 Add gift wrapping <span class="gift-wrap-price">+₹50</span></div>
+            <div class="gift-wrap-sub">Premium brown craft paper, satin ribbon, hand-written gift tag. Perfect for birthdays, Eid, Diwali, anniversaries.</div>
+          </div>
+        </label>
+        <div id="giftMsgRow" class="gift-msg-row" style="display:none;">
+          <label class="form-label" for="giftMessage">Gift Message <small style="font-weight:400;text-transform:none;">(optional — printed on the tag)</small></label>
+          <textarea id="giftMessage" class="form-input" rows="2" maxlength="120" placeholder="e.g. Happy Birthday, Anu! Lots of love."></textarea>
+          <div class="gift-msg-counter"><span id="giftMsgCount">0</span> / 120</div>
+        </div>
+
         <button class="whatsapp-order-btn" onclick="placeOrder()">
           <span style="font-size:22px;">💬</span>
           Place Order via WhatsApp
