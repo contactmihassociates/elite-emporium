@@ -3608,9 +3608,17 @@ function applySortChip(value, btn) {
 // ── PRODUCT DETAIL TABS ───────────────────────
 function switchPdTab(name, btn) {
   const panelMap = { desc: 'pdTabDesc', delivery: 'pdTabDelivery', seller: 'pdTabSeller' };
-  document.querySelectorAll('.pd-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.pd-tab').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
+    b.setAttribute('tabindex', '-1');
+  });
   document.querySelectorAll('.pd-tab-panel').forEach(p => p.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  if (btn) {
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+    btn.setAttribute('tabindex', '0');
+  }
   const panel = document.getElementById(panelMap[name]);
   if (panel) {
     void panel.offsetWidth; // force reflow so animation replays
@@ -3625,11 +3633,39 @@ function switchPdTab(name, btn) {
 }
 
 function initPdTabInk() {
+  const tabs = [...document.querySelectorAll('.pd-tab')];
   const activeTab = document.querySelector('.pd-tab.active');
   const ink = document.getElementById('pdTabInk');
   if (ink && activeTab) {
     ink.style.left  = activeTab.offsetLeft + 'px';
     ink.style.width = activeTab.offsetWidth + 'px';
+  }
+  // ARIA roles + keyboard navigation for the tablist
+  const tablist = activeTab?.closest('.pd-tabs-nav');
+  if (tablist) {
+    tablist.setAttribute('role', 'tablist');
+    tabs.forEach((t, i) => {
+      t.setAttribute('role', 'tab');
+      t.setAttribute('aria-selected', t.classList.contains('active') ? 'true' : 'false');
+      t.setAttribute('tabindex', t.classList.contains('active') ? '0' : '-1');
+    });
+    ['pdTabDesc','pdTabDelivery','pdTabSeller'].forEach(id => {
+      const p = document.getElementById(id);
+      if (p) p.setAttribute('role', 'tabpanel');
+    });
+    tablist.addEventListener('keydown', e => {
+      if (!['ArrowLeft','ArrowRight','Home','End'].includes(e.key)) return;
+      const cur = tabs.findIndex(t => t === document.activeElement);
+      if (cur === -1) return;
+      e.preventDefault();
+      let next;
+      if (e.key === 'ArrowRight') next = (cur + 1) % tabs.length;
+      else if (e.key === 'ArrowLeft') next = (cur - 1 + tabs.length) % tabs.length;
+      else if (e.key === 'Home') next = 0;
+      else next = tabs.length - 1;
+      tabs[next].focus();
+      tabs[next].click();
+    });
   }
 }
 
