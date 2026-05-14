@@ -113,24 +113,71 @@ Dark mode is driven by `data-theme="dark"` on `<html>`, toggled by `initDarkMode
 
 ## 5. Recent feature additions (rough timeline)
 
-This list is approximate — `git log --oneline` is authoritative for what landed and when.
+This list is approximate — `git log --oneline` is authoritative for what landed and when. See also **CHANGELOG-style commits** like `feat(admin):`, `feat(cart):`, `perf+a11y:`, `feat(seo):`, etc.
 
-- **Apple-style refresh:** pill buttons, larger hero, soft shadows, 18px card radius, Inter + Apple system stack.
-- **PAN-Aadhaar quote unescape fix** in the toolkit page.
-- **15 long-form Insights briefs** added.
-- **Admin edit-product feature** so existing products can be modified without re-creating.
-- **Hanii Dhanii partner brand** integration (storefront + admin + linked product cards).
-- **Rich HTML descriptions** for ~27 newer products.
-- **Quantity selector on product detail page** (1-10, syncs with Add to Cart + Buy Now + sticky bar).
-- **Product detail coupon nudge chip** ("Use ELITE10 — Copy").
-- **Wishlist button inside `.pd-actions`**.
-- **Keyboard left/right arrows** to cycle product variants.
-- **Press `/` to focus header search**, `Esc` to close any modal.
-- **PIN-to-state auto-detect** in the checkout form (covers all major Indian state code prefixes).
-- **Bulk order CTA** on the cart when subtotal ≥ ₹2000.
-- **Scroll position restoration** when returning from a product page.
-- **Header wishlist shortcut** auto-injected into `.header-actions` on all pages.
-- **Fixes:** duplicate `const orderBtn` in `placeOrder()` (was a hidden SyntaxError), broken price-alert onclick (`'\\''` quote escaping), duplicate `const setMeta`.
+### Original wave (Apple-style refresh era)
+- Apple-style refresh: pill buttons, larger hero, soft shadows, 18px card radius, Inter + Apple system stack.
+- 15 long-form Insights briefs added.
+- Hanii Dhanii partner brand integration (storefront + admin + linked product cards).
+- Rich HTML descriptions for ~27 newer products.
+
+### UX polish wave
+- Quantity selector on product detail page (1–10, syncs with Add to Cart + Buy Now + sticky bar).
+- Product detail coupon nudge chip ("Use ELITE10 — Copy").
+- Wishlist button inside `.pd-actions`.
+- Keyboard left/right arrows to cycle product variants.
+- Press `/` to focus header search, `Esc` to close any modal.
+- PIN-to-state auto-detect in the checkout form.
+- Bulk order CTA on the cart when subtotal ≥ ₹2000.
+- Scroll position restoration when returning from a product page.
+- Header wishlist shortcut auto-injected into `.header-actions` on all pages.
+
+### Admin 10x wave (commit `800cccd`)
+- **`admin.html`** completely rewritten with sidebar nav (Dashboard / Products / Categories / Orders / Settings).
+- Dashboard: stat cards, recent products, category bar chart, OOS alerts, activity log.
+- Products: search, category/stock filter, sort, bulk select with bulk mark-stock and bulk-delete, inline price edit, drag-and-drop image upload.
+- MRP field with live discount % preview, Featured toggle.
+- Slide-in drawer for add/edit. CSV export. Dark mode persisted. `Ctrl+N`, `/`, `Esc` shortcuts.
+
+### Hanii Dhanii admin parity (`6c698bd`)
+- `hanii-dhanii-admin.html` rewritten with the same architecture, branded red, scoped to `brand == 'Hanii Dhanii'`. Activity log key: `hdAdminActivity`. Cloudinary folder: `elite-emporium/hanii-dhanii`.
+
+### Payment scaffolding (`040624b`)
+- `CONFIG.razorpayPaymentLink` in `script.js` + a "💳 Pay Online" button on cart (hidden by default). When configured, `payOnline()` validates name + 10-digit phone, saves the order to history with status `"Awaiting payment"`, then opens the Razorpay-hosted page in a new tab with prefilled `amount`, `prefill[name]`, `prefill[contact]`, `reference` (order ID).
+
+### Storefront UX polish (`6dbb61f`)
+- Hover-pan zoom on the product detail main image (desktop only, skipped on touch). `transform: scale(2.2)` with `transformOrigin` tracking the cursor.
+- Image modal now builds a gallery from `.pd-thumb` data attrs — prev/next chevrons, "2 / 4" counter pill, arrow-key navigation.
+- "Recently Viewed" horizontal strip injected above the products grid (shown after viewing 2+ products).
+
+### Performance + Accessibility (`ce6787f`)
+- `preconnect` to Cloudinary + gstatic on key pages; `preload` for `styles.css` and logo on index.
+- Skip-to-content link auto-injected (visible only on focus). Target falls back to `<main>` / `.fk-main`.
+- Toast container now has `role="status" aria-live="polite" aria-atomic="true"`.
+- Global `@media (prefers-reduced-motion: reduce)` killing animations & transitions.
+
+### SEO (`44a4ae1`)
+- New `sitemap.xml` (homepage + 6 main pages + 18 category landing URLs) and `robots.txt` (disallows `/admin.html`, `/hanii-dhanii-admin.html`, `/firebase-config.js`; points to sitemap).
+- `index.html`: full `@graph` JSON-LD — LocalBusiness (address, geo, hours, payment, aggregateRating), Organization (vatID=GST, identifier=Udyam), WebSite (SearchAction for sitelinks search box).
+- Canonical links on index/products/product/cart. Product page sets canonical dynamically to the actual `?id=...` URL.
+- BreadcrumbList JSON-LD on `products.html` (static) and `product.html` (generated dynamically: Home → Products → Category → Product).
+- Cart marked `noindex,follow`.
+
+### Trust & social proof (`e0edde1`)
+- Trust strip expanded from 3 → 6 cards (Free Delivery, WhatsApp Orders, GST Registered, 7-Day Returns, Same-Day Dispatch, Real Human Support).
+- Big green WhatsApp Channel CTA card.
+- 3 new testimonials (6 total) covering kitchen, local lehenga buyer, B2B GST gifting.
+
+### Welcome-back + related categories + ask-seller (`fdc7230`)
+- `initWelcomeBack()` — toast on return after >1h, contextual: cart items / recently viewed / fresh welcome.
+- Product detail: "You might also love" chip strip with curated `RELATED_MAP` per category.
+- Product detail: "Have a question about this product?" WhatsApp CTA card (green, hover-arrow).
+
+### Fixes caught along the way
+- Duplicate `const orderBtn` in `placeOrder()` — was a hidden SyntaxError.
+- Broken `'\\''` quote escaping in price-alert onclick.
+- Duplicate `const setMeta` inside `initProductDetailPage()`.
+- PAN-Aadhaar quote unescape fix in the toolkit page.
 
 ---
 
