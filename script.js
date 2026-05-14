@@ -3448,6 +3448,8 @@ function initStickyBar(p) {
 // ── PRINT RECEIPT ────────────────────────────
 // ── DIRECT UPI PAYMENT (no gateway, zero fees) ─────
 async function payViaUPI() {
+  console.log('[UPI] payViaUPI() called');
+
   if (!CONFIG.upiId || !CONFIG.upiId.includes('@')) {
     showToast('💳 UPI not configured yet — please order via WhatsApp.', 4000, 'info');
     return;
@@ -3462,17 +3464,30 @@ async function payViaUPI() {
   const state   = get('custState');
   const pincode = get('custPincode');
 
-  // Lightweight validation before charging
+  // Validate — scroll to + focus the first empty / invalid field so the
+  // customer can see what's missing instead of just seeing a toast.
   const validations = [
-    { ok: name.length >= 2,            id: 'custName',    msg: 'Enter your name' },
-    { ok: /^\d{10}$/.test(phone),      id: 'custPhone',   msg: 'Enter a valid 10-digit phone' },
-    { ok: address.length >= 5,         id: 'custAddress', msg: 'Enter your delivery address' },
-    { ok: city.length >= 2,            id: 'custCity',    msg: 'Enter your city' },
-    { ok: state !== '',                id: 'custState',   msg: 'Select your state' },
-    { ok: /^\d{6}$/.test(pincode),     id: 'custPincode', msg: 'Enter a valid 6-digit PIN' },
+    { ok: name.length >= 2,            id: 'custName',    msg: 'Please enter your full name' },
+    { ok: /^\d{10}$/.test(phone),      id: 'custPhone',   msg: 'Please enter a valid 10-digit phone' },
+    { ok: address.length >= 5,         id: 'custAddress', msg: 'Please enter your delivery address' },
+    { ok: city.length >= 2,            id: 'custCity',    msg: 'Please enter your city' },
+    { ok: state !== '',                id: 'custState',   msg: 'Please select your state' },
+    { ok: /^\d{6}$/.test(pincode),     id: 'custPincode', msg: 'Please enter a valid 6-digit PIN' },
   ];
   const bad = validations.find(v => !v.ok);
-  if (bad) { showToast('⚠️ ' + bad.msg, 3500, 'error'); document.getElementById(bad.id)?.focus(); return; }
+  if (bad) {
+    console.warn('[UPI] validation failed:', bad);
+    showToast('⚠️ ' + bad.msg, 4500, 'error');
+    const el = document.getElementById(bad.id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => el.focus(), 300);
+      el.style.borderColor = 'var(--red)';
+      el.style.boxShadow = '0 0 0 3px rgba(219,48,34,0.15)';
+      setTimeout(() => { el.style.borderColor = ''; el.style.boxShadow = ''; }, 3000);
+    }
+    return;
+  }
 
   const sub      = getSubtotal();
   const del      = getDelivery();
@@ -3500,9 +3515,16 @@ async function payViaUPI() {
 
   // Build the UPI deep link
   const upiUrl = buildUpiUrl({ amount: total, orderId, note: `Order ${orderId} - Elite Emporium` });
+  console.log('[UPI] deep link:', upiUrl);
 
   // Open the confirmation modal (shows QR + 'Open UPI App' button + txn-ID input)
-  openUPIPaymentModal({ upiUrl, total, orderId, customer, orderItems, sub, del, giftWrap, giftMsg, discount });
+  try {
+    openUPIPaymentModal({ upiUrl, total, orderId, customer, orderItems, sub, del, giftWrap, giftMsg, discount });
+    console.log('[UPI] modal opened for order', orderId);
+  } catch (e) {
+    console.error('[UPI] failed to open modal:', e);
+    showToast('⚠️ Could not open payment screen. Try again, or order via WhatsApp.', 5000, 'error');
+  }
 }
 
 function buildUpiUrl({ amount, orderId, note }) {

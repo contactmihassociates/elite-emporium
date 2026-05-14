@@ -4,7 +4,7 @@
    for pages and API calls.
    ============================================ */
 
-const CACHE_NAME = 'elite-emporium-v2';
+const CACHE_NAME = 'elite-emporium-v3';
 
 const STATIC_ASSETS = [
   '/',
@@ -89,7 +89,24 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // CSS / JS / fonts — cache-first
+  // CSS / JS — stale-while-revalidate so updates land on next visit
+  // (avoids stuck-old-script.js bugs after deploys)
+  if (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
+    event.respondWith(
+      caches.match(request).then(cached => {
+        const networkFetch = fetch(request).then(resp => {
+          if (resp && resp.ok) {
+            caches.open(CACHE_NAME).then(cache => cache.put(request, resp.clone()));
+          }
+          return resp;
+        }).catch(() => cached);
+        return cached || networkFetch;
+      })
+    );
+    return;
+  }
+
+  // Fonts / other static — cache-first
   event.respondWith(
     caches.match(request).then(cached => {
       if (cached) return cached;
