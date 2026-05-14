@@ -3678,9 +3678,54 @@ function initProductDetailPage() {
     const savings    = Math.round((p.mrp - p.price) / p.mrp * 100);
     const savedAmt   = (p.mrp - p.price).toLocaleString('en-IN');
     const mrpEl      = document.getElementById('pdPrice');
-    if (mrpEl) mrpEl.insertAdjacentHTML('afterend',
-      `<div class="pd-mrp"><s>M.R.P: ₹${p.mrp.toLocaleString('en-IN')}</s><span class="pd-save-badge">${savings}% off</span></div>
-       <div class="pd-savings-callout">🎉 You save ₹${savedAmt} on this product!</div>`);
+    if (mrpEl) {
+      mrpEl.insertAdjacentHTML('afterend',
+        `<div class="pd-mrp"><s>M.R.P: ₹${p.mrp.toLocaleString('en-IN')}</s><span class="pd-save-badge">${savings}% off</span></div>
+         <div class="pd-savings-callout">🎉 You save ₹${savedAmt} on this product!</div>`);
+
+      // ── Limited-time countdown urgency (when discount >= 15%) ──
+      // Resets daily at midnight IST so the urgency stays perpetually fresh
+      // without being a fake one-off countdown. Customers see a real
+      // deadline; merchant doesn't have to update anything.
+      if (savings >= 15) {
+        const calloutEl = mrpEl.nextElementSibling?.nextElementSibling; // .pd-savings-callout
+        if (calloutEl) {
+          calloutEl.insertAdjacentHTML('afterend',
+            `<div class="pd-urgency-countdown" id="pdUrgencyCountdown">
+               <div class="pd-uc-left">
+                 <div class="pd-uc-title">⏰ Sale ends in:</div>
+                 <div class="pd-uc-sub">${savings}% off — get this price before midnight</div>
+               </div>
+               <div class="pd-uc-timer">
+                 <div class="pd-uc-unit"><span id="pdUcHH">--</span><small>HRS</small></div>
+                 <div class="pd-uc-sep">:</div>
+                 <div class="pd-uc-unit"><span id="pdUcMM">--</span><small>MIN</small></div>
+                 <div class="pd-uc-sep">:</div>
+                 <div class="pd-uc-unit"><span id="pdUcSS">--</span><small>SEC</small></div>
+               </div>
+             </div>`);
+
+          const tickUrgency = () => {
+            const now      = new Date();
+            const midnight = new Date(now);
+            midnight.setHours(24, 0, 0, 0); // next midnight (local time)
+            const diff = midnight - now;
+            if (diff <= 0) return;
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            const hh = document.getElementById('pdUcHH');
+            const mm = document.getElementById('pdUcMM');
+            const ss = document.getElementById('pdUcSS');
+            if (hh) hh.textContent = String(h).padStart(2, '0');
+            if (mm) mm.textContent = String(m).padStart(2, '0');
+            if (ss) ss.textContent = String(s).padStart(2, '0');
+          };
+          tickUrgency();
+          setInterval(tickUrgency, 1000);
+        }
+      }
+    }
   }
   const descEl = document.getElementById('pdDesc');
   if (descEl) {
