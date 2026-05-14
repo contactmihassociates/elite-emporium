@@ -4650,6 +4650,81 @@ kbd {
   outline-offset: 2px;
 }
 
+/* ── Expanded 6-card trust row ─────────────────── */
+.fk-deal-row.trust-6 {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
+}
+@media (max-width: 720px) {
+  .fk-deal-row.trust-6 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+  .fk-deal-row.trust-6 .fk-deal-card { padding: 10px 12px !important; }
+  .fk-deal-row.trust-6 .fk-deal-card h4 { font-size: 12px !important; }
+  .fk-deal-row.trust-6 .fk-deal-card p  { font-size: 10px !important; }
+  .fk-deal-row.trust-6 .fk-deal-icon    { font-size: 24px !important; }
+}
+
+/* ── WhatsApp Channel CTA card ─────────────────── */
+.wa-channel-cta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, #128C7E 0%, #25D366 100%);
+  color: #fff;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  margin: 16px 0;
+  box-shadow: 0 4px 18px rgba(37,211,102,0.25);
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.wa-channel-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(37,211,102,0.38);
+}
+.wa-channel-cta-icon {
+  font-size: 32px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.18);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.wa-channel-cta-text { flex: 1; min-width: 0; }
+.wa-channel-cta-text h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 3px;
+  color: #fff;
+}
+.wa-channel-cta-text p {
+  font-size: 12px;
+  margin: 0;
+  color: rgba(255,255,255,0.9);
+  line-height: 1.4;
+}
+.wa-channel-cta-btn {
+  background: #fff;
+  color: #128C7E;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+@media (max-width: 480px) {
+  .wa-channel-cta { padding: 12px 14px; gap: 10px; }
+  .wa-channel-cta-icon { width: 44px; height: 44px; font-size: 24px; }
+  .wa-channel-cta-text h3 { font-size: 13px; }
+  .wa-channel-cta-text p { font-size: 11px; }
+  .wa-channel-cta-btn { padding: 6px 12px; font-size: 11px; }
+}
+
 /* ── Reduced-motion: respect user preference ─────── */
 @media (prefers-reduced-motion: reduce) {
   *,
