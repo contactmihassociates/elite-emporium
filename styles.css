@@ -5159,6 +5159,81 @@ html { scroll-padding-top: 80px; }
   transform: translateX(2px);
 }
 
+/* ── Print styles (orders / invoices) ──────────── */
+@media print {
+  /* Hide every non-essential UI element */
+  header, footer,
+  .announcement-bar,
+  .bottom-nav,
+  .whatsapp-float,
+  .back-to-top,
+  .page-header .breadcrumb,
+  #scrollProgress,
+  .newsletter-strip,
+  .cart-reminder-banner,
+  .smart-coupon-suggest,
+  .bulk-order-cta,
+  .pay-online-btn,
+  .pay-online-note,
+  .pwa-install-banner,
+  .toast-stack,
+  #toastStack,
+  .img-modal,
+  .qv-backdrop,
+  .cmp-modal-backdrop,
+  .compare-bar,
+  .skip-link,
+  .pp-recent-section,
+  .recently-viewed,
+  #pdRecentlyViewedSection,
+  .fbt-section,
+  .review-section,
+  .oh-card-footer,
+  .oh-clear-btn,
+  .order-success-banner,
+  button { display: none !important; }
+
+  body, html {
+    background: #fff !important;
+    color: #000 !important;
+    font-family: 'Times New Roman', serif !important;
+  }
+
+  .fk-main, main, .products-layout, .pd-page {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .oh-card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    page-break-inside: avoid;
+    margin-bottom: 14px !important;
+    background: #fff !important;
+  }
+
+  .oh-stats {
+    display: none !important; /* dashboard not useful on a printed invoice */
+  }
+
+  a { color: #000 !important; text-decoration: none !important; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 9pt; color: #555; }
+  a[href^="mailto:"]::after,
+  a[href^="tel:"]::after,
+  a[href^="https://wa.me"]::after { content: ""; }
+
+  /* Force black-on-white for any colored panels */
+  .oh-summary, .oh-items, .oh-card-header, .oh-timeline {
+    background: #fff !important;
+    color: #000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Add page-break-after the last order on each page (best-effort) */
+  .oh-card + .oh-card { page-break-before: auto; }
+}
+
 /* ── Reduced-motion: respect user preference ─────── */
 @media (prefers-reduced-motion: reduce) {
   *,
