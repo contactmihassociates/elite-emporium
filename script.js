@@ -3910,6 +3910,97 @@ function initStickyBar(p) {
 }
 
 // ── PRINT RECEIPT ────────────────────────────
+// ── WHATSAPP FLOAT → POPUP CHAT CARD ─────────────
+// Converts the .whatsapp-float button from a direct wa.me link to a
+// "chat card" trigger. Opens a small popup with quick-prompt chips
+// (Quick Question / Track Order / Bulk Order / Custom Request).
+// Each chip deep-links to wa.me with a pre-filled message so customers
+// land in WhatsApp with the right context already typed.
+function initWhatsAppChatCard() {
+  const float = document.querySelector('.whatsapp-float');
+  if (!float || float.dataset.chatCardWired === '1') return;
+  float.dataset.chatCardWired = '1';
+
+  // Replace the bare wa.me link behaviour with our popup
+  float.addEventListener('click', e => {
+    e.preventDefault();
+    openWhatsAppCard();
+  });
+
+  // Inject the card once (hidden until open)
+  if (!document.getElementById('waChatCard')) {
+    const card = document.createElement('div');
+    card.id = 'waChatCard';
+    card.className = 'wa-chat-card';
+    card.setAttribute('role', 'dialog');
+    card.setAttribute('aria-labelledby', 'waChatTitle');
+    card.innerHTML = `
+      <div class="wa-chat-head">
+        <div class="wa-chat-head-avatar">👑</div>
+        <div class="wa-chat-head-info">
+          <div id="waChatTitle" class="wa-chat-head-name">Elite Emporium</div>
+          <div class="wa-chat-head-status"><span class="wa-status-dot"></span>Online · typically replies in 30 min</div>
+        </div>
+        <button class="wa-chat-close" aria-label="Close">✕</button>
+      </div>
+      <div class="wa-chat-body">
+        <div class="wa-chat-bubble">
+          Hi! 👋 How can we help you today? Pick a quick prompt below or message us directly &mdash;
+          <strong>the owner replies personally</strong>, usually within 30 minutes.
+        </div>
+        <div class="wa-chat-prompts">
+          <button class="wa-prompt-chip" data-msg="Hi! I have a quick question about a product.">❓ Quick question</button>
+          <button class="wa-prompt-chip" data-msg="Hi! Can you help me track my order?">📦 Track my order</button>
+          <button class="wa-prompt-chip" data-msg="Hi! I&apos;d like to place a bulk order. Can we discuss pricing?">🏢 Bulk order</button>
+          <button class="wa-prompt-chip" data-msg="Hi! I have a custom request &mdash; is it possible?">✨ Custom request</button>
+          <button class="wa-prompt-chip" data-msg="Hi! I need a GST invoice for an order.">🧾 GST invoice</button>
+          <button class="wa-prompt-chip" data-msg="Hi! What&apos;s your return policy?">🔄 Returns</button>
+        </div>
+        <a class="wa-chat-open-btn" id="waChatOpenBtn" target="_blank" rel="noopener">💬 Open WhatsApp Chat →</a>
+        <div class="wa-chat-alt">Primary: +91 7358650774 &middot; Alt: +91 7358719774</div>
+      </div>`;
+    document.body.appendChild(card);
+
+    card.querySelector('.wa-chat-close').addEventListener('click', closeWhatsAppCard);
+
+    // Default chat button (no preset message)
+    const defaultUrl = `https://wa.me/${CONFIG.whatsappNumber}`;
+    const openBtn = card.querySelector('#waChatOpenBtn');
+    openBtn.href = defaultUrl;
+
+    // Each prompt chip: open WhatsApp with that message pre-filled
+    card.querySelectorAll('.wa-prompt-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const msg = chip.dataset.msg || '';
+        const url = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(msg)}`;
+        window.open(url, '_blank');
+        closeWhatsAppCard();
+      });
+    });
+  }
+
+  // Close on Esc + click-outside
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.getElementById('waChatCard')?.classList.contains('open')) {
+      closeWhatsAppCard();
+    }
+  });
+  document.addEventListener('click', e => {
+    const card = document.getElementById('waChatCard');
+    if (!card?.classList.contains('open')) return;
+    if (card.contains(e.target) || e.target.closest('.whatsapp-float')) return;
+    closeWhatsAppCard();
+  });
+}
+
+function openWhatsAppCard() {
+  const card = document.getElementById('waChatCard');
+  if (card) requestAnimationFrame(() => card.classList.add('open'));
+}
+function closeWhatsAppCard() {
+  document.getElementById('waChatCard')?.classList.remove('open');
+}
+
 // ── DIRECT UPI PAYMENT (no gateway, zero fees) ─────
 async function payViaUPI() {
   console.log('[UPI] payViaUPI() called');
@@ -6400,6 +6491,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initFlashSaleTimer();
   initMiniCart();
   initSideCartDrawer();
+  initWhatsAppChatCard();
   initSocialProof();
   initStatsCounter();
 
