@@ -3533,8 +3533,9 @@ async function payViaUPI() {
     openUPIPaymentModal({ upiUrl, total, orderId, customer, orderItems, sub, del, giftWrap, giftMsg, discount });
     console.log('[UPI] modal opened for order', orderId);
   } catch (e) {
-    console.error('[UPI] failed to open modal:', e);
-    showToast('⚠️ Could not open payment screen. Try again, or order via WhatsApp.', 5000, 'error');
+    console.error('[UPI] failed to open modal:', e, e?.stack);
+    // Surface the actual error message so debugging from a user-side screenshot is possible
+    showToast(`⚠️ Error: ${e?.message || 'unknown'}. Please order via WhatsApp.`, 7000, 'error');
   }
 }
 
@@ -3558,25 +3559,34 @@ function buildUpiUrl({ amount, orderId, note }) {
 }
 
 function openUPIPaymentModal(ctx) {
+  // Inline HTML-escape — does NOT depend on any external helper so this
+  // function works even if escapeHtml() somehow isn't defined yet.
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+
+  // Defensive defaults for every value the template touches.
+  const safeTotal   = Number(ctx?.total) || 0;
+  const totalStr    = safeTotal.toLocaleString('en-IN');
+  const safeOrderId = esc(ctx?.orderId || '');
+  const safeUpiUrl  = ctx?.upiUrl || '';
+  const safeUpiId   = esc(CONFIG.upiId || '');
+  const safePayee   = esc(CONFIG.upiPayeeName || 'Elite Emporium');
+
   // Remove any prior instance
   document.getElementById('upiModal')?.remove();
 
   const isMobile = /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent || '');
 
-  // Multiple QR services so a single one being down doesn't break the modal.
-  // Loaded in order — onerror falls through to the next.
-  const encoded = encodeURIComponent(ctx.upiUrl);
-  const qrSources = [
-    `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encoded}`,
-    `https://chart.googleapis.com/chart?chs=240x240&cht=qr&chld=M|2&chl=${encoded}`,
-    `https://quickchart.io/qr?text=${encoded}&size=240`,
-  ];
-  const qrFallbackChain = qrSources.map((s, i, arr) =>
-    i < arr.length - 1 ? `this.onerror=null;this.src='${arr[i+1]}';` : `this.style.display='none';`
-  );
+  // QR service — single primary + JS-driven fallback (no inline onerror chain
+  // because chained URLs with '|' and '&' inside HTML attributes are fragile)
+  const encoded   = encodeURIComponent(safeUpiUrl);
+  const primaryQR = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encoded}`;
+  const fallback1 = `https://quickchart.io/qr?text=${encoded}&size=240`;
+  const fallback2 = `https://chart.googleapis.com/chart?chs=240x240&cht=qr&chl=${encoded}`;
 
   const upiAppLinks = isMobile
-    ? `<a href="${ctx.upiUrl}" class="upi-open-btn" id="upiOpenBtn">
+    ? `<a href="${esc(safeUpiUrl)}" class="upi-open-btn" id="upiOpenBtn">
          <span class="upi-open-icon">📱</span>
          <span>
            <strong>Tap to pay with your UPI app</strong>
@@ -3585,7 +3595,7 @@ function openUPIPaymentModal(ctx) {
          <span class="upi-open-arrow">→</span>
        </a>
        <div class="upi-or-divider"><span>or scan with another phone</span></div>`
-    : `<div class="upi-desktop-hint">📱 <strong>You're on desktop.</strong> Scan the QR below with your phone's UPI app (GPay, PhonePe, Paytm) — or copy the UPI ID and pay manually.</div>`;
+    : `<div class="upi-desktop-hint">📱 <strong>You&rsquo;re on desktop.</strong> Scan the QR below with your phone&rsquo;s UPI app (GPay, PhonePe, Paytm) &mdash; or copy the UPI ID and pay manually.</div>`;
 
   const modal = document.createElement('div');
   modal.id = 'upiModal';
@@ -3594,48 +3604,60 @@ function openUPIPaymentModal(ctx) {
     <div class="upi-modal" role="dialog" aria-labelledby="upiTitle" aria-modal="true">
       <button class="upi-modal-close" type="button" aria-label="Cancel">✕</button>
       <div class="upi-modal-header">
-        <h2 id="upiTitle">Pay ₹${ctx.total.toLocaleString('en-IN')} via UPI</h2>
-        <p>Order <strong>${ctx.orderId}</strong> · paying <strong>${escapeHtml(CONFIG.upiPayeeName)}</strong></p>
+        <h2 id="upiTitle">Pay &#8377;${totalStr} via UPI</h2>
+        <p>Order <strong>${safeOrderId}</strong> &middot; paying <strong>${safePayee}</strong></p>
       </div>
 
       <div class="upi-modal-body">
         ${upiAppLinks}
 
         <div class="upi-qr-wrap">
-          <img src="${qrSources[0]}" alt="UPI QR code" class="upi-qr" loading="eager" onerror="${qrFallbackChain[0]}" />
+          <img id="upiQrImg" src="${esc(primaryQR)}" alt="UPI QR code" class="upi-qr" loading="eager" />
           <div class="upi-qr-caption">Scan with any UPI app to auto-fill the payment</div>
         </div>
 
         <div class="upi-manual-pay">
           <div class="upi-mp-label">Or pay manually to this UPI ID:</div>
           <div class="upi-mp-row">
-            <code id="upiIdDisplay">${escapeHtml(CONFIG.upiId)}</code>
-            <button type="button" class="upi-copy-btn" id="upiCopyBtn" data-copy="${escapeHtml(CONFIG.upiId)}">📋 Copy</button>
+            <code id="upiIdDisplay">${safeUpiId}</code>
+            <button type="button" class="upi-copy-btn" id="upiCopyBtn" data-copy="${safeUpiId}">📋 Copy</button>
           </div>
-          <div class="upi-mp-amount">Amount to pay: <strong>₹${ctx.total.toLocaleString('en-IN')}</strong></div>
-          <div class="upi-mp-ref">Reference: <code>${escapeHtml(ctx.orderId)}</code> <button type="button" class="upi-copy-btn-mini" id="upiCopyRef" data-copy="${escapeHtml(ctx.orderId)}">Copy</button></div>
+          <div class="upi-mp-amount">Amount to pay: <strong>&#8377;${totalStr}</strong></div>
+          <div class="upi-mp-ref">Reference: <code>${safeOrderId}</code> <button type="button" class="upi-copy-btn-mini" id="upiCopyRef" data-copy="${safeOrderId}">Copy</button></div>
         </div>
 
         <div class="upi-step-confirm">
-          <h3>✅ After you've paid:</h3>
-          <p>Enter the <strong>UPI transaction ID</strong> from your app's payment receipt. We'll send your order to WhatsApp along with this ID for confirmation.</p>
+          <h3>&#9989; After you&rsquo;ve paid:</h3>
+          <p>Enter the <strong>UPI transaction ID</strong> from your app&rsquo;s payment receipt. We&rsquo;ll send your order to WhatsApp along with this ID for confirmation.</p>
           <label class="upi-txn-label">
             <span>UPI Transaction / Reference ID *</span>
             <input type="text" id="upiTxnId" maxlength="40" placeholder="e.g. 423456789012" autocomplete="off" inputmode="numeric" />
           </label>
-          <div class="upi-txn-hint">💡 Look for "UPI Ref. No." or "Transaction ID" in your GPay/PhonePe/Paytm payment receipt (usually a 12-digit number).</div>
+          <div class="upi-txn-hint">&#128161; Look for &quot;UPI Ref. No.&quot; or &quot;Transaction ID&quot; in your GPay/PhonePe/Paytm payment receipt (usually a 12-digit number).</div>
 
           <button class="upi-confirm-btn" type="button" id="upiConfirmBtn">
-            <span>💬 Confirm Payment &amp; Send Order</span>
+            <span>&#128172; Confirm Payment &amp; Send Order</span>
           </button>
           <div class="upi-err" id="upiErr" style="display:none;"></div>
         </div>
       </div>
 
       <div class="upi-modal-footer">
-        <button class="upi-cancel-link" type="button">Cancel — I'll order via WhatsApp instead</button>
+        <button class="upi-cancel-link" type="button">Cancel &mdash; I&rsquo;ll order via WhatsApp instead</button>
       </div>
     </div>`;
+
+  // JS-driven QR fallback (more reliable than inline onerror chain)
+  const qrImg = modal.querySelector('#upiQrImg');
+  if (qrImg) {
+    let qrAttempt = 0;
+    qrImg.addEventListener('error', () => {
+      qrAttempt++;
+      if (qrAttempt === 1) qrImg.src = fallback1;
+      else if (qrAttempt === 2) qrImg.src = fallback2;
+      else qrImg.style.display = 'none';
+    });
+  }
 
   document.body.appendChild(modal);
   document.body.style.overflow = 'hidden';

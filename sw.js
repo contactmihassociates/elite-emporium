@@ -4,7 +4,7 @@
    for pages and API calls.
    ============================================ */
 
-const CACHE_NAME = 'elite-emporium-v3';
+const CACHE_NAME = 'elite-emporium-v4';
 
 const STATIC_ASSETS = [
   '/',
