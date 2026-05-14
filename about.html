@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us – Elite Emporium | Kayalpattinam, Tamil Nadu</title>
+  <meta name="description" content="Elite Emporium is a GST-registered, Udyam-certified retail business in Kayalpattinam, Thoothukudi, serving customers across India with curated fashion, bags, watches, jewellery & home essentials." />
+  <link rel="canonical" href="https://elite-emporium-one.vercel.app/about.html" />
+  <meta property="og:title" content="About Elite Emporium — A Local Tamil Nadu Story" />
+  <meta property="og:description" content="GST-registered micro-enterprise serving Kayalpattinam and all of India. WhatsApp-first ordering, hand-curated products, honest prices." />
+  <meta property="og:image" content="images/logo.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://elite-emporium-one.vercel.app/about.html" />
+  <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#DB3022" />
+  <style>
+    .about-page { max-width: 880px; margin: 0 auto; padding: 24px 4% 60px; }
+    .about-hero {
+      background: linear-gradient(135deg, #1A237E 0%, #C62828 100%);
+      color: #fff;
+      border-radius: 18px;
+      padding: 44px 28px;
+      text-align: center;
+      margin-bottom: 26px;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-hero::after {
+      content: '👑';
+      position: absolute;
+      top: -28px; right: -16px;
+      font-size: 140px;
+      opacity: 0.10;
+      transform: rotate(8deg);
+    }
+    .about-hero h1 {
+      font-size: 30px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    .about-hero p {
+      font-size: 14px;
+      opacity: 0.92;
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .about-pillars {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 22px;
+    }
+    @media (max-width: 600px) { .about-pillars { grid-template-columns: repeat(3, 1fr); gap: 8px; } }
+    .about-pillar {
+      background: rgba(255,255,255,0.14);
+      border-radius: 12px;
+      padding: 14px 8px;
+      text-align: center;
+    }
+    .about-pillar-num { font-size: 24px; font-weight: 800; }
+    .about-pillar-label { font-size: 11px; opacity: 0.88; margin-top: 2px; }
+
+    .about-section {
+      background: var(--surface, #fff);
+      border: 1px solid var(--border, #e8eaf0);
+      border-radius: 16px;
+      padding: 26px;
+      margin-bottom: 16px;
+    }
+    .about-section h2 {
+      font-size: 19px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: var(--text, #1a1a2e);
+    }
+    .about-section p {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--text2, #6c757d);
+      margin-bottom: 12px;
+    }
+    .about-section p:last-child { margin-bottom: 0; }
+    .about-section strong { color: var(--text, #1a1a2e); }
+
+    .founder-card {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      background: linear-gradient(135deg, #f5e6c8, #fff8e1);
+      border: 1px solid #d4af37;
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 14px;
+    }
+    [data-theme="dark"] .founder-card { background: linear-gradient(135deg, #2a2418, #1a1410); border-color: #6b521f; }
+    .founder-avatar {
+      width: 80px; height: 80px;
+      background: linear-gradient(135deg, #C62828, #7B0000);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .founder-info { flex: 1; min-width: 0; }
+    .founder-name { font-size: 16px; font-weight: 700; color: var(--text, #1a1a2e); }
+    .founder-title { font-size: 12px; color: #a0832f; font-weight: 600; margin: 2px 0 6px; }
+    .founder-quote { font-size: 13px; line-height: 1.5; color: var(--text2, #6c757d); font-style: italic; }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 6px;
+    }
+    @media (max-width: 600px) { .info-grid { grid-template-columns: 1fr; } }
+    .info-row {
+      background: var(--bg, #f6f7fb);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    [data-theme="dark"] .info-row { background: #0d1117; }
+    .info-row-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: var(--text2, #6c757d);
+      margin-bottom: 3px;
+    }
+    .info-row-value {
+      font-size: 14px;
+      color: var(--text, #1a1a2e);
+      font-weight: 600;
+    }
+    .info-row-value a { color: var(--red, #DB3022); }
+
+    .about-cta {
+      background: linear-gradient(135deg, #128C7E 0%, #25D366 100%);
+      color: #fff;
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+      transition: transform 0.18s;
+      margin-top: 6px;
+    }
+    .about-cta:hover { transform: translateY(-2px); }
+    .about-cta h3 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+    .about-cta p  { font-size: 13px; opacity: 0.94; margin-bottom: 14px; }
+    .about-cta-btn {
+      display: inline-block;
+      background: #fff;
+      color: #128C7E;
+      padding: 9px 20px;
+      border-radius: 22px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body><div id="scrollProgress"></div>
+
+<!-- ── HEADER ─────────────────────────────── -->
+<header>
+  <div class="header-main">
+    <a href="index.html" class="logo">
+      <img src="images/logo.png" class="logo-img" alt="Elite Emporium" />
+    </a>
+    <div class="header-search">
+      <form id="headerSearchForm">
+        <input type="text" id="headerSearchInput" placeholder="Search for products, brands and more" autocomplete="off" />
+        <button type="submit">🔍</button>
+      </form>
+    </div>
+    <div class="header-actions">
+      <a href="cart.html" class="cart-btn">🛒 Cart <span class="cart-count">0</span></a>
+    </div>
+  </div>
+  <nav>
+    <a href="index.html">🏠 Home</a>
+    <a href="products.html">⭐ All Products</a>
+    <a href="about.html" class="active">ℹ️ About</a>
+    <a href="hanii-dhanii.html">💎 Hanii Dhanii</a>
+  </nav>
+</header>
+
+<div class="page-header">
+  <h1>About Elite Emporium</h1>
+  <p class="breadcrumb"><a href="index.html">Home</a> › About</p>
+</div>
+
+<main class="about-page" id="main">
+
+  <div class="about-hero">
+    <h1>A local Tamil Nadu story, serving all of India.</h1>
+    <p>Elite Emporium is a GST-registered, Udyam-certified micro-enterprise based in Kayalpattinam, Thoothukudi. We curate fashion, bags, watches, jewellery and home essentials — and ship them to your door across India.</p>
+    <div class="about-pillars">
+      <div class="about-pillar"><div class="about-pillar-num">500+</div><div class="about-pillar-label">Happy Customers</div></div>
+      <div class="about-pillar"><div class="about-pillar-num">200+</div><div class="about-pillar-label">Curated Products</div></div>
+      <div class="about-pillar"><div class="about-pillar-num">4.8★</div><div class="about-pillar-label">Average Rating</div></div>
+    </div>
+  </div>
+
+  <section class="about-section">
+    <h2>Our Story</h2>
+    <p>Elite Emporium began as a small retail counter in <strong>Sadukai Street, Kayalpattinam</strong> — a coastal town in Thoothukudi district known for its weavers, traders and tight-knit families. We noticed that customers in our town and nearby villages wanted premium products — designer-style bags, branded watches, modest fashion — but had to travel to Madurai or Chennai to get them. So we built a curated catalog and brought those products to their doorstep.</p>
+    <p>Today we serve customers in <strong>Kayalpattinam, Tirunelveli, Tuticorin, Madurai, Chennai, Bengaluru, Mumbai, Delhi</strong> and many more cities — but the personal touch hasn't changed. Every order is handled by the owner personally on WhatsApp. Every product is inspected before shipping. Every customer matters.</p>
+  </section>
+
+  <section class="about-section">
+    <h2>Meet the Owner</h2>
+    <div class="founder-card">
+      <div class="founder-avatar">👑</div>
+      <div class="founder-info">
+        <div class="founder-name">Muhammad Abubucker Siddeek S M N</div>
+        <div class="founder-title">Founder &amp; Proprietor</div>
+        <div class="founder-quote">"I personally reply to every WhatsApp order. If you ever have a question about a product — fit, quality, delivery — just message me. That's the whole point of a local business."</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-section">
+    <h2>Why customers choose us</h2>
+    <p><strong>1. Hand-curated quality.</strong> We don't list everything we can source. We pick items we'd happily gift to our own family.</p>
+    <p><strong>2. Honest prices.</strong> No inflated MRPs, no fake discounts. The price you see is the real value.</p>
+    <p><strong>3. Real human support.</strong> Every WhatsApp message is answered by a human — usually within 30 minutes during business hours.</p>
+    <p><strong>4. Free delivery + 7-day returns.</strong> ₹499+ orders ship free across India, and you can return any unused item within 7 days.</p>
+    <p><strong>5. GST invoice for everyone.</strong> Useful for businesses, gifting, and proof of authenticity. Just ask.</p>
+  </section>
+
+  <section class="about-section">
+    <h2>Business Information</h2>
+    <div class="info-grid">
+      <div class="info-row"><div class="info-row-label">📋 GST Number</div><div class="info-row-value">33DWGPN3169G1ZF</div></div>
+      <div class="info-row"><div class="info-row-label">🏭 Udyam Registration</div><div class="info-row-value">UDYAM-TN-26-0090343</div></div>
+      <div class="info-row"><div class="info-row-label">📍 Address</div><div class="info-row-value">183b, Sadukai Street, Kayalpattinam – 628204, Thoothukudi, TN</div></div>
+      <div class="info-row"><div class="info-row-label">📞 Phone</div><div class="info-row-value"><a href="tel:+918072173467">+91 8072173467</a></div></div>
+      <div class="info-row"><div class="info-row-label">💬 WhatsApp</div><div class="info-row-value"><a href="https://wa.me/917358650774" target="_blank" rel="noopener">+91 7358650774</a></div></div>
+      <div class="info-row"><div class="info-row-label">📧 Email</div><div class="info-row-value"><a href="mailto:eliteemporium112024@gmail.com">eliteemporium112024@gmail.com</a></div></div>
+      <div class="info-row"><div class="info-row-label">🕐 Business Hours</div><div class="info-row-value">All days, 9 AM – 9 PM IST</div></div>
+      <div class="info-row"><div class="info-row-label">🚚 Shipping</div><div class="info-row-value">All India · 3–7 business days</div></div>
+    </div>
+  </section>
+
+  <a href="https://wa.me/917358650774?text=Hi%21%20I%27d%20like%20to%20know%20more%20about%20Elite%20Emporium." target="_blank" rel="noopener" class="about-cta">
+    <h3>💬 Have a question? Talk to us directly.</h3>
+    <p>WhatsApp the owner. Real reply, usually within 30 minutes.</p>
+    <span class="about-cta-btn">Open WhatsApp →</span>
+  </a>
+
+</main>
+
+<footer>
+  <div class="footer-bottom">
+    <span>© 2026 Elite Emporium. All rights reserved. | GST: 33DWGPN3169G1ZF</span>
+    <span>Made with ❤️ in Kayalpattinam, Tamil Nadu</span>
+  </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
