@@ -40,6 +40,20 @@ const CONFIG = {
   // of a Razorpay Payment Page (Customer-amount type) here.
   // e.g. https://razorpay.com/payment-link/plink_XXXXXXXX
   razorpayPaymentLink: "",
+
+  // ── DIRECT UPI (simplest — no signup, no fees, no KYC) ──────────
+  //
+  // Drop your business UPI ID here and the cart gets a 'Pay via GPay / UPI'
+  // button that opens the customer's UPI app pre-filled with the exact
+  // amount and an order reference. After they pay, they're asked for the
+  // UPI transaction ID — which then gets sent to your WhatsApp along with
+  // the full order so you can verify in your bank app.
+  //
+  // To find your UPI ID: open your UPI app (GPay/PhonePe/Paytm/BHIM) →
+  // 'My UPI ID' / 'Profile'. Looks like 'name@oksbi', 'mobile@paytm', etc.
+  //
+  upiId:        "",                  // e.g. "eliteemporium@oksbi"
+  upiPayeeName: "Elite Emporium",    // shows up in customer's UPI app
 };
 
 // ── PRODUCT CATALOG (base / hardcoded) ───────
@@ -3432,6 +3446,236 @@ function initStickyBar(p) {
 }
 
 // ── PRINT RECEIPT ────────────────────────────
+// ── DIRECT UPI PAYMENT (no gateway, zero fees) ─────
+async function payViaUPI() {
+  if (!CONFIG.upiId || !CONFIG.upiId.includes('@')) {
+    showToast('💳 UPI not configured yet — please order via WhatsApp.', 4000, 'info');
+    return;
+  }
+  if (!cart.length) { showToast('⚠️ Your cart is empty!'); return; }
+
+  const get = id => (document.getElementById(id) || {}).value?.trim() || '';
+  const name    = get('custName');
+  const phone   = get('custPhone');
+  const address = get('custAddress');
+  const city    = get('custCity');
+  const state   = get('custState');
+  const pincode = get('custPincode');
+
+  // Lightweight validation before charging
+  const validations = [
+    { ok: name.length >= 2,            id: 'custName',    msg: 'Enter your name' },
+    { ok: /^\d{10}$/.test(phone),      id: 'custPhone',   msg: 'Enter a valid 10-digit phone' },
+    { ok: address.length >= 5,         id: 'custAddress', msg: 'Enter your delivery address' },
+    { ok: city.length >= 2,            id: 'custCity',    msg: 'Enter your city' },
+    { ok: state !== '',                id: 'custState',   msg: 'Select your state' },
+    { ok: /^\d{6}$/.test(pincode),     id: 'custPincode', msg: 'Enter a valid 6-digit PIN' },
+  ];
+  const bad = validations.find(v => !v.ok);
+  if (bad) { showToast('⚠️ ' + bad.msg, 3500, 'error'); document.getElementById(bad.id)?.focus(); return; }
+
+  const sub      = getSubtotal();
+  const del      = getDelivery();
+  const giftWrap = (typeof getGiftWrap === 'function') ? getGiftWrap() : 0;
+  const discount = getCouponDiscount(sub);
+  const total    = Math.max(0, sub + del + giftWrap - discount);
+  const orderId  = generateOrderId();
+  const giftMsg  = (document.getElementById('giftMessage')?.value || '').trim();
+  const notes    = get('custNotes');
+
+  const customer = { name, phone, address, city, state, pincode, notes };
+  const orderItems = cart.map(i => ({ id: i.id, name: i.name, image: i.image, price: i.price, quantity: i.quantity, selectedColor: i.selectedColor || null }));
+
+  // Save order BEFORE opening UPI app so it persists even if browser is closed
+  saveOrderToHistory({
+    id: orderId,
+    date: new Date().toISOString(),
+    status: 'UPI payment pending verification',
+    payment: { provider: 'upi', method: 'direct', vpa: CONFIG.upiId, txnId: null },
+    customer, items: orderItems,
+    subtotal: sub, delivery: del,
+    giftWrap, giftMessage: giftWrap > 0 ? giftMsg : null,
+    discount, coupon: _activeCoupon || null, total,
+  });
+
+  // Build the UPI deep link
+  const upiUrl = buildUpiUrl({ amount: total, orderId, note: `Order ${orderId} - Elite Emporium` });
+
+  // Open the confirmation modal (shows QR + 'Open UPI App' button + txn-ID input)
+  openUPIPaymentModal({ upiUrl, total, orderId, customer, orderItems, sub, del, giftWrap, giftMsg, discount });
+}
+
+function buildUpiUrl({ amount, orderId, note }) {
+  // Standard UPI deep link spec used by GPay/PhonePe/Paytm/BHIM
+  const params = new URLSearchParams();
+  params.set('pa', CONFIG.upiId);
+  params.set('pn', CONFIG.upiPayeeName || 'Elite Emporium');
+  params.set('am', amount.toFixed(2));
+  params.set('cu', 'INR');
+  params.set('tn', note);
+  params.set('tr', orderId);
+  // URLSearchParams encodes '+' which UPI apps don't like — re-encode to %20 style
+  return 'upi://pay?' + params.toString().replace(/\+/g, '%20');
+}
+
+function openUPIPaymentModal(ctx) {
+  // Remove any prior instance
+  document.getElementById('upiModal')?.remove();
+
+  const isMobile = /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent || '');
+  const qrSize   = 240;
+  const qrSrc    = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&margin=8&data=${encodeURIComponent(ctx.upiUrl)}`;
+
+  const modal = document.createElement('div');
+  modal.id = 'upiModal';
+  modal.className = 'upi-modal-backdrop';
+  modal.innerHTML = `
+    <div class="upi-modal" role="dialog" aria-labelledby="upiTitle" aria-modal="true">
+      <button class="upi-modal-close" type="button" aria-label="Cancel">✕</button>
+      <div class="upi-modal-header">
+        <h2 id="upiTitle">Pay ₹${ctx.total.toLocaleString('en-IN')} via UPI</h2>
+        <p>Order <strong>${ctx.orderId}</strong> · paying <strong>${escapeHtml(CONFIG.upiPayeeName)}</strong></p>
+      </div>
+
+      <div class="upi-modal-body">
+        ${isMobile ? `
+          <a href="${ctx.upiUrl}" class="upi-open-btn" id="upiOpenBtn">
+            <span class="upi-open-icon">📱</span>
+            <span>
+              <strong>Tap to pay with your UPI app</strong>
+              <small>Opens GPay / PhonePe / Paytm / BHIM</small>
+            </span>
+            <span class="upi-open-arrow">→</span>
+          </a>
+          <div class="upi-or-divider"><span>or scan with another phone</span></div>
+        ` : ''}
+
+        <div class="upi-qr-wrap">
+          <img src="${qrSrc}" alt="UPI QR code" class="upi-qr" loading="lazy" />
+          <div class="upi-qr-caption">
+            Scan with any UPI app on another phone<br />
+            <small><strong>${escapeHtml(CONFIG.upiId)}</strong> · ₹${ctx.total.toLocaleString('en-IN')}</small>
+          </div>
+        </div>
+
+        <div class="upi-step-confirm">
+          <h3>✅ After you've paid:</h3>
+          <p>Enter the <strong>UPI transaction ID</strong> from your app's payment receipt. We'll send your order to WhatsApp along with this ID for confirmation.</p>
+          <label class="upi-txn-label">
+            <span>UPI Transaction / Reference ID *</span>
+            <input type="text" id="upiTxnId" maxlength="40" placeholder="e.g. 423456789012" autocomplete="off" />
+          </label>
+          <div class="upi-txn-hint">💡 Look for "UPI Ref. No." or "Transaction ID" in your GPay/PhonePe/Paytm receipt (12-digit number).</div>
+
+          <button class="upi-confirm-btn" type="button" id="upiConfirmBtn">
+            <span>💬 Confirm Payment &amp; Send Order</span>
+          </button>
+          <div class="upi-err" id="upiErr" style="display:none;"></div>
+        </div>
+      </div>
+
+      <div class="upi-modal-footer">
+        <button class="upi-cancel-link" type="button">Cancel — I'll order via WhatsApp instead</button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(modal);
+  requestAnimationFrame(() => modal.classList.add('show'));
+
+  const close = () => {
+    modal.classList.remove('show');
+    setTimeout(() => modal.remove(), 240);
+  };
+  modal.querySelector('.upi-modal-close').addEventListener('click', close);
+  modal.querySelector('.upi-cancel-link').addEventListener('click', close);
+  modal.addEventListener('click', e => { if (e.target === modal) close(); });
+
+  modal.querySelector('#upiConfirmBtn').addEventListener('click', () => {
+    const txnId = (document.getElementById('upiTxnId').value || '').trim();
+    const errEl = document.getElementById('upiErr');
+    if (txnId.length < 6) {
+      errEl.textContent = '⚠️ Please enter the UPI transaction ID (at least 6 characters).';
+      errEl.style.display = 'block';
+      document.getElementById('upiTxnId').focus();
+      return;
+    }
+
+    // Update the saved order with the txn ID
+    const orders = getOrderHistory();
+    const order = orders.find(o => o.id === ctx.orderId);
+    if (order) {
+      order.status = 'Paid via UPI — awaiting dispatch';
+      order.payment = { ...(order.payment || {}), txnId, paidAt: new Date().toISOString() };
+      try { localStorage.setItem('eliteEmporiumOrders', JSON.stringify(orders)); } catch {}
+    }
+
+    // Build the WhatsApp confirmation message
+    const baseUrl = 'https://elite-emporium-one.vercel.app/';
+    let msg = `✅ *UPI PAYMENT — ELITE EMPORIUM*\n`;
+    msg    += `━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    msg    += `🆔 Order: *${ctx.orderId}*\n`;
+    msg    += `💰 Amount: *₹${ctx.total.toLocaleString('en-IN')}*\n`;
+    msg    += `🏦 Paid to: ${CONFIG.upiId}\n`;
+    msg    += `📱 UPI Txn ID: *${txnId}*\n`;
+    msg    += `⏰ Paid at: ${new Date().toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })}\n\n`;
+    msg    += `━━━━━━━━━━━━━━━━━━━━━━━\n📋 *ITEMS:*\n\n`;
+    cart.forEach((item, i) => {
+      msg += `${i + 1}. *${item.name}*\n`;
+      if (item.selectedColor) msg += `   🎨 Color: ${item.selectedColor}\n`;
+      msg += `   Qty: ${item.quantity} × ₹${item.price.toLocaleString('en-IN')} = *₹${(item.price * item.quantity).toLocaleString('en-IN')}*\n`;
+      if (item.image) {
+        const imgUrl = item.image.startsWith('http') ? item.image : baseUrl + item.image;
+        msg += `   🖼️ ${imgUrl}\n`;
+      }
+      msg += `\n`;
+    });
+
+    msg += `━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    msg += `💰 Subtotal : ₹${ctx.sub.toLocaleString('en-IN')}\n`;
+    msg += `🚚 Delivery : ${ctx.del === 0 ? 'FREE' : '₹' + ctx.del}\n`;
+    if (ctx.giftWrap > 0) msg += `🎁 Gift wrap : +₹${ctx.giftWrap}\n`;
+    if (ctx.discount > 0) msg += `🎟️ Coupon (${_activeCoupon}) : –₹${ctx.discount.toLocaleString('en-IN')}\n`;
+    msg += `✅ *TOTAL PAID : ₹${ctx.total.toLocaleString('en-IN')}*\n`;
+    msg += `━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+    msg += `👤 *CUSTOMER:*\n`;
+    msg += `${ctx.customer.name}\n`;
+    msg += `📞 ${ctx.customer.phone}\n`;
+    msg += `📍 ${ctx.customer.address}, ${ctx.customer.city}, ${ctx.customer.state} - ${ctx.customer.pincode}\n`;
+    if (ctx.customer.notes) msg += `📝 Notes: ${ctx.customer.notes}\n`;
+    if (ctx.giftWrap > 0)   msg += `\n🎁 *GIFT WRAP REQUESTED* (+₹50)${ctx.giftMsg ? `\nMessage: "${ctx.giftMsg}"` : ''}\n`;
+
+    msg += `\n_Please verify the UPI transaction in your bank app and confirm dispatch._`;
+
+    const waUrl = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(msg)}`;
+
+    // Clear the cart, celebrate, redirect
+    cart = [];
+    saveCart();
+    clearFormDraft?.();
+    launchConfetti?.();
+    showToast('🎉 Payment confirmed! Opening WhatsApp…', 4000, 'success');
+    window.open(waUrl, '_blank');
+    setTimeout(() => { close(); window.location.href = 'orders.html'; }, 2500);
+  });
+
+  // Auto-focus the txn ID field when mobile user returns from UPI app
+  if (isMobile) {
+    document.getElementById('upiOpenBtn')?.addEventListener('click', () => {
+      // After short delay, scroll to and focus the txn input so user remembers to fill it
+      setTimeout(() => {
+        document.getElementById('upiTxnId')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        document.getElementById('upiTxnId')?.focus();
+      }, 2000);
+    });
+  }
+
+  // Esc to close
+  document.addEventListener('keydown', function esc(e) {
+    if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
+  });
+}
+
 // ── RAZORPAY: embedded Checkout (preferred) or hosted link (fallback) ─
 //
 // Loads checkout.js on demand (saves ~85KB on every other page).
@@ -3597,23 +3841,28 @@ async function payOnline() {
   showToast('💳 Online payment not configured yet — please order via WhatsApp.', 4500, 'info');
 }
 
-// Show Pay Online button if EITHER Key ID OR Payment Link is configured
+// Show payment buttons based on what's configured
 function initPayOnlineButton() {
-  const btn = document.getElementById('payOnlineBtn');
-  const note = document.getElementById('payOnlineNote');
-  if (!btn) return;
+  // Razorpay (Card / Netbanking / Wallets — full gateway)
+  const rzpBtn  = document.getElementById('payOnlineBtn');
+  const rzpNote = document.getElementById('payOnlineNote');
   const hasKey  = !!(CONFIG.razorpayKeyId && CONFIG.razorpayKeyId.startsWith('rzp_'));
   const hasLink = !!(CONFIG.razorpayPaymentLink && CONFIG.razorpayPaymentLink.startsWith('http'));
-  const enabled = hasKey || hasLink;
-  btn.style.display  = enabled ? 'flex' : 'none';
-  if (note) {
-    note.style.display = enabled ? 'block' : 'none';
+  const rzpEnabled = hasKey || hasLink;
+  if (rzpBtn)  rzpBtn.style.display = rzpEnabled ? 'flex' : 'none';
+  if (rzpNote) {
+    rzpNote.style.display = rzpEnabled ? 'block' : 'none';
     if (hasKey && !CONFIG.razorpayLiveMode) {
-      note.innerHTML = `🧪 <strong>Test mode</strong> — use card <code style="background:rgba(0,0,0,0.1);padding:1px 6px;border-radius:4px;">4111 1111 1111 1111</code>, any future expiry, CVV <code style="background:rgba(0,0,0,0.1);padding:1px 6px;border-radius:4px;">123</code>. Real payments come live the moment you flip <code>razorpayLiveMode</code> to true.`;
+      rzpNote.innerHTML = `🧪 <strong>Test mode</strong> — use card <code style="background:rgba(0,0,0,0.1);padding:1px 6px;border-radius:4px;">4111 1111 1111 1111</code>, any future expiry, CVV <code style="background:rgba(0,0,0,0.1);padding:1px 6px;border-radius:4px;">123</code>. Real payments come live the moment you flip <code>razorpayLiveMode</code> to true.`;
     } else if (hasKey) {
-      note.innerHTML = `🔒 Secure payment powered by <strong>Razorpay</strong> — UPI · Cards · Netbanking · Wallets · GST invoice.`;
+      rzpNote.innerHTML = `🔒 Secure payment powered by <strong>Razorpay</strong> — Cards · Netbanking · Wallets · GST invoice.`;
     }
   }
+
+  // Direct UPI (zero-fee, opens GPay/PhonePe/Paytm directly)
+  const upiBtn = document.getElementById('payUpiBtn');
+  const upiEnabled = !!(CONFIG.upiId && CONFIG.upiId.includes('@'));
+  if (upiBtn) upiBtn.style.display = upiEnabled ? 'flex' : 'none';
 }
 
 function printReceipt() {

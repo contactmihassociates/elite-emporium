@@ -188,13 +188,17 @@
           <div class="gift-msg-counter"><span id="giftMsgCount">0</span> / 120</div>
         </div>
 
+        <button id="payUpiBtn" class="pay-upi-btn" onclick="payViaUPI()" style="display:none;">
+          <span style="font-size:20px;">💸</span>
+          Pay via GPay / UPI
+        </button>
         <button class="whatsapp-order-btn" onclick="placeOrder()">
           <span style="font-size:22px;">💬</span>
           Place Order via WhatsApp
         </button>
         <button id="payOnlineBtn" class="pay-online-btn" onclick="payOnline()" style="display:none;">
           <span style="font-size:18px;">💳</span>
-          Pay Online (UPI / Cards / Netbanking)
+          Pay Online (Cards / Netbanking / Wallets)
         </button>
         <button onclick="printReceipt()" style="display:block;width:100%;margin-top:8px;padding:10px;background:transparent;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:600;color:var(--text-mid);cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-mid)'">
           🖨️ Print / Save Receipt

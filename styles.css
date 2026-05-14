@@ -4564,6 +4564,310 @@ kbd {
 }
 [data-theme="dark"] .pay-online-note { background: rgba(40,116,240,0.12); border-color: #1a4ea3; color: #90caf9; }
 
+/* ── Direct UPI button + payment modal ───────────── */
+.pay-upi-btn {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 14px;
+  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.1s, box-shadow 0.18s, opacity 0.18s;
+  box-shadow: 0 4px 14px rgba(76,175,80,0.32);
+  letter-spacing: 0.3px;
+}
+.pay-upi-btn:hover { opacity: 0.95; box-shadow: 0 6px 22px rgba(76,175,80,0.42); transform: translateY(-1px); }
+.pay-upi-btn:active { transform: scale(0.99); }
+
+/* Modal backdrop */
+.upi-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 9700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.24s ease;
+  overflow-y: auto;
+}
+.upi-modal-backdrop.show { opacity: 1; }
+.upi-modal {
+  background: var(--surface, #fff);
+  border-radius: 18px;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+  transform: scale(0.92) translateY(20px);
+  transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+  max-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+}
+.upi-modal-backdrop.show .upi-modal { transform: scale(1) translateY(0); }
+.upi-modal-close {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: rgba(0,0,0,0.06);
+  border: none;
+  font-size: 16px;
+  color: var(--text2, #6c757d);
+  cursor: pointer;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: background 0.15s;
+}
+.upi-modal-close:hover { background: rgba(0,0,0,0.12); color: var(--text, #1a1a1a); }
+[data-theme="dark"] .upi-modal-close { background: rgba(255,255,255,0.08); }
+
+.upi-modal-header {
+  padding: 24px 24px 14px;
+  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+  color: #fff;
+  text-align: center;
+}
+.upi-modal-header h2 {
+  font-size: 21px;
+  font-weight: 800;
+  margin: 0 0 4px;
+  color: #fff;
+}
+.upi-modal-header p {
+  font-size: 12px;
+  margin: 0;
+  color: rgba(255,255,255,0.92);
+}
+.upi-modal-header p strong { font-weight: 800; color: #fff; }
+
+.upi-modal-body {
+  padding: 20px 22px 14px;
+  overflow-y: auto;
+}
+
+.upi-open-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
+  color: #fff;
+  text-decoration: none;
+  padding: 14px 16px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  transition: transform 0.15s, box-shadow 0.18s;
+}
+.upi-open-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(26,115,232,0.35); }
+.upi-open-icon {
+  font-size: 26px;
+  width: 44px; height: 44px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.upi-open-btn > span:nth-child(2) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.upi-open-btn strong { font-size: 14px; font-weight: 800; }
+.upi-open-btn small { font-size: 11px; opacity: 0.9; }
+.upi-open-arrow { font-size: 22px; opacity: 0.85; }
+
+.upi-or-divider {
+  text-align: center;
+  position: relative;
+  margin: 14px 0;
+  font-size: 11px;
+  color: var(--text-3, #9aa3b2);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.upi-or-divider span {
+  background: var(--surface, #fff);
+  padding: 0 12px;
+  position: relative;
+  z-index: 1;
+}
+.upi-or-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0; right: 0;
+  height: 1px;
+  background: var(--border, #e0e0e0);
+}
+
+.upi-qr-wrap {
+  text-align: center;
+  background: var(--bg, #f6f7fb);
+  border-radius: 14px;
+  padding: 16px 14px;
+  margin-bottom: 18px;
+}
+[data-theme="dark"] .upi-qr-wrap { background: #0d1117; }
+.upi-qr {
+  width: 200px;
+  height: 200px;
+  background: #fff;
+  padding: 8px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.upi-qr-caption {
+  font-size: 12px;
+  color: var(--text2, #6c757d);
+  margin-top: 10px;
+  line-height: 1.5;
+}
+.upi-qr-caption strong {
+  font-family: 'SF Mono', monospace;
+  background: rgba(0,0,0,0.05);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  color: var(--text, #1a1a1a);
+}
+[data-theme="dark"] .upi-qr-caption strong { background: rgba(255,255,255,0.08); color: #e8eaf0; }
+
+.upi-step-confirm {
+  background: linear-gradient(135deg, #fff8e1 0%, #fff3e0 100%);
+  border: 1.5px dashed #ff9800;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+[data-theme="dark"] .upi-step-confirm { background: rgba(255,152,0,0.10); border-color: #f57c00; }
+.upi-step-confirm h3 {
+  font-size: 14px;
+  font-weight: 800;
+  color: #bf360c;
+  margin: 0 0 6px;
+}
+[data-theme="dark"] .upi-step-confirm h3 { color: #ffb74d; }
+.upi-step-confirm p {
+  font-size: 12px;
+  color: #8d6e63;
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+[data-theme="dark"] .upi-step-confirm p { color: #ffcc80; }
+.upi-txn-label {
+  display: block;
+  margin-bottom: 4px;
+}
+.upi-txn-label span {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #bf360c;
+  margin-bottom: 4px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+[data-theme="dark"] .upi-txn-label span { color: #ffb74d; }
+.upi-txn-label input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 2px solid #ff9800;
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: 'SF Mono', monospace;
+  letter-spacing: 0.5px;
+  background: #fff;
+  color: var(--text, #1a1a1a);
+}
+.upi-txn-label input:focus {
+  outline: none;
+  border-color: #e65100;
+  box-shadow: 0 0 0 3px rgba(255,152,0,0.2);
+}
+[data-theme="dark"] .upi-txn-label input { background: #141821; color: #e8eaf0; }
+.upi-txn-hint {
+  font-size: 11px;
+  color: #8d6e63;
+  margin-top: 6px;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+[data-theme="dark"] .upi-txn-hint { color: #ffcc80; }
+
+.upi-confirm-btn {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: #fff;
+  border: none;
+  border-radius: 22px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.15s, box-shadow 0.18s;
+  letter-spacing: 0.3px;
+}
+.upi-confirm-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37,211,102,0.4);
+}
+.upi-err {
+  background: rgba(231,76,60,0.10);
+  color: #c62828;
+  border: 1px solid rgba(231,76,60,0.3);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+.upi-modal-footer {
+  padding: 10px 24px 18px;
+  text-align: center;
+  border-top: 1px solid var(--border, #e0e0e0);
+}
+.upi-cancel-link {
+  background: none;
+  border: none;
+  color: var(--text2, #6c757d);
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: inherit;
+  padding: 4px;
+}
+.upi-cancel-link:hover { color: var(--text, #1a1a1a); }
+
+@media (max-width: 480px) {
+  .upi-modal { max-width: 100%; max-height: calc(100vh - 24px); border-radius: 14px; }
+  .upi-modal-header { padding: 18px 20px 12px; }
+  .upi-modal-header h2 { font-size: 18px; }
+  .upi-modal-body { padding: 16px 18px 12px; }
+  .upi-qr { width: 180px; height: 180px; }
+}
+
 /* ── Product Detail: Hover-Pan Zoom ────────────── */
 .pd-main-image.pd-zoomable {
   overflow: hidden;
