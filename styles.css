@@ -4725,6 +4725,89 @@ kbd {
   .wa-channel-cta-btn { padding: 6px 12px; font-size: 11px; }
 }
 
+/* ── Product detail: Related categories chips ─── */
+.pd-related-cats {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+}
+.pd-related-cats-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text2);
+  margin-bottom: 8px;
+}
+.pd-related-cats-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.pd-related-cat-chip {
+  display: inline-block;
+  padding: 6px 12px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.pd-related-cat-chip:hover {
+  border-color: var(--red);
+  color: var(--red);
+  background: rgba(219,48,34,0.06);
+}
+
+/* ── Product detail: "Ask about this product" ──── */
+.pd-ask-product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(37,211,102,0.10), rgba(37,211,102,0.04));
+  border: 1px solid rgba(37,211,102,0.3);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-top: 14px;
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.18s;
+}
+.pd-ask-product:hover {
+  background: linear-gradient(135deg, rgba(37,211,102,0.16), rgba(37,211,102,0.08));
+  border-color: #25D366;
+  transform: translateY(-1px);
+}
+.pd-ask-product-icon {
+  font-size: 28px;
+  width: 44px; height: 44px;
+  background: #25D366;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.pd-ask-product > div {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pd-ask-product strong { font-size: 13px; color: var(--text); }
+.pd-ask-product span:not(.pd-ask-product-icon):not(.pd-ask-product-arrow) {
+  font-size: 11.5px;
+  color: var(--text2);
+  line-height: 1.4;
+}
+.pd-ask-product-arrow {
+  font-size: 18px;
+  color: #25D366;
+  flex-shrink: 0;
+  transition: transform 0.18s;
+}
+.pd-ask-product:hover .pd-ask-product-arrow { transform: translateX(3px); }
+
 /* ── Reduced-motion: respect user preference ─────── */
 @media (prefers-reduced-motion: reduce) {
   *,

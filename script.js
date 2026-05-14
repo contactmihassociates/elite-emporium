@@ -2746,6 +2746,63 @@ function initProductDetailPage() {
     actions.appendChild(askBtn);
   }
 
+  // Related categories chip strip — appended to description tab
+  (() => {
+    const descEl = document.getElementById('pdDesc');
+    if (!descEl) return;
+    const RELATED_MAP = {
+      'Abaiya':         ['Hijab', 'Sarees', 'Clothing', 'Perfumes'],
+      'Hijab':          ['Abaiya', 'Sarees', 'Clothing', 'Cosmetics'],
+      'Sarees':         ['Kurta Sets', 'Clothing', 'Jewellery', 'Hijab'],
+      'Kurta Sets':     ['Sarees', 'Mens Dress', 'Clothing', 'Footwear'],
+      'Clothing':       ['Footwear', 'Bags', 'Watches', 'Belts'],
+      'Mens Dress':     ['Watches', 'Wallets', 'Belts', 'Footwear'],
+      'Kids Wear':      ['Footwear', 'Toys & Games', 'Bags'],
+      'Bags':           ['Wallets', 'Watches', 'Coolers', 'Clothing'],
+      'Watches':        ['Bags', 'Wallets', 'Mens Dress', 'Coolers'],
+      'Coolers':        ['Watches', 'Bags', 'Mens Dress'],
+      'Wallets':        ['Bags', 'Belts', 'Watches', 'Mens Dress'],
+      'Belts':          ['Wallets', 'Mens Dress', 'Footwear'],
+      'Perfumes':       ['Cosmetics', 'Hair Care', 'Abaiya'],
+      'Cosmetics':      ['Perfumes', 'Hair Care', 'Jewellery'],
+      'Hair Care':      ['Cosmetics', 'Perfumes'],
+      'Jewellery':      ['Sarees', 'Kurta Sets', 'Cosmetics'],
+      'Home & Kitchen': ['Sports', 'Toys & Games'],
+      'Sports':         ['Footwear', 'Clothing'],
+      'Footwear':       ['Bags', 'Clothing', 'Belts'],
+      'Toys & Games':   ['Kids Wear', 'Home & Kitchen'],
+    };
+    const related = RELATED_MAP[p.category] || [];
+    if (!related.length) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'pd-related-cats';
+    wrap.innerHTML = `
+      <div class="pd-related-cats-label">🔍 You might also love:</div>
+      <div class="pd-related-cats-chips">
+        ${related.map(c => `<a class="pd-related-cat-chip" href="products.html?category=${encodeURIComponent(c)}">${c}</a>`).join('')}
+      </div>`;
+    descEl.appendChild(wrap);
+  })();
+
+  // "Ask about this product" — dedicated WhatsApp deep link with product URL prefilled
+  (() => {
+    const descEl = document.getElementById('pdDesc');
+    if (!descEl) return;
+    const askProduct = document.createElement('a');
+    askProduct.className = 'pd-ask-product';
+    askProduct.target = '_blank';
+    askProduct.rel = 'noopener';
+    askProduct.href = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(`Hi! I have a question about this product:\n\n*${p.name}*\nPrice: ₹${p.price.toLocaleString('en-IN')}\nLink: ${window.location.href}\n\nMy question: `)}`;
+    askProduct.innerHTML = `
+      <span class="pd-ask-product-icon">💬</span>
+      <div>
+        <strong>Have a question about this product?</strong>
+        <span>Ask the seller directly on WhatsApp — usually replies within 30 minutes.</span>
+      </div>
+      <span class="pd-ask-product-arrow">→</span>`;
+    descEl.appendChild(askProduct);
+  })();
+
   // Coupon nudge chip below price
   const priceEl = document.getElementById('pdPrice');
   if (priceEl && p.inStock !== false) {
@@ -3604,6 +3661,54 @@ function initDarkMode() {
 }
 
 // ── CART REMINDER BANNER (homepage) ──────────
+// ── WELCOME-BACK NUDGE ───────────────────────
+// Stores last visit timestamp. If the user returns after >1h with a non-empty
+// cart, show a single contextual toast. Runs once per session to avoid noise.
+const LAST_VISIT_KEY = 'eliteEmporiumLastVisit';
+function initWelcomeBack() {
+  if (sessionStorage.getItem('welcomeBackShown')) return;
+
+  const now      = Date.now();
+  const lastRaw  = localStorage.getItem(LAST_VISIT_KEY);
+  const lastMs   = lastRaw ? parseInt(lastRaw, 10) : 0;
+  const hoursAgo = lastMs ? (now - lastMs) / 3600000 : null;
+
+  // Always update the timestamp for next time
+  localStorage.setItem(LAST_VISIT_KEY, String(now));
+
+  // First-ever visit — no nudge
+  if (!hoursAgo) return;
+  // Same-session bounce — no nudge
+  if (hoursAgo < 1) return;
+
+  sessionStorage.setItem('welcomeBackShown', '1');
+
+  // Returning user with items in cart → highest priority nudge
+  if (cart.length) {
+    const itemCount = cart.reduce((s, i) => s + i.quantity, 0);
+    setTimeout(() => {
+      showToast(`👋 Welcome back! You have ${itemCount} item${itemCount > 1 ? 's' : ''} waiting in your cart.`, 6000, 'info');
+    }, 1200);
+    return;
+  }
+
+  // Returning user with recently viewed items but no cart → soft nudge
+  const rv = JSON.parse(localStorage.getItem(RV_KEY) || '[]');
+  if (rv.length) {
+    setTimeout(() => {
+      showToast(`👋 Welcome back! Continue browsing where you left off.`, 5000, 'info');
+    }, 1500);
+    return;
+  }
+
+  // Long-gone returning user (1 week+) → fresh-welcome nudge
+  if (hoursAgo > 24 * 7) {
+    setTimeout(() => {
+      showToast(`👋 Welcome back to Elite Emporium! Check out what's new this week.`, 5000, 'info');
+    }, 1500);
+  }
+}
+
 function initCartReminder() {
   if (!document.getElementById('featuredProducts')) return; // homepage only
   if (!cart.length) return;
@@ -4345,6 +4450,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   if (document.getElementById('featuredProducts')) initHomePage();
+  initWelcomeBack();
   if (document.getElementById('productsGrid'))     initProductsPage();
   if (document.getElementById('cartItems')) {
     renderCart();
