@@ -56,6 +56,23 @@ self.addEventListener('fetch', event => {
   // Firebase Firestore — always network, never cache
   if (url.hostname.includes('firestore') || url.hostname.includes('firebase')) return;
 
+  // Versioned asset URLs (e.g. script.js?v=...) — always go to network so
+  // a deploy is picked up immediately. Cache the response under the
+  // bare URL too so offline fallback still works for the previous version.
+  if (url.search.includes('v=')) {
+    event.respondWith(
+      fetch(request).then(resp => {
+        if (resp && resp.ok) {
+          const bareUrl = url.pathname; // strip query
+          const cacheReq = new Request(bareUrl, request);
+          caches.open(CACHE_NAME).then(c => c.put(cacheReq, resp.clone())).catch(() => {});
+        }
+        return resp;
+      }).catch(() => caches.match(url.pathname))
+    );
+    return;
+  }
+
   // HTML pages — network-first with cache fallback, finally 404
   if (request.destination === 'document') {
     event.respondWith(

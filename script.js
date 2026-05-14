@@ -3527,17 +3527,23 @@ async function payViaUPI() {
   }
 }
 
+// Build a UPI deep link per NPCI spec. We construct it manually because
+// URLSearchParams aggressively encodes '@' as %40 — many UPI apps (esp.
+// older versions of GPay / PhonePe / BHIM) only recognise the literal '@'.
+// Spaces in tn/pn are encoded as %20 (not '+').
 function buildUpiUrl({ amount, orderId, note }) {
-  // Standard UPI deep link spec used by GPay/PhonePe/Paytm/BHIM
-  const params = new URLSearchParams();
-  params.set('pa', CONFIG.upiId);
-  params.set('pn', CONFIG.upiPayeeName || 'Elite Emporium');
-  params.set('am', amount.toFixed(2));
-  params.set('cu', 'INR');
-  params.set('tn', note);
-  params.set('tr', orderId);
-  // URLSearchParams encodes '+' which UPI apps don't like — re-encode to %20 style
-  return 'upi://pay?' + params.toString().replace(/\+/g, '%20');
+  const enc = s => encodeURIComponent(String(s))
+    .replace(/%40/g, '@')   // preserve @ in the VPA
+    .replace(/\+/g, '%20'); // never use '+' encoding
+  const parts = [
+    'pa=' + enc(CONFIG.upiId),                                  // payee VPA
+    'pn=' + enc(CONFIG.upiPayeeName || 'Elite Emporium'),       // payee name
+    'am=' + amount.toFixed(2),                                  // amount in rupees
+    'cu=INR',                                                   // currency
+    'tn=' + enc(note),                                          // txn note
+    'tr=' + enc(orderId),                                       // merchant ref
+  ];
+  return 'upi://pay?' + parts.join('&');
 }
 
 function openUPIPaymentModal(ctx) {
@@ -3545,8 +3551,30 @@ function openUPIPaymentModal(ctx) {
   document.getElementById('upiModal')?.remove();
 
   const isMobile = /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent || '');
-  const qrSize   = 240;
-  const qrSrc    = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&margin=8&data=${encodeURIComponent(ctx.upiUrl)}`;
+
+  // Multiple QR services so a single one being down doesn't break the modal.
+  // Loaded in order — onerror falls through to the next.
+  const encoded = encodeURIComponent(ctx.upiUrl);
+  const qrSources = [
+    `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encoded}`,
+    `https://chart.googleapis.com/chart?chs=240x240&cht=qr&chld=M|2&chl=${encoded}`,
+    `https://quickchart.io/qr?text=${encoded}&size=240`,
+  ];
+  const qrFallbackChain = qrSources.map((s, i, arr) =>
+    i < arr.length - 1 ? `this.onerror=null;this.src='${arr[i+1]}';` : `this.style.display='none';`
+  );
+
+  const upiAppLinks = isMobile
+    ? `<a href="${ctx.upiUrl}" class="upi-open-btn" id="upiOpenBtn">
+         <span class="upi-open-icon">📱</span>
+         <span>
+           <strong>Tap to pay with your UPI app</strong>
+           <small>Opens GPay / PhonePe / Paytm / BHIM</small>
+         </span>
+         <span class="upi-open-arrow">→</span>
+       </a>
+       <div class="upi-or-divider"><span>or scan with another phone</span></div>`
+    : `<div class="upi-desktop-hint">📱 <strong>You're on desktop.</strong> Scan the QR below with your phone's UPI app (GPay, PhonePe, Paytm) — or copy the UPI ID and pay manually.</div>`;
 
   const modal = document.createElement('div');
   modal.id = 'upiModal';
@@ -3560,24 +3588,21 @@ function openUPIPaymentModal(ctx) {
       </div>
 
       <div class="upi-modal-body">
-        ${isMobile ? `
-          <a href="${ctx.upiUrl}" class="upi-open-btn" id="upiOpenBtn">
-            <span class="upi-open-icon">📱</span>
-            <span>
-              <strong>Tap to pay with your UPI app</strong>
-              <small>Opens GPay / PhonePe / Paytm / BHIM</small>
-            </span>
-            <span class="upi-open-arrow">→</span>
-          </a>
-          <div class="upi-or-divider"><span>or scan with another phone</span></div>
-        ` : ''}
+        ${upiAppLinks}
 
         <div class="upi-qr-wrap">
-          <img src="${qrSrc}" alt="UPI QR code" class="upi-qr" loading="lazy" />
-          <div class="upi-qr-caption">
-            Scan with any UPI app on another phone<br />
-            <small><strong>${escapeHtml(CONFIG.upiId)}</strong> · ₹${ctx.total.toLocaleString('en-IN')}</small>
+          <img src="${qrSources[0]}" alt="UPI QR code" class="upi-qr" loading="eager" onerror="${qrFallbackChain[0]}" />
+          <div class="upi-qr-caption">Scan with any UPI app to auto-fill the payment</div>
+        </div>
+
+        <div class="upi-manual-pay">
+          <div class="upi-mp-label">Or pay manually to this UPI ID:</div>
+          <div class="upi-mp-row">
+            <code id="upiIdDisplay">${escapeHtml(CONFIG.upiId)}</code>
+            <button type="button" class="upi-copy-btn" id="upiCopyBtn" data-copy="${escapeHtml(CONFIG.upiId)}">📋 Copy</button>
           </div>
+          <div class="upi-mp-amount">Amount to pay: <strong>₹${ctx.total.toLocaleString('en-IN')}</strong></div>
+          <div class="upi-mp-ref">Reference: <code>${escapeHtml(ctx.orderId)}</code> <button type="button" class="upi-copy-btn-mini" id="upiCopyRef" data-copy="${escapeHtml(ctx.orderId)}">Copy</button></div>
         </div>
 
         <div class="upi-step-confirm">
@@ -3585,9 +3610,9 @@ function openUPIPaymentModal(ctx) {
           <p>Enter the <strong>UPI transaction ID</strong> from your app's payment receipt. We'll send your order to WhatsApp along with this ID for confirmation.</p>
           <label class="upi-txn-label">
             <span>UPI Transaction / Reference ID *</span>
-            <input type="text" id="upiTxnId" maxlength="40" placeholder="e.g. 423456789012" autocomplete="off" />
+            <input type="text" id="upiTxnId" maxlength="40" placeholder="e.g. 423456789012" autocomplete="off" inputmode="numeric" />
           </label>
-          <div class="upi-txn-hint">💡 Look for "UPI Ref. No." or "Transaction ID" in your GPay/PhonePe/Paytm receipt (12-digit number).</div>
+          <div class="upi-txn-hint">💡 Look for "UPI Ref. No." or "Transaction ID" in your GPay/PhonePe/Paytm payment receipt (usually a 12-digit number).</div>
 
           <button class="upi-confirm-btn" type="button" id="upiConfirmBtn">
             <span>💬 Confirm Payment &amp; Send Order</span>
@@ -3602,15 +3627,43 @@ function openUPIPaymentModal(ctx) {
     </div>`;
 
   document.body.appendChild(modal);
+  document.body.style.overflow = 'hidden';
   requestAnimationFrame(() => modal.classList.add('show'));
 
   const close = () => {
     modal.classList.remove('show');
+    document.body.style.overflow = '';
     setTimeout(() => modal.remove(), 240);
   };
   modal.querySelector('.upi-modal-close').addEventListener('click', close);
   modal.querySelector('.upi-cancel-link').addEventListener('click', close);
   modal.addEventListener('click', e => { if (e.target === modal) close(); });
+
+  // Copy UPI ID + order reference buttons
+  modal.querySelectorAll('.upi-copy-btn, .upi-copy-btn-mini').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const val = btn.dataset.copy || '';
+      const originalHtml = btn.innerHTML;
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(val);
+        } else {
+          // Fallback for older browsers / non-https environments
+          const ta = document.createElement('textarea');
+          ta.value = val; ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select();
+          document.execCommand('copy'); ta.remove();
+        }
+        btn.innerHTML = '✅ Copied!';
+        btn.classList.add('upi-copied');
+        setTimeout(() => { btn.innerHTML = originalHtml; btn.classList.remove('upi-copied'); }, 2000);
+      } catch (e) {
+        console.warn('[UPI] copy failed:', e);
+        btn.innerHTML = '⚠️ Manual';
+        setTimeout(() => { btn.innerHTML = originalHtml; }, 2000);
+      }
+    });
+  });
 
   modal.querySelector('#upiConfirmBtn').addEventListener('click', () => {
     const txnId = (document.getElementById('upiTxnId').value || '').trim();
@@ -3696,6 +3749,14 @@ function openUPIPaymentModal(ctx) {
   document.addEventListener('keydown', function esc(e) {
     if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
   });
+}
+
+// Explicit window attachment — guarantees onclick="payViaUPI()" always works
+// regardless of how the module is loaded (strict mode, modules, bundlers, etc.)
+if (typeof window !== 'undefined') {
+  window.payViaUPI = payViaUPI;
+  window.openUPIPaymentModal = openUPIPaymentModal;
+  window.buildUpiUrl = buildUpiUrl;
 }
 
 // ── RAZORPAY: embedded Checkout (preferred) or hosted link (fallback) ─
