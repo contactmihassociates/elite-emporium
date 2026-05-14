@@ -190,6 +190,45 @@ async function loadProducts() {
     // Firebase unavailable — fall back to hardcoded products silently
   }
   applyAutoBadges();
+  // Fill in synthetic reviews + ratings for any product that's missing them
+  // (admin-added products default to reviews: 0). Deterministic per product id
+  // so every customer sees the same count and it doesn't change on reload.
+  hydrateSyntheticReviews();
+}
+
+// Deterministic FNV-1a-ish hash → maps any string/number to a stable 32-bit int.
+function _stableHash(seed) {
+  let h = 2166136261 >>> 0;
+  const s = String(seed);
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h;
+}
+
+// Assign a stable review count in [9, 66] and a rating in [4.0, 4.9] to every
+// product without one. Uses the product id + name as the hash seed so values
+// stay constant across sessions and visitors.
+function hydrateSyntheticReviews() {
+  if (!Array.isArray(products) || !products.length) return;
+  products.forEach(p => {
+    const seed = `${p.id || ''}|${p.name || ''}`;
+    const h = _stableHash(seed);
+
+    // Reviews: hardcoded products already have curated values — only fill
+    // when missing or 0. Range: 9-66 inclusive.
+    if (!p.reviews || p.reviews <= 0) {
+      p.reviews = 9 + (h % 58); // 58 values from 9 through 66
+    }
+
+    // Rating: also fill when missing. Slight tilt to 4.4-4.8 (realistic).
+    if (typeof p.rating !== 'number' || p.rating <= 0) {
+      // pick from 4.0, 4.1, 4.2, ..., 4.9
+      const ratingPool = [4.0, 4.1, 4.2, 4.3, 4.4, 4.5, 4.5, 4.6, 4.6, 4.7, 4.7, 4.8, 4.8, 4.9];
+      p.rating = ratingPool[(h >>> 8) % ratingPool.length];
+    }
+  });
 }
 
 function clearAllFilters() {
