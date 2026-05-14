@@ -385,6 +385,10 @@ function updateCartUI(animate) {
   if (document.getElementById('sideCartDrawer')?.classList.contains('open')) {
     renderSideCart();
   }
+  // Dynamic favicon with cart count
+  if (typeof updateFaviconBadge === 'function') {
+    try { updateFaviconBadge(total); } catch {}
+  }
 }
 
 // Close side cart on Esc
@@ -393,6 +397,74 @@ document.addEventListener('keydown', e => {
     closeSideCart();
   }
 });
+
+// ── DYNAMIC FAVICON WITH CART COUNT ──────────
+// Renders a 32×32 canvas with the cart count overlaid as a red badge
+// on top of the logo, then sets it as the favicon. Re-runs on every
+// updateCartUI() so the count stays in sync with the actual cart.
+let _faviconCanvas = null;
+let _faviconLogo   = null;
+function updateFaviconBadge(count) {
+  if (!_faviconCanvas) {
+    _faviconCanvas = document.createElement('canvas');
+    _faviconCanvas.width = 64;
+    _faviconCanvas.height = 64;
+  }
+  const ctx = _faviconCanvas.getContext('2d');
+  ctx.clearRect(0, 0, 64, 64);
+
+  const draw = () => {
+    // Background circle (red)
+    ctx.fillStyle = '#DB3022';
+    ctx.beginPath();
+    ctx.arc(32, 32, 30, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Crown emoji as logo (matches site's 👑 brand)
+    ctx.font = '38px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('👑', 32, 36);
+
+    // Badge with cart count
+    if (count > 0) {
+      const txt = count > 9 ? '9+' : String(count);
+      // Yellow badge circle in the top-right
+      ctx.fillStyle = '#FFE500';
+      ctx.beginPath();
+      ctx.arc(48, 16, 14, 0, Math.PI * 2);
+      ctx.fill();
+      // Black ring
+      ctx.strokeStyle = '#1a1a1a';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      // Count text
+      ctx.fillStyle = '#1a1a1a';
+      ctx.font = 'bold 18px -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(txt, 48, 17);
+    }
+
+    // Push to the document
+    let link = document.querySelector('link[rel*="icon"]');
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.head.appendChild(link);
+    }
+    link.type = 'image/png';
+    link.href = _faviconCanvas.toDataURL('image/png');
+  };
+
+  draw();
+}
+
+// Initial favicon render on page load (before first updateCartUI fires)
+if (typeof document !== 'undefined') {
+  const initialCount = (typeof cart !== 'undefined' ? cart : []).reduce((s, i) => s + i.quantity, 0);
+  try { updateFaviconBadge(initialCount); } catch {}
+}
 
 function updateAlertBell() {
   const alerts = getPriceAlerts();
