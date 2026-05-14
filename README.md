@@ -47,6 +47,8 @@ elite-emporium/
 ├── wishlist.html           # Saved items: sort dropdown, value bar with avg-discount + OOS counts
 ├── orders.html             # Local order history with stats dashboard (tier, total spent, fav category)
 ├── about.html              # Standalone About page (story, founder, business info)
+├── privacy.html            # Privacy Policy (legal, covers Razorpay onboarding)
+├── terms.html              # Terms & Conditions (ordering, returns, liability)
 ├── 404.html                # Friendly 404 with category quick-jump
 ├── admin.html              # 10x admin panel (Firebase Auth gated) — manage products
 ├── hanii-dhanii.html       # Partner brand storefront
@@ -188,6 +190,20 @@ This list is approximate — `git log --oneline` is authoritative for what lande
 - **404 page** (`a05439b`): `/404.html` with floating-emoji illustration, 3 primary CTAs, 10-category quick-jump grid.
 - **Service worker v2** (`a05439b`): bumped to v2, precaches `/404.html`, navigation chain now network → cache → /404.html → /index.html.
 - **About page** (`4e04a84`): standalone `/about.html` with hero pillars, founder card, business info grid, WhatsApp CTA. Added to sitemap + sw cache.
+
+### A11y + animation polish wave
+- **Tab a11y + scroll-padding** (`1582e58`): product detail tabs got proper `role="tablist"`/`role="tab"`/`role="tabpanel"` semantics, full W3C keyboard pattern (Left/Right cycle, Home/End jump). Added global `scroll-padding-top: 80px` so anchor jumps clear the sticky header.
+- **Scroll-reveal extension + cart bounce** (`6395fc6`): `initScrollReveal()` now also reveals FAQ, footer-strip, WhatsApp channel CTA, fk-deal-row, about sections, oh-stats. `flyToCart()` now triggers a `.cart-bounce` keyframe on the cart icon when the flying image lands.
+
+### Conversion-juice wave
+- **Smart coupon suggestion** (`5fa4348`): inside `refreshSummary()`, picks the best-value coupon for the current subtotal (SUMMER15 only above ₹500) and shows a one-click "Apply" banner. Dismissible per session.
+- **Shop by Occasion** (`2894017`): 6-card gradient grid on homepage (Wedding, Eid, Gifts for Him/Her, Birthday, Housewarming). Each card uses a CSS custom property `--occ-grad` for its background. Drives discovery for scenario-shoppers.
+- **Checkout auto-tab + button feedback** (`8d6864e`): focus jumps from phone (10 digits) → address and from PIN (6 digits) → notes (only if next field is empty). `.add-to-cart:active` adds a 0.96 scale press feedback.
+
+### Legal pages wave (`9b2afbf`)
+- **`/privacy.html`** — what we collect, how we use it, who we share with, cookies, retention, rights, security, contact. Covers Razorpay onboarding requirement.
+- **`/terms.html`** — ordering, payment, shipping, returns, product accuracy, IP, liability cap, governing law (Thoothukudi jurisdiction).
+- Both added to sitemap, sw cache, and footer Quick Links. Cross-linked from each other's footer.
 
 ### Fixes caught along the way
 - Duplicate `const orderBtn` in `placeOrder()` — was a hidden SyntaxError.
