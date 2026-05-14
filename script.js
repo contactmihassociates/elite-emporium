@@ -2514,9 +2514,62 @@ function initProductDetailPage() {
   const p      = products.find(prod => String(prod.id) === String(rawId));
 
   if (!p) {
-    document.getElementById('pdTitle').textContent = 'Product not found';
+    // Friendly empty-state instead of bare "Product not found"
+    document.title = 'Product Not Found – Elite Emporium';
     const breadEl = document.getElementById('pdBreadcrumb');
     if (breadEl) breadEl.innerHTML = `<a href="index.html">Home</a> › <a href="products.html">Products</a> › Not Found`;
+
+    const pdPage = document.querySelector('.pd-page');
+    if (pdPage) {
+      // Build suggestions: top 6 in-stock, high-rated products
+      const suggestions = [...products]
+        .filter(x => x.inStock !== false)
+        .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+        .slice(0, 6);
+      pdPage.innerHTML = `
+        <div class="pd-notfound">
+          <div class="pd-notfound-emoji">🔍</div>
+          <h1>This product wandered off…</h1>
+          <p>The product you're looking for may have been removed, sold out, or the link is incorrect.</p>
+          <div class="pd-notfound-actions">
+            <a href="products.html" class="btn-primary">Browse All Products</a>
+            <a href="index.html" class="btn-primary" style="background:transparent;color:var(--red);border:1.5px solid var(--red);">← Back to Home</a>
+            <a href="https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(`Hi! I was looking for a product (id ${rawId}) but the page is missing. Can you help?`)}" target="_blank" rel="noopener" class="btn-primary" style="background:#25D366;">💬 Ask on WhatsApp</a>
+          </div>
+          ${suggestions.length ? `
+            <div class="pd-notfound-suggest">
+              <h3>You might like these instead</h3>
+              <div class="products-grid pd-notfound-grid"></div>
+            </div>` : ''}
+        </div>`;
+      if (suggestions.length) {
+        renderProducts(suggestions, null); // need a target — fall through to direct rendering
+        const grid = pdPage.querySelector('.pd-notfound-grid');
+        if (grid) {
+          // Render simple cards (the renderProducts() helper writes to an element with that id, so do it inline)
+          grid.innerHTML = suggestions.map(s => {
+            const discount = s.mrp && s.mrp > s.price ? Math.round((s.mrp - s.price) / s.mrp * 100) : 0;
+            return `
+              <a href="product.html?id=${s.id}" class="product-card" style="text-decoration:none;color:inherit;">
+                <div class="product-image product-image-photo"><img src="${s.image}" alt="${s.name}" loading="lazy" /></div>
+                <div class="product-info">
+                  <div class="product-name">${s.name.length > 38 ? s.name.slice(0,38) + '…' : s.name}</div>
+                  <div class="product-rating"><span class="fk-rating-badge">★ ${s.rating}</span></div>
+                  <div class="product-footer">
+                    <div class="product-price-block">
+                      <div class="product-price">₹${s.price.toLocaleString('en-IN')}</div>
+                      ${discount ? `<span class="product-save">${discount}% off</span>` : ''}
+                    </div>
+                  </div>
+                </div>
+              </a>`;
+          }).join('');
+        }
+      }
+    }
+    // Hide the sticky bar and any chrome that expects a product
+    const stickyBar = document.getElementById('pdStickyBar');
+    if (stickyBar) stickyBar.style.display = 'none';
     return;
   }
 

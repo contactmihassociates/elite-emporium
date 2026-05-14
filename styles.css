@@ -5234,6 +5234,65 @@ html { scroll-padding-top: 80px; }
   .oh-card + .oh-card { page-break-before: auto; }
 }
 
+/* ── Product not-found empty state ──────────────── */
+.pd-notfound {
+  max-width: 760px;
+  margin: 28px auto;
+  text-align: center;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e8eaf0);
+  border-radius: 18px;
+  padding: 44px 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+.pd-notfound-emoji {
+  font-size: 80px;
+  line-height: 1;
+  margin-bottom: 12px;
+  animation: errFloat 3s ease-in-out infinite;
+}
+.pd-notfound h1 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text, #1a1a1a);
+  margin-bottom: 8px;
+}
+.pd-notfound > p {
+  font-size: 14px;
+  color: var(--text2, #6c757d);
+  max-width: 520px;
+  margin: 0 auto 24px;
+  line-height: 1.6;
+}
+.pd-notfound-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+.pd-notfound-suggest {
+  border-top: 1px dashed var(--border, #e8eaf0);
+  padding-top: 22px;
+  text-align: left;
+}
+.pd-notfound-suggest h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text, #1a1a1a);
+  margin-bottom: 12px;
+  text-align: center;
+}
+.pd-notfound-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+@media (max-width: 480px) {
+  .pd-notfound { padding: 28px 16px; }
+  .pd-notfound h1 { font-size: 20px; }
+}
+
 /* ── Reduced-motion: respect user preference ─────── */
 @media (prefers-reduced-motion: reduce) {
   *,
