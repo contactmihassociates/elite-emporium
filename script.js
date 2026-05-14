@@ -959,6 +959,17 @@ function updateQuantity(cartKey, delta) {
 }
 
 // ── TOTALS ───────────────────────────────────
+// ── HTML escape helper — safe to call on any string for use inside
+// HTML attributes / template-literal-built innerHTML. Returns '' for
+// null / undefined. Used by side cart drawer, UPI modal, back-to-cat
+// pill, etc. (Without this defined globally, those features throw
+// ReferenceError and fail silently / catch-block error toasts.)
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
 function getSubtotal() { return cart.reduce((s, i) => s + i.price * i.quantity, 0); }
 function getItemCount() { return cart.reduce((s, i) => s + i.quantity, 0); }
 function getDelivery()  { const st = getSubtotal(); return st === 0 ? 0 : st < CONFIG.minFreeDelivery ? CONFIG.deliveryCharge : 0; }
