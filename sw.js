@@ -4,7 +4,7 @@
    for pages and API calls.
    ============================================ */
 
-const CACHE_NAME = 'elite-emporium-v1';
+const CACHE_NAME = 'elite-emporium-v2';
 
 const STATIC_ASSETS = [
   '/',
@@ -14,6 +14,7 @@ const STATIC_ASSETS = [
   '/cart.html',
   '/wishlist.html',
   '/orders.html',
+  '/404.html',
   '/styles.css',
   '/script.js',
   '/manifest.json',
@@ -51,16 +52,21 @@ self.addEventListener('fetch', event => {
   // Firebase Firestore — always network, never cache
   if (url.hostname.includes('firestore') || url.hostname.includes('firebase')) return;
 
-  // HTML pages — network-first with cache fallback
+  // HTML pages — network-first with cache fallback, finally 404
   if (request.destination === 'document') {
     event.respondWith(
       fetch(request)
         .then(resp => {
-          const clone = resp.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+          // Only cache successful navigations
+          if (resp && resp.ok) {
+            const clone = resp.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+          }
           return resp;
         })
-        .catch(() => caches.match(request).then(r => r || caches.match('/index.html')))
+        .catch(() => caches.match(request).then(r =>
+          r || caches.match('/404.html').then(p => p || caches.match('/index.html'))
+        ))
     );
     return;
   }

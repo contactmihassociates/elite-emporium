@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page Not Found – Elite Emporium</title>
+  <meta name="description" content="The page you're looking for doesn't exist. Browse our top categories or head to the homepage." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#DB3022" />
+  <style>
+    .err-shell {
+      min-height: 70vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .err-card {
+      max-width: 640px;
+      width: 100%;
+      text-align: center;
+      background: var(--surface, #fff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 18px;
+      padding: 40px 28px;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.06);
+    }
+    .err-emoji {
+      font-size: 88px;
+      line-height: 1;
+      margin-bottom: 8px;
+      animation: errFloat 3s ease-in-out infinite;
+    }
+    @keyframes errFloat {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+    .err-code {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-light, #878787);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .err-card h1 {
+      font-size: 28px;
+      font-weight: 800;
+      margin: 4px 0 8px;
+      color: var(--text, #1a1a1a);
+    }
+    .err-card p {
+      font-size: 14px;
+      color: var(--text2, #6c757d);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .err-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .err-cat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 10px;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px dashed var(--border, #e0e0e0);
+    }
+    .err-cat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 12px 8px;
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--text, #1a1a1a);
+      font-size: 11px;
+      font-weight: 600;
+      transition: all 0.18s;
+    }
+    .err-cat:hover {
+      border-color: var(--red, #DB3022);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(219,48,34,0.12);
+    }
+    .err-cat-emoji { font-size: 26px; }
+  </style>
+</head>
+<body><div id="scrollProgress"></div>
+
+<header>
+  <div class="header-main">
+    <a href="index.html" class="logo">
+      <img src="images/logo.png" class="logo-img" alt="Elite Emporium" />
+    </a>
+    <div class="header-search">
+      <form id="headerSearchForm">
+        <input type="text" id="headerSearchInput" placeholder="Search products, brands and more" autocomplete="off" />
+        <button type="submit">🔍</button>
+      </form>
+    </div>
+    <div class="header-actions">
+      <a href="cart.html" class="cart-btn">🛒 Cart <span class="cart-count">0</span></a>
+    </div>
+  </div>
+</header>
+
+<div class="err-shell">
+  <div class="err-card">
+    <div class="err-emoji">🔍</div>
+    <div class="err-code">Error 404</div>
+    <h1>This page wandered off…</h1>
+    <p>
+      We couldn't find what you were looking for. Maybe it moved, maybe it never existed,
+      or maybe you typed the URL by hand and slipped a letter.
+    </p>
+    <div class="err-actions">
+      <a href="index.html" class="btn-primary">🏠 Back to Home</a>
+      <a href="products.html" class="btn-primary" style="background:transparent;color:var(--red,#DB3022);border:1.5px solid var(--red,#DB3022);">🛍️ Browse Products</a>
+      <a href="https://wa.me/917358650774?text=Hi%21%20I%20landed%20on%20a%20broken%20page." target="_blank" rel="noopener" class="btn-primary" style="background:#25D366;">💬 Tell us on WhatsApp</a>
+    </div>
+
+    <div style="font-size:12px;font-weight:700;color:var(--text-light,#878787);text-transform:uppercase;letter-spacing:1px;">
+      Or try a category
+    </div>
+    <div class="err-cat-grid">
+      <a href="products.html?category=Bags" class="err-cat"><span class="err-cat-emoji">👜</span>Bags</a>
+      <a href="products.html?category=Watches" class="err-cat"><span class="err-cat-emoji">⌚</span>Watches</a>
+      <a href="products.html?category=Clothing" class="err-cat"><span class="err-cat-emoji">👗</span>Fashion</a>
+      <a href="products.html?category=Abaiya" class="err-cat"><span class="err-cat-emoji">🕌</span>Abaiya</a>
+      <a href="products.html?category=Hijab" class="err-cat"><span class="err-cat-emoji">🧕</span>Hijab</a>
+      <a href="products.html?category=Sarees" class="err-cat"><span class="err-cat-emoji">👘</span>Sarees</a>
+      <a href="products.html?category=Home%20%26%20Kitchen" class="err-cat"><span class="err-cat-emoji">🍳</span>Kitchen</a>
+      <a href="products.html?category=Perfumes" class="err-cat"><span class="err-cat-emoji">🧴</span>Perfumes</a>
+      <a href="hanii-dhanii.html" class="err-cat"><span class="err-cat-emoji">💎</span>Jewellery</a>
+      <a href="products.html?category=Cosmetics" class="err-cat"><span class="err-cat-emoji">💄</span>Cosmetics</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-bottom">
+    <span>© 2026 Elite Emporium. All rights reserved. | GST: 33DWGPN3169G1ZF</span>
+    <span>Made with ❤️ in Kayalpattinam, Tamil Nadu</span>
+  </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
