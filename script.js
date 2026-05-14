@@ -4053,6 +4053,54 @@ function initStickyBar(p) {
 }
 
 // ── PRINT RECEIPT ────────────────────────────
+// ── BOTTOM NAV AUTO ACTIVE-STATE ─────────────────
+// Hand-coded `.bottom-nav-item.active` HTML on each page sometimes drifts
+// out of sync (e.g. about.html, track-order.html have no hardcoded active
+// state). This pass infers the right one from window.location.pathname
+// and sets aria-current="page" on the matched item.
+function initBottomNavActive() {
+  const items = document.querySelectorAll('.bottom-nav .bottom-nav-item');
+  if (!items.length) return;
+
+  const path = window.location.pathname.toLowerCase();
+  const fileMatch = path.match(/([^/]+)$/);
+  const currentFile = fileMatch ? fileMatch[1] : 'index.html';
+
+  // Reset
+  items.forEach(a => {
+    a.classList.remove('active');
+    a.removeAttribute('aria-current');
+  });
+
+  // Find the matching item
+  let matched = null;
+  items.forEach(a => {
+    const href = (a.getAttribute('href') || '').toLowerCase();
+    const hrefFile = (href.match(/([^/?#]+)/) || [])[1] || '';
+    if (hrefFile === currentFile || (currentFile === '' && hrefFile === 'index.html')) {
+      matched = a;
+    }
+  });
+
+  // Special routing rules
+  if (!matched) {
+    if (currentFile.startsWith('product') && !currentFile.startsWith('products')) {
+      // Single product page → highlight 'Products'
+      matched = [...items].find(a => (a.getAttribute('href') || '').toLowerCase().includes('products.html'));
+    } else if (currentFile === 'track-order.html') {
+      matched = [...items].find(a => (a.getAttribute('href') || '').toLowerCase().includes('orders.html'));
+    } else if (['about.html', 'privacy.html', 'terms.html'].includes(currentFile)) {
+      // No matching tab — leave Home highlighted as a sensible default
+      matched = [...items].find(a => (a.getAttribute('href') || '').toLowerCase().includes('index.html'));
+    }
+  }
+
+  if (matched) {
+    matched.classList.add('active');
+    matched.setAttribute('aria-current', 'page');
+  }
+}
+
 // ── TESTIMONIALS ROTATOR ─────────────────────────
 // Highlights one customer card at a time inside #testimonialsRotator.
 // Cards fade through with a subtle scale. Pauses on hover (desktop)
@@ -6682,6 +6730,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initSideCartDrawer();
   initWhatsAppChatCard();
   initTestimonialsRotator();
+  initBottomNavActive();
   initSocialProof();
   initStatsCounter();
 

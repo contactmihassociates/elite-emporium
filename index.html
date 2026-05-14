@@ -343,6 +343,7 @@
     <span class="hsc-text">Scroll to explore</span>
     <span class="hsc-arrow">↓</span>
   </a>
+  <div class="hero-progress" aria-hidden="true"><div class="hero-progress-fill" id="heroProgressFill"></div></div>
 </div>
 
 <!-- ── MAIN CONTENT ───────────────────────── -->
@@ -1150,6 +1151,16 @@
   function resetAuto() {
     clearInterval(autoTimer);
     autoTimer = setInterval(function() { goToSlide(current + 1); }, 4500);
+    restartProgressBar();
+  }
+  function restartProgressBar() {
+    var fill = document.getElementById('heroProgressFill');
+    if (!fill) return;
+    fill.style.transition = 'none';
+    fill.style.width = '0%';
+    void fill.offsetWidth; // force reflow
+    fill.style.transition = 'width 4.5s linear';
+    fill.style.width = '100%';
   }
   resetAuto();
 

@@ -1675,6 +1675,28 @@ textarea.form-input { resize:vertical; min-height:72px; }
 [data-theme="dark"] .wa-prompt-chip:hover { background: #128C7E; color: #fff; }
 [data-theme="dark"] .wa-chat-alt { color: rgba(255,255,255,0.55); }
 
+/* Hero slideshow auto-progress bar */
+.hero-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255,255,255,0.18);
+  z-index: 6;
+  overflow: hidden;
+}
+.hero-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ffd700, #ff9800);
+  transition: width 4.5s linear;
+  box-shadow: 0 0 8px rgba(255,215,0,0.5);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-progress-fill { transition: none !important; width: 100% !important; }
+}
+
 /* Just Landed — recently added products strip */
 .just-landed-section { padding: 12px 4% 8px; }
 .just-landed-strip {
