@@ -61,6 +61,11 @@ A single long session that shipped ~25 batches. Grouped by theme; commit hashes 
 - **/track-order.html** (`412869a`) — standalone order lookup page with status card, visual 4-step timeline, ETA, order metadata grid, recent orders chip list, ?id= deep-link support.
 - **Festive auto-theming** (`dd5f2e6`) — calendar-driven banner for 7 festivals (New Year, Pongal, Republic Day, Eid, Independence Day, Diwali, Christmas) with subtle accent tint that persists for the session.
 - **Dynamic favicon with cart count** (`4f618e1`) — 64×64 canvas-rendered favicon with 👑 crown + yellow count badge in top-right, re-serialised on every cart change.
+- **Most Loved homepage strip + Verified Buyer badge** (`16b485e`) — algorithmic score `rating × log(reviews+1)` selects top 8 in-stock products with ≥ 4.3 rating and ≥ 5 reviews. Seeded reviews now display a green '✓ Verified Buyer' pill.
+- **Exit-intent modal** (`05ce29e`) — desktop mouse-out-from-top + mobile back-button sentinel. Item count + free-delivery line + Complete Order / Keep Browsing CTAs. One per session.
+- **Auto-open side cart on first add** (`8b76319`) — opens the drawer 700 ms after the first add-to-cart per session (skipped on cart.html and product.html where it would be redundant).
+- **One-click 'Order Again'** (`c28f73d`) — on each orders.html card, a real Re-Order button that rebuilds the cart from the original items (handles discontinued + OOS gracefully) and redirects to /cart.html. Also added a 🔎 Track shortcut to deep-link into track-order.html.
+- **Hero scroll-down cue** (current) — small animated 'Scroll to explore ↓' pill anchored to `#shopByCategory`. Hidden on mobile, respects reduced-motion.
 
 ### Fixes caught along the way
 - Duplicate `const orderBtn` in `placeOrder()` was a hidden SyntaxError.
