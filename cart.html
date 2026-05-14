@@ -175,12 +175,19 @@
           <span style="font-size:22px;">💬</span>
           Place Order via WhatsApp
         </button>
+        <button id="payOnlineBtn" class="pay-online-btn" onclick="payOnline()" style="display:none;">
+          <span style="font-size:18px;">💳</span>
+          Pay Online (UPI / Cards / Netbanking)
+        </button>
         <button onclick="printReceipt()" style="display:block;width:100%;margin-top:8px;padding:10px;background:transparent;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:600;color:var(--text-mid);cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-mid)'">
           🖨️ Print / Save Receipt
         </button>
         <div class="order-note">
           ✅ Clicking the button will open WhatsApp with your complete order details.<br />
           Simply <strong>send the message</strong> to confirm your order with Elite Emporium.
+        </div>
+        <div id="payOnlineNote" class="pay-online-note" style="display:none;">
+          🔒 Secure payment powered by <strong>Razorpay</strong> — UPI · Cards · Netbanking · Wallets · GST invoice.
         </div>
       </div>
     </div>

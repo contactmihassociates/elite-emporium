@@ -14,6 +14,13 @@ const CONFIG = {
   phone: "8072173467",
   minFreeDelivery: 499,
   deliveryCharge: 60,
+
+  // Razorpay Payment Link — drop a public link here to enable "Pay Online".
+  // 1. Sign in to Razorpay → Payment Pages → create a "Customer-amount" page.
+  // 2. Paste the public URL (e.g. https://razorpay.com/payment-link/...).
+  // 3. The "Pay Online" button on the cart will then open it in a new tab.
+  // Leave empty to keep the cart WhatsApp-only.
+  razorpayPaymentLink: "",
 };
 
 // ── PRODUCT CATALOG (base / hardcoded) ───────
@@ -2765,6 +2772,62 @@ function initStickyBar(p) {
 }
 
 // ── PRINT RECEIPT ────────────────────────────
+// ── RAZORPAY: open hosted Payment Link ─────
+function payOnline() {
+  const link = CONFIG.razorpayPaymentLink;
+  if (!link) {
+    showToast('💳 Online payment not configured yet — please order via WhatsApp.', 4000, 'info');
+    return;
+  }
+  if (!cart.length) { showToast('⚠️ Your cart is empty!'); return; }
+
+  // Validate required customer fields before sending them off-site
+  const get = id => (document.getElementById(id) || {}).value?.trim() || '';
+  const name  = get('custName');
+  const phone = get('custPhone');
+  if (!name || !/^\d{10}$/.test(phone)) {
+    showToast('⚠️ Fill name & 10-digit phone first — we use these for the receipt.', 4000, 'error');
+    document.getElementById(name ? 'custPhone' : 'custName')?.focus();
+    return;
+  }
+
+  const sub      = getSubtotal();
+  const del      = getDelivery();
+  const discount = getCouponDiscount(sub);
+  const total    = Math.max(0, sub + del - discount);
+
+  // Save order to history before redirecting off-site
+  const orderId = generateOrderId();
+  saveOrderToHistory({
+    id: orderId,
+    date: new Date().toISOString(),
+    status: 'Awaiting payment',
+    customer: { name, phone, address: get('custAddress'), city: get('custCity'), state: get('custState'), pincode: get('custPincode'), notes: get('custNotes') },
+    items: cart.map(i => ({ id: i.id, name: i.name, image: i.image, price: i.price, quantity: i.quantity, selectedColor: i.selectedColor || null })),
+    subtotal: sub, delivery: del, discount, coupon: _activeCoupon || null, total,
+  });
+
+  // Append prefill params if the link supports them (Razorpay Payment Pages accept name/email/contact)
+  const url = new URL(link);
+  url.searchParams.set('amount', String(total));
+  url.searchParams.set('prefill[name]', name);
+  url.searchParams.set('prefill[contact]', phone);
+  url.searchParams.set('reference', orderId);
+
+  window.open(url.toString(), '_blank');
+  showToast('💳 Opening secure payment page…', 3000, 'info');
+}
+
+// Show Pay Online button when configured
+function initPayOnlineButton() {
+  const btn = document.getElementById('payOnlineBtn');
+  const note = document.getElementById('payOnlineNote');
+  if (!btn) return;
+  const enabled = !!(CONFIG.razorpayPaymentLink && CONFIG.razorpayPaymentLink.startsWith('http'));
+  btn.style.display  = enabled ? 'flex' : 'none';
+  if (note) note.style.display = enabled ? 'block' : 'none';
+}
+
 function printReceipt() {
   if (!cart.length) { showToast('⚠️ Your cart is empty.'); return; }
   const sub      = getSubtotal();
@@ -4120,6 +4183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (document.getElementById('productsGrid'))     initProductsPage();
   if (document.getElementById('cartItems')) {
     renderCart();
+    initPayOnlineButton();
     // Auto-apply coupon from URL: cart.html?coupon=ELITE10
     const urlCoupon = new URLSearchParams(window.location.search).get('coupon');
     if (urlCoupon && COUPONS[urlCoupon.toUpperCase()] && !_activeCoupon) {

@@ -174,11 +174,29 @@ A separate `hanii-dhanii-admin.html` exists for the partner brand with its own c
 
 ## 8. Payments
 
-**No gateway integrated yet.** Today's flow is WhatsApp → manual UPI/bank transfer.
+**Status:** WhatsApp-only by default. A Razorpay Payment Link button is scaffolded on the cart but hidden until the link is configured.
 
-Recommended next step: **Razorpay Payment Links** (zero-code, generate per-order via dashboard or API, share via WhatsApp). For embedded checkout: **Razorpay Standard Checkout JS**, but that needs a tiny backend (Cloud Functions, Cloudflare Worker, or Vercel serverless function) to create `order_id`s server-side — the secret key cannot live in the browser.
+**To turn on online payments:**
 
-If keeping it 100% frontend: switch to **Razorpay Payment Button** (one HTML snippet, hosted checkout) or **Instamojo Payment Links**. Both work without a server.
+1. Sign in to [Razorpay Dashboard](https://dashboard.razorpay.com/) → **Payment Pages** → create a "Customer-amount" page (the customer types the amount).
+2. Copy the public link (e.g. `https://razorpay.com/payment-link/pl_XXXXXXXX`).
+3. Paste it into `CONFIG.razorpayPaymentLink` at the top of `script.js`.
+4. Done. The "💳 Pay Online" button appears on the cart next to "Place Order via WhatsApp".
+
+What the button does (`payOnline()` in `script.js`):
+- Validates name + 10-digit phone are filled.
+- Saves the order to local history with status `"Awaiting payment"` and a generated order ID.
+- Opens the Razorpay-hosted Payment Page in a new tab, prefilling `amount`, `prefill[name]`, `prefill[contact]`, and `reference` (the order ID).
+
+This is **fully frontend** — no backend needed. The merchant reconciles by matching the `reference` field in Razorpay → Payments → Filter by reference.
+
+**Upgrade path** (when you want embedded checkout instead of hosted page):
+- **Razorpay Standard Checkout JS** — needs a tiny backend (Vercel serverless function or Firebase Cloud Function) to create `order_id`s server-side; the API secret cannot live in the browser. ~30 lines of server code + ~20 lines of frontend.
+- **Razorpay Payment Button** (zero-code HTML snippet) — works for fixed-amount only or single-product flows.
+
+**Alternative gateways** (similar simplicity):
+- **Instamojo Payment Links** — even easier signup, slightly higher fees.
+- **Cashfree Payment Links** — comparable to Razorpay.
 
 ---
 
