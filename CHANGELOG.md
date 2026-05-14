@@ -43,6 +43,19 @@ A single long session that shipped ~25 batches. Grouped by theme; commit hashes 
 ### Footer + branding
 - **Footer payment + trust strip** (`31bd80f`): 2-column row with payment methods + trust seals as pills.
 
+### 2026-05-15 — Continued autonomous improvement wave
+
+- **WhatsApp 'live chat' popup card** (`cabde9b`) — the float button now opens a chat-bubble popup with 6 quick-prompt chips (Quick question, Track order, Bulk order, Custom request, GST invoice, Returns), an "online" pulse dot, and contact lines for primary + alt numbers.
+- **og:locale + hreflang for India** (`bfaff0a`) — `en_IN` + `ta_IN` alternate, hreflang `en-IN` and `x-default` for SERP regional signals.
+- **Testimonials auto-rotator** (`bfaff0a`) — mobile/tablet fades through cards every 5.5s with indicator dots; desktop shows all 3 cards in grid (no rotation).
+- **Editor's Picks magazine spotlight** (`9e328aa`) — 4-product strip with weighted score (rating × 10 + log(reviews+1) × 8 + discount × 30 + badge bonus), numbered cards 01–04, italic editor quotes, cream-tinted magazine styling.
+- **'Just Landed' recently-added strip** (`4e88671`) — top 10 most-recent products sorted by Firestore `createdAt`, pulsing red 'NEW' ribbon, relative-time line ("Added today" / "3 days ago" / "2 weeks ago").
+- **Hero slide progress bar** (`3b2adcb`) — gold-to-orange gradient strip animates across 4.5s in sync with auto-advance; respects reduced-motion.
+- **Bottom-nav auto-active state** (`3b2adcb`) — infers correct tab from `window.location.pathname` with special routing rules (product.html → Products, track-order.html → Orders, about/privacy/terms → Home). Sets `aria-current="page"`.
+- **Cart 'Why customers trust us' stack** (`ba81b60`) — 5-reason reassurance block on cart with GST/Udyam, owner-replies-personally, free delivery, returns, hand-curated lines.
+- **Empty cart category quick-jumps** (`f9efe20`) — 8 category chips with emoji + name when cart is empty, converts a dead-end into a discovery surface.
+- **Trending searches in header dropdown** (`62420d0`) — top 6 product terms by review count, orange chip-style, shown when search input is focused empty.
+
 ### Late batches (docs + cross-device + welcome flow)
 - **CHANGELOG.md + print stylesheet** (`f71dfbe`).
 - **Newsletter form (real handler) + cart save/restore via URL** (`44fe04d`).
