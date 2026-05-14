@@ -4808,6 +4808,54 @@ kbd {
 }
 .pd-ask-product:hover .pd-ask-product-arrow { transform: translateX(3px); }
 
+/* ── Orders page: customer stats dashboard ──── */
+.oh-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.oh-stat-card {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.oh-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: var(--red);
+}
+.oh-stat-card.oh-tier::before { background: var(--tier-color, var(--red)); }
+.oh-stat-icon { font-size: 24px; margin-bottom: 4px; }
+.oh-stat-val {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oh-tier .oh-stat-val { color: var(--tier-color, var(--red)); }
+.oh-stat-label {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+@media (max-width: 480px) {
+  .oh-stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .oh-stat-icon { font-size: 20px; }
+  .oh-stat-val { font-size: 15px; }
+  .oh-stat-label { font-size: 10px; }
+}
+[data-theme="dark"] .oh-stat-card { background: #141821; }
+
 /* ── Reduced-motion: respect user preference ─────── */
 @media (prefers-reduced-motion: reduce) {
   *,

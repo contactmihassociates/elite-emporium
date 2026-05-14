@@ -4359,6 +4359,44 @@ function initOrdersPage() {
     return;
   }
 
+  // Customer stats dashboard (above the order list)
+  const totalSpent = orders.reduce((s, o) => s + (o.total || 0), 0);
+  const totalItems = orders.reduce((s, o) => s + (o.items || []).reduce((x, i) => x + (i.quantity || 1), 0), 0);
+  const catCount   = {};
+  orders.forEach(o => (o.items || []).forEach(i => {
+    const c = (products.find(p => p.id === i.id) || {}).category;
+    if (c) catCount[c] = (catCount[c] || 0) + (i.quantity || 1);
+  }));
+  const topCat = Object.entries(catCount).sort((a,b) => b[1] - a[1])[0];
+  const tier = orders.length >= 10 ? { label: 'Gold', emoji: '🥇', color: '#c9a84c' }
+              : orders.length >= 5 ? { label: 'Silver', emoji: '🥈', color: '#9aa3b2' }
+              : { label: 'Bronze', emoji: '🥉', color: '#b87333' };
+
+  const statsHtml = `
+    <div class="oh-stats">
+      <div class="oh-stat-card">
+        <div class="oh-stat-icon">💰</div>
+        <div class="oh-stat-val">₹${totalSpent.toLocaleString('en-IN')}</div>
+        <div class="oh-stat-label">Total spent</div>
+      </div>
+      <div class="oh-stat-card">
+        <div class="oh-stat-icon">📦</div>
+        <div class="oh-stat-val">${totalItems}</div>
+        <div class="oh-stat-label">Items ordered</div>
+      </div>
+      <div class="oh-stat-card">
+        <div class="oh-stat-icon">${topCat ? '❤️' : '🛍️'}</div>
+        <div class="oh-stat-val">${topCat ? topCat[0] : '—'}</div>
+        <div class="oh-stat-label">${topCat ? 'Favourite category' : 'No favourite yet'}</div>
+      </div>
+      <div class="oh-stat-card oh-tier" style="--tier-color:${tier.color};">
+        <div class="oh-stat-icon">${tier.emoji}</div>
+        <div class="oh-stat-val">${tier.label}</div>
+        <div class="oh-stat-label">Customer tier · ${orders.length} order${orders.length > 1 ? 's' : ''}</div>
+      </div>
+    </div>`;
+  container.insertAdjacentHTML('beforebegin', statsHtml);
+
   container.innerHTML = orders.map(order => {
     const date  = new Date(order.date);
     const dStr  = date.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
