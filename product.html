@@ -161,17 +161,17 @@
 
       <!-- Action Buttons -->
       <div class="pd-actions">
-        <button class="add-to-cart" id="pdAddToCart">🛒 Add to Cart</button>
-        <button class="pd-btn-buy-now" id="pdBuyNow">⚡ Buy Now</button>
+        <button type="button" class="add-to-cart" id="pdAddToCart">🛒 Add to Cart</button>
+        <button type="button" class="pd-btn-buy-now" id="pdBuyNow">⚡ Buy Now</button>
         <a class="pd-btn-wa" id="pdWhatsApp" href="#" target="_blank" rel="noopener">💬 Order on WhatsApp</a>
-        <button class="pd-btn-share" id="pdShare" onclick="shareProduct()">🔗 Share</button>
+        <button type="button" class="pd-btn-share" id="pdShare" onclick="shareProduct()">🔗 Share</button>
       </div>
 
       <!-- Product Detail Tabs -->
       <div class="pd-tabs-nav">
-        <button class="pd-tab active" data-tab="desc" onclick="switchPdTab('desc',this)">📋 Description</button>
-        <button class="pd-tab" data-tab="delivery" onclick="switchPdTab('delivery',this)">🚚 Delivery</button>
-        <button class="pd-tab" data-tab="seller" onclick="switchPdTab('seller',this)">🏪 Seller</button>
+        <button type="button" class="pd-tab active" data-tab="desc" onclick="switchPdTab('desc',this)">📋 Description</button>
+        <button type="button" class="pd-tab" data-tab="delivery" onclick="switchPdTab('delivery',this)">🚚 Delivery</button>
+        <button type="button" class="pd-tab" data-tab="seller" onclick="switchPdTab('seller',this)">🏪 Seller</button>
         <div class="pd-tab-ink" id="pdTabInk"></div>
       </div>
 
@@ -192,7 +192,7 @@
             <div class="pin-checker-label">📍 Check delivery to your PIN code</div>
             <div class="pin-checker-row">
               <input type="text" id="pinCheckerInput" class="pin-checker-input" placeholder="Enter 6-digit PIN code" aria-label="Delivery PIN code" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" />
-              <button class="pin-checker-btn" onclick="checkPinDelivery()">Check</button>
+              <button type="button" class="pin-checker-btn" onclick="checkPinDelivery()">Check</button>
             </div>
             <div class="pin-checker-result" id="pinCheckerResult"></div>
           </div>
@@ -234,7 +234,7 @@
     <div class="pd-sticky-name" id="pdStickyName"></div>
     <div class="pd-sticky-price" id="pdStickyPrice"></div>
   </div>
-  <button class="add-to-cart pd-sticky-btn" id="pdStickyBtn">🛒 Add to Cart</button>
+  <button type="button" class="add-to-cart pd-sticky-btn" id="pdStickyBtn">🛒 Add to Cart</button>
 </div>
 
 <!-- ── FREQUENTLY BOUGHT TOGETHER ─────────── -->
@@ -286,7 +286,7 @@
     </div>
     <input type="text" id="reviewName" placeholder="Your name" aria-label="Your name" class="review-input" />
     <textarea id="reviewText" placeholder="Share your experience with this product…" aria-label="Your review" class="review-input review-textarea" rows="3"></textarea>
-    <button class="review-submit-btn" onclick="submitReview()">📤 Submit Review via WhatsApp</button>
+    <button type="button" class="review-submit-btn" onclick="submitReview()">📤 Submit Review via WhatsApp</button>
   </div>
 </div>
 
@@ -380,12 +380,12 @@
 <div class="img-modal" id="imgModal" onclick="closeImageModal()">
   <div class="img-modal-inner" onclick="event.stopPropagation()">
     <img id="imgModalImg" src="" alt="Product zoom" loading="lazy" decoding="async" />
-    <button class="img-modal-close" onclick="closeImageModal()" aria-label="Close image preview">✕</button>
+    <button type="button" class="img-modal-close" onclick="closeImageModal()" aria-label="Close image preview">✕</button>
   </div>
 </div>
 
 <a href="https://wa.me/917358650774" class="whatsapp-float" target="_blank" rel="noopener" title="Chat on WhatsApp">💬</a>
-<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+<button type="button" class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js" defer></script>

@@ -139,7 +139,7 @@
     <div class="cart-items-section">
       <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;">
         <span>🛒 Your Cart Items</span>
-        <button onclick="clearCart()" style="font-size:12px;color:var(--text-light);background:none;border:1.5px solid var(--border);padding:4px 10px;border-radius:4px;cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.2s;" onmouseover="this.style.color='var(--red)';this.style.borderColor='var(--red)'" onmouseout="this.style.color='var(--text-light)';this.style.borderColor='var(--border)'">🗑️ Clear All</button>
+        <button type="button" onclick="clearCart()" style="font-size:12px;color:var(--text-light);background:none;border:1.5px solid var(--border);padding:4px 10px;border-radius:4px;cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.2s;" onmouseover="this.style.color='var(--red)';this.style.borderColor='var(--red)'" onmouseout="this.style.color='var(--text-light)';this.style.borderColor='var(--border)'">🗑️ Clear All</button>
       </div>
       <div id="cartItems"><!-- Populated by script.js --></div>
     </div>
@@ -149,7 +149,7 @@
       <!-- Prefill hint (shown only when order history found) -->
       <div id="prefillHint" class="prefill-hint" style="display:none;">
         <span>✅ Details filled from your last order.</span>
-        <button onclick="document.querySelectorAll('.form-input').forEach(el=>el.value='');document.getElementById('prefillHint').style.display='none';" class="prefill-clear">Clear</button>
+        <button type="button" onclick="document.querySelectorAll('.form-input').forEach(el=>el.value='');document.getElementById('prefillHint').style.display='none';" class="prefill-clear">Clear</button>
       </div>
       <div class="form-body">
         <div class="form-row">
@@ -222,19 +222,19 @@
           <div class="gift-msg-counter"><span id="giftMsgCount">0</span> / 120</div>
         </div>
 
-        <button id="payUpiBtn" class="pay-upi-btn" onclick="payViaUPI()" style="display:none;">
+        <button type="button" id="payUpiBtn" class="pay-upi-btn" onclick="payViaUPI()" style="display:none;">
           <span style="font-size:20px;">💸</span>
           Pay via GPay / UPI
         </button>
-        <button class="whatsapp-order-btn" onclick="placeOrder()">
+        <button type="button" class="whatsapp-order-btn" onclick="placeOrder()">
           <span style="font-size:22px;">💬</span>
           Place Order via WhatsApp
         </button>
-        <button id="payOnlineBtn" class="pay-online-btn" onclick="payOnline()" style="display:none;">
+        <button type="button" id="payOnlineBtn" class="pay-online-btn" onclick="payOnline()" style="display:none;">
           <span style="font-size:18px;">💳</span>
           Pay Online (Cards / Netbanking / Wallets)
         </button>
-        <button onclick="printReceipt()" style="display:block;width:100%;margin-top:8px;padding:10px;background:transparent;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:600;color:var(--text-mid);cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-mid)'">
+        <button type="button" onclick="printReceipt()" style="display:block;width:100%;margin-top:8px;padding:10px;background:transparent;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:600;color:var(--text-mid);cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-mid)'">
           🖨️ Print / Save Receipt
         </button>
         <div class="order-note">
@@ -274,18 +274,18 @@
           <div class="available-coupons-row">
             <span class="avail-coupon-label">🎟️ Tap a coupon to apply:</span>
             <div class="avail-coupon-chips">
-              <button class="avail-coupon-chip" onclick="fillCoupon('ELITE10')">ELITE10 <span>10% off</span></button>
-              <button class="avail-coupon-chip" onclick="fillCoupon('FLAT50')">FLAT50 <span>₹50 off</span></button>
-              <button class="avail-coupon-chip" onclick="fillCoupon('SUMMER15')">SUMMER15 <span>15% off</span></button>
+              <button type="button" class="avail-coupon-chip" onclick="fillCoupon('ELITE10')">ELITE10 <span>10% off</span></button>
+              <button type="button" class="avail-coupon-chip" onclick="fillCoupon('FLAT50')">FLAT50 <span>₹50 off</span></button>
+              <button type="button" class="avail-coupon-chip" onclick="fillCoupon('SUMMER15')">SUMMER15 <span>15% off</span></button>
             </div>
           </div>
           <div id="couponApplied" style="display:none;background:#E8F5E9;border:1px solid #C8E6C9;border-radius:4px;padding:8px 12px;font-size:12px;color:#388E3C;display:none;align-items:center;justify-content:space-between;gap:8px;">
             <span id="couponAppliedText">🎟️ Coupon applied!</span>
-            <button onclick="removeCoupon()" aria-label="Remove coupon" style="background:transparent;border:none;color:#c62828;cursor:pointer;font-size:13px;font-weight:700;padding:0;">✕</button>
+            <button type="button" onclick="removeCoupon()" aria-label="Remove coupon" style="background:transparent;border:none;color:#c62828;cursor:pointer;font-size:13px;font-weight:700;padding:0;">✕</button>
           </div>
           <div id="couponInput" style="display:flex;gap:6px;">
             <input id="couponCode" type="text" placeholder="Enter coupon code" aria-label="Coupon code" style="flex:1;padding:8px 10px;border:1.5px solid #E0E0E0;border-radius:4px;font-size:12px;font-family:'Poppins',sans-serif;outline:none;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()" />
-            <button onclick="applyCoupon()" style="background:#DB3022;color:white;border:none;padding:8px 14px;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;white-space:nowrap;">Apply</button>
+            <button type="button" onclick="applyCoupon()" style="background:#DB3022;color:white;border:none;padding:8px 14px;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;white-space:nowrap;">Apply</button>
           </div>
         </div>
         <div class="summary-row" id="discountRow" style="display:none;">
@@ -487,7 +487,7 @@
   </div>
 </footer>
 
-<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+<button type="button" class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
 
 <!-- Mobile sticky place-order bar -->
 <div class="cart-mobile-bar" id="cartMobileBar">
@@ -495,7 +495,7 @@
     <span id="cartBarItems">0 items</span>
     <strong id="cartBarTotal">₹0</strong>
   </div>
-  <button class="cart-mobile-bar-btn" onclick="document.querySelector('.whatsapp-order-btn')?.scrollIntoView({behavior:'smooth',block:'center'})">Proceed →</button>
+  <button type="button" class="cart-mobile-bar-btn" onclick="document.querySelector('.whatsapp-order-btn')?.scrollIntoView({behavior:'smooth',block:'center'})">Proceed →</button>
 </div>
 
 <nav class="bottom-nav" aria-label="Bottom navigation">

@@ -119,8 +119,8 @@
   <div class="products-header" style="margin-bottom:14px;">
     <span id="wishlistCount" class="products-count">Loading…</span>
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-      <button onclick="addAllWishlistToCart()" class="btn-add-all-cart">🛒 Add All to Cart</button>
-      <button onclick="shareWishlist()" class="btn-share-wishlist">💬 Share Wishlist</button>
+      <button type="button" onclick="addAllWishlistToCart()" class="btn-add-all-cart">🛒 Add All to Cart</button>
+      <button type="button" onclick="shareWishlist()" class="btn-share-wishlist">💬 Share Wishlist</button>
       <a href="products.html" style="font-size:13px;color:var(--red);font-weight:600;">Browse More →</a>
     </div>
   </div>
@@ -181,7 +181,7 @@
   </div>
 </footer>
 
-<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+<button type="button" class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
 
 <nav class="bottom-nav" aria-label="Bottom navigation">
   <a href="index.html" class="bottom-nav-item">

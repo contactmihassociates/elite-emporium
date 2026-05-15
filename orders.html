@@ -119,8 +119,8 @@
   <div class="products-header" style="margin-bottom:18px;gap:8px;flex-wrap:wrap;">
     <span id="ordersCount" class="products-count">…</span> order(s) found
     <div style="display:flex;gap:8px;margin-left:auto;">
-      <button onclick="exportOrdersCSV()" class="oh-clear-btn" title="Download orders as CSV" style="color:#1565c0;border-color:#90caf9;">📥 Export CSV</button>
-      <button onclick="clearOrderHistory()" class="oh-clear-btn" title="Clear all order history">🗑️ Clear History</button>
+      <button type="button" onclick="exportOrdersCSV()" class="oh-clear-btn" title="Download orders as CSV" style="color:#1565c0;border-color:#90caf9;">📥 Export CSV</button>
+      <button type="button" onclick="clearOrderHistory()" class="oh-clear-btn" title="Clear all order history">🗑️ Clear History</button>
     </div>
   </div>
   <div id="ordersContainer"></div>
@@ -176,7 +176,7 @@
   </div>
 </footer>
 
-<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+<button type="button" class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
 
 <nav class="bottom-nav" aria-label="Bottom navigation">
   <a href="index.html" class="bottom-nav-item">
