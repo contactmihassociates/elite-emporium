@@ -3062,9 +3062,10 @@ function initLiveVisitorCount() {
   };
   placeBadge(base);
 
-  // Drift ±1 every 22s
+  // Drift ±1 every 22s. Bail when tab is hidden to save CPU/battery.
   if (window.__lvbInterval) clearInterval(window.__lvbInterval);
   window.__lvbInterval = setInterval(() => {
+    if (document.hidden) return;
     const el = document.getElementById('lvbCount');
     if (!el) return;
     let cur = parseInt(el.textContent, 10) || base;
@@ -4971,8 +4972,10 @@ function initProductDetailPage() {
       bw.appendChild(proofEl);
 
       // Drift the viewer count ±1 every 15-22s so it feels alive.
+      // Bail when tab is hidden to save CPU/battery.
       if (!window.__pdLpInterval) {
         window.__pdLpInterval = setInterval(() => {
+          if (document.hidden) return;
           const n = document.getElementById('pdLpViewersN');
           if (!n) { clearInterval(window.__pdLpInterval); window.__pdLpInterval = null; return; }
           let cur = parseInt(n.textContent, 10) || baseViewers;
