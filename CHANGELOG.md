@@ -86,7 +86,67 @@ A single long session that shipped ~25 batches. Grouped by theme; commit hashes 
 - Duplicate `const setMeta` inside `initProductDetailPage()`.
 - PAN-Aadhaar quote unescape fix in the toolkit page (earlier session).
 
-### v11-v13 APK build wave + SEO/PWA depth (latest hour)
+### Profile + Collection + App Badging wave (latest hour: APK v15 + v16)
+
+**APK v15.0.0 and v16.0.0** built locally, signed with the same key
+as v10-v14, committed to `release/`. In-place upgrade compatible.
+
+New pages:
+
+- **`/profile.html`** — dedicated user profile.
+  - Gradient hero (navy → red) with initials avatar pulled from
+    customer name on most-recent order, member-since date, tier pill.
+  - Stat grid: total spent, **lifetime savings** (MRP-vs-paid +
+    coupons + free-delivery savings), items bought, wishlist count.
+  - Saved-addresses card with per-row delete button.
+  - Recently viewed activity rows with thumbs + jump links.
+  - 2×2 quick-action grid: orders / wishlist / track / WhatsApp.
+  - Friendly empty state when there's no order history yet.
+  - Orders page tier card is now a clickable link to /profile.html.
+
+- **`/collection.html`** — festive landing page.
+  - 9 themed collections (Eid, Diwali, Christmas, New Year, Pongal,
+    Wedding, Summer, Monsoon, Kids) each with emoji, gradient palette,
+    4 mapped categories, coupon code.
+  - `?theme=eid` query overrides the date-based auto-detection.
+  - Floating emoji hero with subtle bob animation.
+  - Promo strip with monospace coupon code.
+  - Live product counts in the 4-card category strip.
+  - Two grids: 'Hand-picked' (top-rated in this theme) + 'Trending
+    today' (top by review count).
+  - Festive top banner on the homepage is now a clickable link to
+    the matching `/collection.html?theme=` — turns the dismissable
+    notice into a real entry point.
+
+PWA / installed-app polish:
+
+- **App Badging API** — `navigator.setAppBadge(cart.totalCount)` so
+  installed PWA / TWA users see the cart count on the home-screen
+  icon (Chrome Android, Edge Windows, Safari macOS Sonoma+). Silent
+  no-op on unsupported browsers.
+- **Cross-tab cart sync via BroadcastChannel** — open the site in two
+  tabs, add to cart in one, the other tab's badge + side-cart updates
+  live. Channel `elite-emporium-cart`.
+- **Hover prefetch on product cards** — pointerenter / touchstart on
+  any `<a href="product.html?id=...">` injects a `<link rel="prefetch"
+  as="document">` so the next click feels instant. Save-data /
+  slow-2g aware (skipped on metered connections).
+- **Service worker v8** — `/profile.html` and `/collection.html` added
+  to STATIC_ASSETS for offline access.
+
+Engagement & social proof:
+
+- **Live visitor count badge** site-wide — `🟢 23 shopping now` with
+  pulsing green dot, deterministic per-hour, peak-hour-biased
+  (10 AM-10 PM IST), drifts ±1 every 22s.
+- **PDP review filter chips** — `All / ★5 only / ★4+ / ✓ Verified /
+  🕐 Most recent` with live counts. Empty result state. Active chip
+  red-filled, haptic tap on switch.
+
+Bottom-nav active-state mapping extended for profile.html (highlights
+Orders) and collection.html (highlights Products).
+
+### v11-v13 APK build wave + SEO/PWA depth (previous hour)
 
 🎉 **Three real-built signed APKs committed to release/** — `v11.0.0`,
 `v12.0.0`, `v13.0.0`. Built locally on the developer machine using

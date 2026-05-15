@@ -7422,13 +7422,27 @@ function initFestiveTheming() {
     return;
   }
 
+  // Map theme id → /collection.html?theme= equivalent
+  const COLL_THEME_MAP = {
+    'new-year':         'new-year',
+    'pongal':           'pongal',
+    'ramadan-eid':      'eid',
+    'eid':              'eid',
+    'independence-day': 'new-year', // generic festive
+    'diwali':           'diwali',
+    'christmas':        'christmas',
+    'republic-day':     'new-year',
+  };
+  const collTheme = COLL_THEME_MAP[theme.id];
+  const shopHref = collTheme ? `collection.html?theme=${collTheme}` : 'products.html?sort=discount';
+
   // Inject the festive banner at the very top of the body
   const banner = document.createElement('div');
   banner.id = 'festiveBanner';
   banner.className = 'festive-banner';
   banner.style.background = `linear-gradient(135deg, ${theme.tint}, ${shadeColor(theme.tint, -15)})`;
   banner.innerHTML = `
-    <span class="fb-text"><strong>${theme.label}</strong> &middot; <span>${theme.subtitle}</span></span>
+    <a href="${shopHref}" class="fb-text fb-link"><strong>${theme.label}</strong> &middot; <span>${theme.subtitle}</span> <span class="fb-cta">Shop Now →</span></a>
     <button class="fb-close" onclick="dismissFestive('${theme.id}')" aria-label="Dismiss">✕</button>`;
   // Insert as the very first element of body so it sits above the header
   document.body.insertBefore(banner, document.body.firstChild);
