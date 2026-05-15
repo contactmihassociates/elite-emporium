@@ -954,6 +954,7 @@ header nav a:hover, header nav a.active { color:white; border-bottom-color:var(-
 .ps-hist-item:hover { background: var(--red-light); color: var(--red); }
 
 .sort-select, .form-select { padding:8px 12px; border:1.5px solid var(--border); border-radius:var(--radius); font-size:13px; font-family:'Poppins',sans-serif; outline:none; cursor:pointer; color:var(--text); background:white; }
+.sort-select:focus-visible, .form-select:focus-visible { border-color: var(--red); box-shadow: 0 0 0 3px rgba(219,48,34,0.18); }
 
 /* ══════════════════════════════════════════════
    PRODUCT GRID
