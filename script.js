@@ -5921,7 +5921,6 @@ function closeWhatsAppCard() {
 
 // ── DIRECT UPI PAYMENT (no gateway, zero fees) ─────
 async function payViaUPI() {
-  console.log('[UPI] payViaUPI() called');
 
   if (!CONFIG.upiId || !CONFIG.upiId.includes('@')) {
     showToast('💳 UPI not configured yet — please order via WhatsApp.', 4000, 'info');
@@ -5988,12 +5987,10 @@ async function payViaUPI() {
 
   // Build the UPI deep link
   const upiUrl = buildUpiUrl({ amount: total, orderId, note: `Order ${orderId} - Elite Emporium` });
-  console.log('[UPI] deep link:', upiUrl);
 
   // Open the confirmation modal (shows QR + 'Open UPI App' button + txn-ID input)
   try {
     openUPIPaymentModal({ upiUrl, total, orderId, customer, orderItems, sub, del, giftWrap, giftMsg, discount });
-    console.log('[UPI] modal opened for order', orderId);
   } catch (e) {
     console.error('[UPI] failed to open modal:', e, e?.stack);
     // Surface the actual error message so debugging from a user-side screenshot is possible
