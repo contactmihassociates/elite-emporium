@@ -419,6 +419,7 @@
   </div>
   <button type="button" class="slide-arrow slide-arrow-prev" onclick="goToSlide(window._heroCurrentSlide - 1)" aria-label="Previous slide" aria-controls="heroSlides">&#8249;</button>
   <button type="button" class="slide-arrow slide-arrow-next" onclick="goToSlide(window._heroCurrentSlide + 1)" aria-label="Next slide" aria-controls="heroSlides">&#8250;</button>
+  <button type="button" class="slide-playpause" id="slidePlayPause" aria-label="Pause auto-rotation" aria-pressed="false" onclick="window.__heroToggleAuto()"><span aria-hidden="true">⏸</span></button>
   <div class="slide-dots" id="slideDots" role="tablist" aria-label="Choose slide">
     <button class="slide-dot active" type="button" role="tab" aria-selected="true"  aria-label="Slide 1: Premium Bags" aria-controls="heroSlides" onclick="goToSlide(0)"></button>
     <button class="slide-dot"        type="button" role="tab" aria-selected="false" aria-label="Slide 2: Fashion &amp; Watches" aria-controls="heroSlides" onclick="goToSlide(1)"></button>
@@ -1270,9 +1271,39 @@
   });
 
   // Respect prefers-reduced-motion — don't auto-advance at all.
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    clearInterval(autoTimer);
+  // Listen for live changes too, so toggling Reduce Motion in OS while
+  // the page is open pauses/resumes the carousel without a reload.
+  var rmQ = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+  function applyRM() {
+    if (!rmQ) return;
+    if (rmQ.matches) { clearInterval(autoTimer); _paused = true; syncPlayBtn(); }
   }
+  if (rmQ) {
+    applyRM();
+    try { rmQ.addEventListener('change', applyRM); } catch { rmQ.addListener && rmQ.addListener(applyRM); }
+  }
+
+  // Manual play/pause control — WAI-ARIA Carousel best practice.
+  // Persists choice per-tab via sessionStorage so a user who paused
+  // doesn't get auto-rotation restarted on every visibility change.
+  var _paused = sessionStorage.getItem('heroPaused') === '1' || (rmQ && rmQ.matches);
+  function syncPlayBtn() {
+    var btn = document.getElementById('slidePlayPause');
+    if (!btn) return;
+    btn.setAttribute('aria-pressed', _paused ? 'true' : 'false');
+    btn.setAttribute('aria-label', _paused ? 'Resume auto-rotation' : 'Pause auto-rotation');
+    btn.firstElementChild && (btn.firstElementChild.textContent = _paused ? '▶' : '⏸');
+  }
+  window.__heroToggleAuto = function() {
+    _paused = !_paused;
+    sessionStorage.setItem('heroPaused', _paused ? '1' : '0');
+    if (_paused) { clearInterval(autoTimer); }
+    else { resetAuto(); }
+    syncPlayBtn();
+  };
+  // Initial paint of button + initial paused state
+  if (_paused) clearInterval(autoTimer);
+  syncPlayBtn();
 })();
 </script>
 

@@ -683,10 +683,36 @@ header nav a:hover, header nav a.active { color:white; border-bottom-color:var(-
   transition: background 0.2s, transform 0.2s;
   padding: 0;
 }
-.slide-arrow:hover { background: rgba(0,0,0,0.5); transform: translateY(-50%) scale(1.1); }
+.slide-arrow:hover,
+.slide-arrow:focus-visible { background: rgba(0,0,0,0.5); transform: translateY(-50%) scale(1.1); }
+.slide-arrow:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .slide-arrow-prev { left: 10px; }
 .slide-arrow-next { right: 10px; }
 @media (max-width: 480px) { .slide-arrow { display: none; } }
+
+/* Hero play/pause button (WAI-ARIA Carousel best practice) */
+.slide-playpause {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.55);
+  background: rgba(0,0,0,0.35);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: background 0.18s ease, transform 0.15s ease, opacity 0.18s ease;
+  opacity: 0.85;
+  font-family: inherit;
+}
+.slide-playpause:hover,
+.slide-playpause:focus-visible { background: rgba(0,0,0,0.55); opacity: 1; transform: scale(1.06); }
+.slide-playpause:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (max-width: 480px) { .slide-playpause { bottom: 8px; right: 8px; width: 28px; height: 28px; font-size: 11px; } }
 
 /* ══════════════════════════════════════════════
    MAIN CONTENT
