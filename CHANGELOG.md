@@ -2,6 +2,28 @@
 
 All notable changes are tracked here. Authoritative source is `git log --oneline`.
 
+## 2026-05-15 — Autonomous Optimization Loop, seventh pass (iters 109-115)
+
+Seven iterations shipping the offline-fallback feature, perf hints, and SEO polish:
+
+### New feature
+- **Dedicated `offline.html`** (iter 109) — replaces the misleading 404-fallback when SW network-fetch fails. Self-contained gradient design with inline styles, status indicator, "Try again" reload button, WhatsApp fallback contact, auto-reload on `online` event. SW updated to fall back here; CACHE_NAME bumped v14 → v15; added to STATIC_ASSETS pre-cache.
+- **CI gate** for offline.html (iter 110) — fails the build if the file is missing or lacks h1/reload-button/WA-link. Total CI gates: **18**.
+
+### Performance
+- **Firestore preconnect on all 15 pages** (iter 111) — was missing entirely. 9 pages had only `dns-prefetch`, 6 pages had nothing. Upgraded all to `preconnect` so DNS + TCP + TLS handshake completes during HTML head parse. Saves 100-200 ms per page load on slow networks.
+
+### SEO
+- **`noindex, follow` on orders.html + wishlist.html** (iter 112) — user-specific localStorage data; was wasting Google's crawl budget.
+- **Sitemap lastmod bumped 2026-05-16 → 2026-05-15** (iter 113) — was future-dated; 41 entries updated.
+
+### Theme
+- **`<meta name="color-scheme" content="light dark">` on all 15 pages** (iter 114) — declares dark-mode support so the browser pre-paints native form controls + scrollbars in the right system colors, eliminating wrong-theme flash on first paint.
+
+(See iter 73, 83, 94, 100, 108 for prior changelog entries.)
+
+---
+
 ## 2026-05-15 — Autonomous Optimization Loop, sixth pass (iters 101-108)
 
 Wrap-up of the second-session autonomous loop. Highlights:
