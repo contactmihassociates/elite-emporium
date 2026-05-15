@@ -18,3 +18,30 @@ WhatsApp Image*
 !images/**
 !images/**/*.jpg
 !images/**/*.jpeg
+
+# APK build artifacts — committed when GitHub Actions builds them
+!release/
+!release/*.apk
+!release/*.aab
+!release/README.md
+
+# Local Bubblewrap build leftovers (don't commit these)
+app-build/app/
+app-build/.gradle/
+app-build/build/
+app-build/twa-manifest.json.generated
+app-build/twa-manifest.json.from-us
+app-build/android.keystore
+*.keystore
+keystore.b64.txt
+.bubblewrap/
+
+# Editor & OS metadata
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# Node deps (none committed; if anyone runs npm install locally)
+node_modules/

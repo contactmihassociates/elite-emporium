@@ -1,8 +1,24 @@
-# Elite Emporium — APK Build Guide (v10)
+# Elite Emporium — APK Build Guide (v10+)
 
 This folder contains everything needed to build an Android APK for the Elite Emporium PWA.
 
 The site is already a fully-functional Progressive Web App (`manifest.json`, `sw.js`, installable on Android & iOS). The APK simply wraps the live PWA inside a native Android shell — no separate codebase, no parallel maintenance.
+
+## ⚡ Quickest path: GitHub Actions auto-builds
+
+**The repo now ships with `.github/workflows/build-apk.yml`** which automatically builds an APK + AAB on every push to master that touches `manifest.json` or `app-build/twa-manifest.json`, and you can also trigger it manually.
+
+To get the APK:
+1. Open your repo on GitHub → **Actions** tab.
+2. Click **"Build Android APK (TWA)"** in the left sidebar.
+3. Click **"Run workflow"** (top right) → green **Run workflow** button → wait ~12-18 min.
+4. When the run finishes, scroll down on the run page to find the **Artifacts** section. Download the ZIP — APK + AAB inside.
+5. The workflow also auto-creates a **GitHub Release** tagged `app-v10.0.0-<run#>` with the APK + AAB attached, so anyone can download from the Releases page.
+
+**Optional: real release signing key** — to avoid the "brown URL bar" inside the app, add a GitHub repo secret called `ANDROID_KEYSTORE_B64` (base64 of your `.keystore` file). The workflow auto-detects it and signs with your key. Otherwise it generates a debug keystore so the build still completes — fine for sideloading & testing.
+
+The rest of this doc covers manual local builds if you'd rather not use the Action:
+
 
 ## What's in this folder
 

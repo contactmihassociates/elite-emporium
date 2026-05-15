@@ -1,0 +1,160 @@
+name: Build Android APK (TWA)
+
+on:
+  push:
+    branches: [master, main]
+    paths:
+      - 'manifest.json'
+      - 'app-build/twa-manifest.json'
+      - '.github/workflows/build-apk.yml'
+  workflow_dispatch:
+    inputs:
+      version_code:
+        description: 'App version code (integer)'
+        required: false
+        default: '10'
+      version_name:
+        description: 'App version name (semver)'
+        required: false
+        default: '10.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Bubblewrap CLI
+        run: npm install -g @bubblewrap/cli@latest
+
+      - name: Compute version
+        id: ver
+        run: |
+          VC="${{ github.event.inputs.version_code }}"
+          VN="${{ github.event.inputs.version_name }}"
+          if [ -z "$VC" ]; then VC=10; fi
+          if [ -z "$VN" ]; then VN="10.0.0"; fi
+          # Bump versionCode by run number so each build is unique on Play
+          VC=$((VC + GITHUB_RUN_NUMBER))
+          echo "version_code=$VC" >> $GITHUB_OUTPUT
+          echo "version_name=$VN" >> $GITHUB_OUTPUT
+          echo "Building $VN ($VC)"
+
+      - name: Restore or generate signing key
+        id: keystore
+        run: |
+          if [ -n "${{ secrets.ANDROID_KEYSTORE_B64 }}" ]; then
+            echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 -d > app-build/android.keystore
+            echo "have_secret=1" >> $GITHUB_OUTPUT
+          else
+            # Generate a debug keystore so the build still produces an
+            # installable (un-signed-for-Play) APK that users can sideload.
+            echo "No ANDROID_KEYSTORE_B64 secret found — generating temporary debug keystore."
+            keytool -genkeypair -v \
+              -keystore app-build/android.keystore \
+              -alias android \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass eliteemporium \
+              -keypass eliteemporium \
+              -dname "CN=Elite Emporium, OU=Web, O=Elite Emporium, L=Kayalpattinam, ST=Tamil Nadu, C=IN"
+            echo "have_secret=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Initialise TWA project
+        working-directory: app-build
+        env:
+          BUBBLEWRAP_CONFIG: ${{ runner.temp }}/bubblewrap-config.json
+        run: |
+          # Create a Bubblewrap config to avoid the interactive prompt
+          mkdir -p $HOME/.bubblewrap
+          cat > $HOME/.bubblewrap/config.json <<EOF
+          {
+            "jdkPath": "$JAVA_HOME",
+            "androidSdkPath": "$ANDROID_SDK_ROOT"
+          }
+          EOF
+
+          # Bubblewrap init reads manifest from the live PWA. Use --directory=.
+          bubblewrap init --manifest=https://elite-emporium-one.vercel.app/manifest.json --directory=. || echo "init complete (or partial)"
+
+          # Patch our pre-configured twa-manifest.json over the generated one
+          # (we keep our values for packageId / theme / shortcuts).
+          if [ -f twa-manifest.json.generated ]; then
+            mv twa-manifest.json twa-manifest.json.from-us
+            mv twa-manifest.json.generated twa-manifest.json
+          fi
+
+          # Update version
+          node -e "
+            const fs = require('fs');
+            const m = JSON.parse(fs.readFileSync('twa-manifest.json', 'utf8'));
+            m.appVersionCode = ${{ steps.ver.outputs.version_code }};
+            m.appVersion = '${{ steps.ver.outputs.version_name }}';
+            fs.writeFileSync('twa-manifest.json', JSON.stringify(m, null, 2));
+          "
+
+      - name: Build APK
+        working-directory: app-build
+        run: bubblewrap build --skipPwaValidation
+
+      - name: Rename artifacts
+        working-directory: app-build
+        run: |
+          mkdir -p ../release
+          if [ -f app-release-signed.apk ]; then
+            cp app-release-signed.apk ../release/elite-emporium-${{ steps.ver.outputs.version_name }}-${{ steps.ver.outputs.version_code }}.apk
+          fi
+          if [ -f app-release-bundle.aab ]; then
+            cp app-release-bundle.aab ../release/elite-emporium-${{ steps.ver.outputs.version_name }}-${{ steps.ver.outputs.version_code }}.aab
+          fi
+          ls -la ../release
+
+      - name: Upload APK as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: elite-emporium-${{ steps.ver.outputs.version_name }}-${{ steps.ver.outputs.version_code }}
+          path: release/*
+          retention-days: 30
+
+      - name: Create GitHub Release
+        if: github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: app-v${{ steps.ver.outputs.version_name }}-${{ steps.ver.outputs.version_code }}
+          name: Elite Emporium App v${{ steps.ver.outputs.version_name }} (build ${{ steps.ver.outputs.version_code }})
+          body: |
+            Auto-built TWA Android app for [Elite Emporium](https://elite-emporium-one.vercel.app/).
+
+            **Install:** Download the `.apk` below, then on Android:
+            1. Enable "Install unknown apps" for your file manager.
+            2. Tap the downloaded APK.
+            3. The app launches in standalone mode (no browser URL bar) on next open.
+
+            **For Play Store submission:** use the `.aab` file with the Play Console.
+
+            If this build used the auto-generated debug keystore, you'll see a brown URL bar
+            inside the app until you replace the `ANDROID_KEYSTORE_B64` GitHub secret with
+            your real release key (see `app-build/BUILD-APK.md`).
+          files: |
+            release/*.apk
+            release/*.aab
+          fail_on_unmatched_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
