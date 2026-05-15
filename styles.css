@@ -3889,7 +3889,10 @@ footer { background:#172337; color:#9b9b9b; padding:40px 4% 18px; }
 .cart-mobile-bar {
   display: none;
   position: fixed;
-  bottom: 62px;
+  /* Sit just above the (now safe-area-padded) bottom-nav. iter 87
+     made the nav taller by env(safe-area-inset-bottom) on iPhones,
+     so the bar's offset needs to match. */
+  bottom: calc(62px + env(safe-area-inset-bottom, 0));
   left: 0; right: 0;
   background: var(--text);
   padding: 10px 16px;
