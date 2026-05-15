@@ -1252,7 +1252,7 @@ function initSideCartDrawer() {
     drawer.innerHTML = `
       <header class="side-cart-header">
         <h3>🛒 Your Cart <span class="side-cart-count-pill" id="sideCartCountPill">0</span></h3>
-        <button class="side-cart-close" onclick="closeSideCart()" aria-label="Close cart">✕</button>
+        <button type="button" class="side-cart-close" onclick="closeSideCart()" aria-label="Close cart">✕</button>
       </header>
       <div class="side-cart-body" id="sideCartBody"></div>
       <footer class="side-cart-footer" id="sideCartFooter"></footer>`;
@@ -1326,7 +1326,7 @@ function renderSideCart() {
   if (!cart.length) {
     body.innerHTML = `
       <div class="side-cart-empty">
-        <div class="side-cart-empty-icon">🛒</div>
+        <div class="side-cart-empty-icon" aria-hidden="true">🛒</div>
         <h4>Your cart is empty</h4>
         <p>Add a few favourites and they'll show up here.</p>
         <a href="products.html" class="side-cart-shop-btn" onclick="closeSideCart()">Browse Products →</a>
