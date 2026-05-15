@@ -2361,11 +2361,15 @@ function initCartUpsell() {
 }
 
 // ── COUPON CODES ──────────────────────────────
+// minOrder = subtotal floor (in ₹) the cart must reach BEFORE the
+// coupon applies. applyCoupon() rejects with a friendly toast if
+// the floor isn't met. Labels include the floor so customers see
+// the rule before they try.
 const COUPONS = {
-  'ELITE10':  { type: 'percent', value: 10,  label: '10% off' },
-  'FLAT50':   { type: 'flat',    value: 50,  label: '₹50 off' },
-  'WELCOME':  { type: 'percent', value: 5,   label: '5% off' },
-  'SUMMER15': { type: 'percent', value: 15,  label: '15% off' },
+  'ELITE10':  { type: 'percent', value: 10,  minOrder:  499, label: '10% off (min ₹499)' },
+  'FLAT50':   { type: 'flat',    value: 50,  minOrder:  299, label: '₹50 off (min ₹299)' },
+  'WELCOME':  { type: 'percent', value: 5,   minOrder:    0, label: '5% off (any order)' },
+  'SUMMER15': { type: 'percent', value: 15,  minOrder:  999, label: '15% off (min ₹999)' },
 };
 let _activeCoupon = null;
 
@@ -2373,6 +2377,12 @@ function getCouponDiscount(sub) {
   if (!_activeCoupon) return 0;
   const c = COUPONS[_activeCoupon];
   if (!c) return 0;
+  // Min-order safety: if the cart dropped below the threshold after
+  // the coupon was applied (e.g. user removed items), don't apply
+  // the discount. We don't auto-clear _activeCoupon here so the
+  // chip remains visible — but the discount goes to 0 and the
+  // summary re-render will show the user it's no longer active.
+  if (c.minOrder && sub < c.minOrder) return 0;
   if (c.type === 'percent') return Math.round(sub * c.value / 100);
   return Math.min(c.value, sub);
 }
@@ -2381,13 +2391,23 @@ function applyCoupon() {
   const code = (document.getElementById('couponCode')?.value || '').trim().toUpperCase();
   if (!code) { showToast('⚠️ Enter a coupon code first.'); return; }
   if (!COUPONS[code]) { showToast('❌ Invalid coupon code.'); return; }
+
+  // Min-order check — fail with a clear delta if the cart's too small.
+  const c = COUPONS[code];
+  const sub = (typeof getSubtotal === 'function') ? getSubtotal() : 0;
+  if (c.minOrder && sub < c.minOrder) {
+    const need = (c.minOrder - sub).toLocaleString('en-IN');
+    showToast(`⚠️ ${code} needs a min order of ₹${c.minOrder.toLocaleString('en-IN')}. Add ₹${need} more.`, 4500, 'error');
+    return;
+  }
+
   _activeCoupon = code;
   const inputDiv    = document.getElementById('couponInput');
   const appliedDiv  = document.getElementById('couponApplied');
   const appliedText = document.getElementById('couponAppliedText');
   if (inputDiv)   inputDiv.style.display = 'none';
   if (appliedDiv) { appliedDiv.style.display = 'flex'; }
-  if (appliedText) appliedText.textContent = `🎟️ "${code}" — ${COUPONS[code].label} applied!`;
+  if (appliedText) appliedText.textContent = `🎟️ "${code}" — ${c.label} applied!`;
   refreshSummary();
   showToast(`✅ Coupon ${code} applied!`);
 }
