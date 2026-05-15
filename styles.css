@@ -16,7 +16,9 @@
 }
 
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+/* Poppins font is loaded via <link rel="stylesheet"> in every HTML page,
+   not via @import here — @import would block CSS parsing on a separate
+   round-trip and is also disallowed by our CSP style-src. */
 
 :root {
   --red:         #DB3022;
