@@ -12,7 +12,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://elite-emporium-one.vercel.app/about.html" />
   <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
-  <link rel="stylesheet" href="styles.css?v=20260515a" />
+  <link rel="stylesheet" href="styles.css?v=20260515b" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#DB3022" />
   <style>
@@ -153,6 +153,54 @@
     .about-cta:hover { transform: translateY(-2px); }
     .about-cta h3 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
     .about-cta p  { font-size: 13px; opacity: 0.94; margin-bottom: 14px; }
+
+    /* Get-the-app callout */
+    .about-app {
+      background: linear-gradient(135deg, #1a1a2e 0%, #DB3022 100%);
+      color: #fff;
+      border-radius: 16px;
+      padding: 22px 22px 18px;
+      margin-top: 18px;
+      box-shadow: 0 6px 22px rgba(0,0,0,0.10);
+      position: relative;
+      overflow: hidden;
+    }
+    .about-app::after {
+      content: '📱';
+      position: absolute;
+      top: -12px; right: -8px;
+      font-size: 110px;
+      opacity: 0.10;
+      transform: rotate(8deg);
+      pointer-events: none;
+    }
+    .about-app h3 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+    .about-app p { font-size: 13px; opacity: 0.92; line-height: 1.55; margin-bottom: 12px; max-width: 480px; }
+    .about-app-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .about-app-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff;
+      color: #1a1a2e;
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      border: none;
+      cursor: pointer;
+    }
+    .about-app-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .about-app-btn.ghost { background: rgba(255,255,255,0.16); color: #fff; }
+    .about-app-tip {
+      display: block;
+      font-size: 11px;
+      opacity: 0.7;
+      margin-top: 10px;
+    }
+
     .about-cta-btn {
       display: inline-block;
       background: #fff;
@@ -248,11 +296,57 @@
     </div>
   </section>
 
+  <div class="about-app" id="aboutAppCard">
+    <h3>📱 Get the Elite Emporium app</h3>
+    <p>Faster checkout, push-style price drops, and works offline. Install the web app in one tap — or grab the Android APK.</p>
+    <div class="about-app-actions">
+      <button type="button" class="about-app-btn" id="aboutAppInstallBtn" onclick="triggerPwaInstall && triggerPwaInstall()">⬇️ Install web app</button>
+      <a href="https://wa.me/917358650774?text=Hi%21%20Please%20send%20me%20the%20Elite%20Emporium%20Android%20APK." target="_blank" rel="noopener" class="about-app-btn ghost">🤖 Request APK on WhatsApp</a>
+    </div>
+    <span class="about-app-tip">Tip: on iPhone, tap Share → "Add to Home Screen".</span>
+  </div>
+
   <a href="https://wa.me/917358650774?text=Hi%21%20I%27d%20like%20to%20know%20more%20about%20Elite%20Emporium." target="_blank" rel="noopener" class="about-cta">
     <h3>💬 Have a question? Talk to us directly.</h3>
     <p>WhatsApp the owner. Real reply, usually within 30 minutes.</p>
     <span class="about-cta-btn">Open WhatsApp →</span>
   </a>
+
+  <script>
+    // If the browser can't prompt (Firefox, iOS Safari, already-installed), hide the button gracefully.
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('aboutAppInstallBtn');
+      if (!btn) return;
+      // Hide if app is already running standalone
+      if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+        btn.style.display = 'none';
+      }
+      // Disable until beforeinstallprompt fires
+      const orig = btn.textContent;
+      btn.disabled = true;
+      btn.style.opacity = '0.6';
+      window.addEventListener('beforeinstallprompt', () => {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      });
+      // If still disabled after 4s, repurpose to a WhatsApp fallback (iOS / unsupported)
+      setTimeout(() => {
+        if (btn.disabled) {
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          btn.textContent = '⬇️ How to install';
+          btn.onclick = () => {
+            const ua = navigator.userAgent || '';
+            const ios = /iPhone|iPad|iPod/.test(ua);
+            const msg = ios
+              ? 'On iPhone: tap the Share button at the bottom of Safari, then choose "Add to Home Screen".'
+              : 'Open this site in Chrome on Android, tap ⋮ menu, then "Install app" or "Add to Home screen".';
+            alert(msg);
+          };
+        }
+      }, 4000);
+    });
+  </script>
 
 </main>
 
@@ -266,6 +360,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="script.js?v=20260515a"></script>
+<script src="script.js?v=20260515b"></script>
 </body>
 </html>

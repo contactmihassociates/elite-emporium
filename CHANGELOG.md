@@ -85,3 +85,13 @@ A single long session that shipped ~25 batches. Grouped by theme; commit hashes 
 - Broken `'\\''` quote escaping in price-alert onclick.
 - Duplicate `const setMeta` inside `initProductDetailPage()`.
 - PAN-Aadhaar quote unescape fix in the toolkit page (earlier session).
+
+### Final wave — full deep audit + v10 APK package (this batch)
+- **Deep audit pass** — `node --check` clean, all onclick handlers cross-referenced and resolved, 173 unique global functions / 21 unique consts (zero duplicates), all 14 HTML pages have balanced div tags, all `<img>` tags have `alt` (admin variant-preview placeholders excepted by design).
+- **Phone-number regression sweep** — `+91 80721 73467` had re-appeared in 6 places between earlier removals and now: `terms.html`, `privacy.html`, `orders.html` footer, `index.html` JSON-LD `telephone`, `README.md` §1, and the invoice-print template inside `script.js`. Replaced everywhere with the primary WhatsApp number plus the alt (`+91 73587 19774`) where appropriate.
+- **Cache-bust + SW cache bump** — bumped 23 `?v=20260515a` → `?v=20260515b` across all 11 HTML files; bumped `CACHE_NAME` from `elite-emporium-v4` → `elite-emporium-v5` in `sw.js`. Old SW caches auto-purge on activate.
+- **PWA manifest v10** — added `id`, `scope`, `display_override` (window-controls-overlay → standalone → minimal-ui → browser), maskable + any-purpose 192/512 icons, 4 shortcuts (Shop / Cart / Track / Orders), `share_target` for Web Share API → `/index.html?title=...`, screenshots, `prefer_related_applications: false`, `dir: "ltr"`.
+- **APK build kit** (`app-build/`) — `twa-manifest.json` for Bubblewrap CLI with packageId `in.eliteemporium.app`, appVersionCode 10, 4 launcher shortcuts, theme `#DB3022` / bg `#F1F3F6`. `BUILD-APK.md` documents 3 build paths: (A) PWABuilder.com one-click — recommended, ~3 min; (B) Bubblewrap CLI; (C) Capacitor wrap. Plus troubleshooting matrix and versioning convention.
+- **Digital Asset Links** (`.well-known/assetlinks.json`) — template ready for SHA256 fingerprint paste-in after the keystore is generated. Without this, the TWA shows a brown URL bar.
+- **In-site "Get the app" card** — on `about.html` above the WhatsApp CTA. Wires to the existing `triggerPwaInstall()` from `beforeinstallprompt`. Gracefully hides on already-installed devices (matchMedia `display-mode: standalone`), and after 4s falls back to a "How to install" alert with platform-specific instructions for iOS Safari vs Android Chrome.
+- **README §11 (new)** — Android APK section pointing to the build kit, with the quickest path documented inline.

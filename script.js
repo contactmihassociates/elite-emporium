@@ -6546,7 +6546,7 @@ function printGSTInvoice(orderId) {
   <div class="inv-header">
     <div>
       <div class="inv-logo">Elite Emporium<small>183b, Sadukai Street, Kayalpattinam – 628204</small></div>
-      <div style="margin-top:6px;font-size:12px;color:#555;">📞 +91 80721 73467 &nbsp;|&nbsp; ✉️ eliteemporium112024@gmail.com</div>
+      <div style="margin-top:6px;font-size:12px;color:#555;">💬 WhatsApp +91 73586 50774 · Alt +91 73587 19774 &nbsp;|&nbsp; ✉️ eliteemporium112024@gmail.com</div>
       <div style="margin-top:3px;font-size:12px;color:#555;">GSTIN: <strong>33DWGPN3169G1ZF</strong> &nbsp;|&nbsp; Udyam: UDYAM-TN-26-0090343</div>
     </div>
     <div style="text-align:right;">

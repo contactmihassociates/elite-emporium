@@ -1,0 +1,65 @@
+{
+  "packageId": "in.eliteemporium.app",
+  "host": "elite-emporium-one.vercel.app",
+  "name": "Elite Emporium",
+  "launcherName": "Elite Emporium",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#DB3022",
+  "navigationColor": "#DB3022",
+  "navigationColorDark": "#1a1a2e",
+  "navigationDividerColor": "#DB3022",
+  "navigationDividerColorDark": "#1a1a2e",
+  "backgroundColor": "#F1F3F6",
+  "enableNotifications": true,
+  "startUrl": "/index.html?source=twa",
+  "iconUrl": "https://elite-emporium-one.vercel.app/images/logo.png",
+  "maskableIconUrl": "https://elite-emporium-one.vercel.app/images/logo.png",
+  "monochromeIconUrl": "https://elite-emporium-one.vercel.app/images/logo.png",
+  "shortcuts": [
+    {
+      "name": "Shop products",
+      "short_name": "Shop",
+      "url": "/products.html?source=twa-shortcut",
+      "chosenIconUrl": "https://elite-emporium-one.vercel.app/images/logo.png"
+    },
+    {
+      "name": "View cart",
+      "short_name": "Cart",
+      "url": "/cart.html?source=twa-shortcut",
+      "chosenIconUrl": "https://elite-emporium-one.vercel.app/images/logo.png"
+    },
+    {
+      "name": "Track order",
+      "short_name": "Track",
+      "url": "/track-order.html?source=twa-shortcut",
+      "chosenIconUrl": "https://elite-emporium-one.vercel.app/images/logo.png"
+    },
+    {
+      "name": "My orders",
+      "short_name": "Orders",
+      "url": "/orders.html?source=twa-shortcut",
+      "chosenIconUrl": "https://elite-emporium-one.vercel.app/images/logo.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://elite-emporium-one.vercel.app/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": { "enabled": false },
+    "playBilling": { "enabled": false }
+  },
+  "alphaDependencies": { "enabled": false },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://elite-emporium-one.vercel.app/",
+  "minSdkVersion": 21,
+  "appVersion": "10.0.0",
+  "appVersionCode": 10,
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "android"
+  }
+}

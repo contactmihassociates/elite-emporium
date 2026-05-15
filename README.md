@@ -11,7 +11,7 @@ This README is intentionally detailed — it's the entry point for any new codin
 - **Business:** Elite Emporium — small premium retail store (clothing, bags, watches, beauty, jewellery, kitchen).
 - **Location:** 183b, Sadukai Street, Kayalpattinam – 628204, Thoothukudi District, Tamil Nadu.
 - **GST:** 33DWGPN3169G1ZF · **Udyam:** UDYAM-TN-26-0090343
-- **Contact:** +91 80721 73467 · WhatsApp **+91 7358 650 774** · eliteemporium112024@gmail.com
+- **Contact:** WhatsApp **+91 7358 650 774** · Alt **+91 7358 719 774** · eliteemporium112024@gmail.com
 - **Order flow:** Customer browses → adds to cart → fills delivery details → clicks "Place Order via WhatsApp" → opens WhatsApp with a pre-formatted order message → store confirms manually. No payment gateway yet — see §8.
 - **Partner brand:** *Hanii Dhanii* (fancy & cosmetics) lives on its own page (`hanii-dhanii.html`) with its own admin panel (`hanii-dhanii-admin.html`).
 
@@ -336,7 +336,22 @@ When Key ID is missing but a Payment Link is set, `payOnline()` opens the Razorp
 
 ---
 
-## 11. Where to start in a new session
+## 11. Android app (v10) — APK build
+
+The site is a fully-installable PWA. To turn it into an APK you can sideload or upload to Google Play, use the build kit in `app-build/`:
+
+- `app-build/twa-manifest.json` — Bubblewrap CLI input.
+- `app-build/BUILD-APK.md` — step-by-step build guide with 3 paths (PWABuilder.com one-click, Bubblewrap CLI, Capacitor wrap).
+- `.well-known/assetlinks.json` — Digital Asset Links file. After signing the APK, paste the SHA256 fingerprint into this file and redeploy. Without it, the app shows a brown URL bar at the top.
+- `manifest.json` — v10 PWA manifest with maskable icons, 4 shortcuts (Shop / Cart / Track / Orders), share_target, `id: "/?source=pwa"`.
+
+**Quickest path (3 min):** open <https://www.pwabuilder.com>, paste `https://elite-emporium-one.vercel.app`, click "Package For Stores → Android", choose package id `in.eliteemporium.app`, download the ZIP, paste the SHA256 from `signing-key-info.txt` into `.well-known/assetlinks.json`, push & redeploy. Done.
+
+**Versioning:** `appVersionCode 10` / `appVersion 10.0.0`. Most future updates don't need an APK rebuild — the TWA shell loads the live site, so changes go live the moment Vercel deploys.
+
+---
+
+## 12. Where to start in a new session
 
 1. Read `git log --oneline -20` to see what just landed.
 2. `git status` to see any uncommitted work in flight.
