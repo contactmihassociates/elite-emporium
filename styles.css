@@ -616,7 +616,8 @@ header nav a:hover, header nav a.active { color:white; border-bottom-color:var(-
 }
 .hero-slide-btn:hover { opacity:0.9; }
 .slide-dots { display:flex; justify-content:center; gap:6px; padding:10px 0 8px; background:var(--red-dark); }
-.slide-dot { width:22px; height:4px; border-radius:2px; background:rgba(255,255,255,0.3); cursor:pointer; transition:background 0.2s,width 0.2s; }
+.slide-dot { width:22px; height:4px; border-radius:2px; background:rgba(255,255,255,0.3); cursor:pointer; transition:background 0.2s,width 0.2s; border:none; padding:0; margin:0; -webkit-appearance:none; appearance:none; }
+.slide-dot:focus-visible { outline:2px solid #fff; outline-offset:3px; }
 .slide-dot.active { background:white; width:32px; }
 
 /* Hero prev/next arrows */
@@ -4511,10 +4512,20 @@ footer { background:#172337; color:#9b9b9b; padding:40px 4% 18px; }
   border-radius: var(--radius);
   padding: 10px 12px;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, transform 0.12s;
   background: var(--red-light);
+  /* Button-element resets so the <button class="coupon-card"> looks
+     identical to the legacy <div> version. */
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  text-align: left;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
 }
-.coupon-card:hover { background: #ffd6d2; }
+.coupon-card:hover { background: #ffd6d2; transform: translateY(-1px); }
+.coupon-card:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 .coupon-code {
   font-size: 13px;
   font-weight: 700;

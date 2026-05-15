@@ -393,11 +393,11 @@
   <button class="slide-arrow slide-arrow-prev" onclick="goToSlide(window._heroCurrentSlide - 1)" aria-label="Previous slide">&#8249;</button>
   <button class="slide-arrow slide-arrow-next" onclick="goToSlide(window._heroCurrentSlide + 1)" aria-label="Next slide">&#8250;</button>
   <div class="slide-dots" id="slideDots">
-    <div class="slide-dot active" onclick="goToSlide(0)"></div>
-    <div class="slide-dot" onclick="goToSlide(1)"></div>
-    <div class="slide-dot" onclick="goToSlide(2)"></div>
-    <div class="slide-dot" onclick="goToSlide(3)"></div>
-    <div class="slide-dot" onclick="goToSlide(4)"></div>
+    <button class="slide-dot active" type="button" aria-label="Go to slide" onclick="goToSlide(0)"></button>
+    <button class="slide-dot" type="button" aria-label="Go to slide" onclick="goToSlide(1)"></button>
+    <button class="slide-dot" type="button" aria-label="Go to slide" onclick="goToSlide(2)"></button>
+    <button class="slide-dot" type="button" aria-label="Go to slide" onclick="goToSlide(3)"></button>
+    <button class="slide-dot" type="button" aria-label="Go to slide" onclick="goToSlide(4)"></button>
   </div>
   <a class="hero-scroll-cue" href="#shopByCategory" aria-label="Scroll down to explore">
     <span class="hsc-text">Scroll to explore</span>
