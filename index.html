@@ -358,11 +358,11 @@
 </div>
 
 <!-- ── HERO SLIDESHOW ────────────────────── -->
-<div class="hero-slideshow" id="heroSlideshow">
-  <div class="hero-slides" id="heroSlides">
+<div class="hero-slideshow" id="heroSlideshow" role="region" aria-roledescription="carousel" aria-label="Featured collections">
+  <div class="hero-slides" id="heroSlides" aria-live="polite">
 
     <!-- Slide 1: Bags -->
-    <div class="hero-slide">
+    <div class="hero-slide" role="group" aria-roledescription="slide" aria-label="Slide 1 of 5: Premium Bags &amp; Accessories">
       <div class="hero-slide-bg" style="background:linear-gradient(135deg,#7B0D0D 0%,#C62828 40%,#E53935 100%);"></div>
       <div class="hero-slide-content">
         <div class="hero-save-badge">🔥 BIG SAVING DAYS</div>
@@ -373,7 +373,7 @@
     </div>
 
     <!-- Slide 2: Fashion -->
-    <div class="hero-slide">
+    <div class="hero-slide" role="group" aria-roledescription="slide" aria-label="Slide 2 of 5: Fashion &amp; Watches from ₹450">
       <div class="hero-slide-bg" style="background:linear-gradient(135deg,#4A148C 0%,#7B1FA2 40%,#CE93D8 70%,#AB47BC 100%);"></div>
       <div class="hero-slide-content">
         <div class="hero-save-badge">✨ NEW ARRIVALS</div>
@@ -384,7 +384,7 @@
     </div>
 
     <!-- Slide 3: Kitchen -->
-    <div class="hero-slide">
+    <div class="hero-slide" role="group" aria-roledescription="slide" aria-label="Slide 3 of 5: Kitchen &amp; Home essentials from ₹580">
       <div class="hero-slide-bg" style="background:linear-gradient(135deg,#004D40 0%,#00695C 40%,#00897B 80%,#26C6DA 100%);"></div>
       <div class="hero-slide-content">
         <div class="hero-save-badge">🏠 HOME ESSENTIALS</div>
@@ -395,7 +395,7 @@
     </div>
 
     <!-- Slide 4: Ethnic Wear -->
-    <div class="hero-slide">
+    <div class="hero-slide" role="group" aria-roledescription="slide" aria-label="Slide 4 of 5: Abaiya, Hijab &amp; Sarees">
       <div class="hero-slide-bg" style="background:linear-gradient(135deg,#880E4F 0%,#AD1457 40%,#E91E63 70%,#F48FB1 100%);"></div>
       <div class="hero-slide-content">
         <div class="hero-save-badge">🕌 ETHNIC COLLECTION</div>
@@ -406,7 +406,7 @@
     </div>
 
     <!-- Slide 5: Watches & Accessories -->
-    <div class="hero-slide">
+    <div class="hero-slide" role="group" aria-roledescription="slide" aria-label="Slide 5 of 5: Watches &amp; Sunglasses from ₹600">
       <div class="hero-slide-bg" style="background:linear-gradient(135deg,#1A237E 0%,#283593 40%,#3949AB 70%,#7986CB 100%);"></div>
       <div class="hero-slide-content">
         <div class="hero-save-badge">⌚ PREMIUM PICKS</div>
@@ -417,14 +417,14 @@
     </div>
 
   </div>
-  <button type="button" class="slide-arrow slide-arrow-prev" onclick="goToSlide(window._heroCurrentSlide - 1)" aria-label="Previous slide">&#8249;</button>
-  <button type="button" class="slide-arrow slide-arrow-next" onclick="goToSlide(window._heroCurrentSlide + 1)" aria-label="Next slide">&#8250;</button>
-  <div class="slide-dots" id="slideDots">
-    <button class="slide-dot active" type="button" aria-label="Go to slide" onclick="goToSlide(0)"></button>
-    <button class="slide-dot" type="button" aria-label="Go to slide" onclick="goToSlide(1)"></button>
-    <button class="slide-dot" type="button" aria-label="Go to slide" onclick="goToSlide(2)"></button>
-    <button class="slide-dot" type="button" aria-label="Go to slide" onclick="goToSlide(3)"></button>
-    <button class="slide-dot" type="button" aria-label="Go to slide" onclick="goToSlide(4)"></button>
+  <button type="button" class="slide-arrow slide-arrow-prev" onclick="goToSlide(window._heroCurrentSlide - 1)" aria-label="Previous slide" aria-controls="heroSlides">&#8249;</button>
+  <button type="button" class="slide-arrow slide-arrow-next" onclick="goToSlide(window._heroCurrentSlide + 1)" aria-label="Next slide" aria-controls="heroSlides">&#8250;</button>
+  <div class="slide-dots" id="slideDots" role="tablist" aria-label="Choose slide">
+    <button class="slide-dot active" type="button" role="tab" aria-selected="true"  aria-label="Slide 1: Premium Bags" aria-controls="heroSlides" onclick="goToSlide(0)"></button>
+    <button class="slide-dot"        type="button" role="tab" aria-selected="false" aria-label="Slide 2: Fashion &amp; Watches" aria-controls="heroSlides" onclick="goToSlide(1)"></button>
+    <button class="slide-dot"        type="button" role="tab" aria-selected="false" aria-label="Slide 3: Kitchen &amp; Home" aria-controls="heroSlides" onclick="goToSlide(2)"></button>
+    <button class="slide-dot"        type="button" role="tab" aria-selected="false" aria-label="Slide 4: Ethnic Wear" aria-controls="heroSlides" onclick="goToSlide(3)"></button>
+    <button class="slide-dot"        type="button" role="tab" aria-selected="false" aria-label="Slide 5: Watches &amp; Sunglasses" aria-controls="heroSlides" onclick="goToSlide(4)"></button>
   </div>
   <a class="hero-scroll-cue" href="#shopByCategory" aria-label="Scroll down to explore">
     <span class="hsc-text">Scroll to explore</span>
@@ -1215,7 +1215,12 @@
     current = ((n % total) + total) % total;
     window._heroCurrentSlide = current;
     slides.style.transform = 'translateX(-' + (current * 100) + '%)';
-    dots.forEach(function(d, i) { d.classList.toggle('active', i === current); });
+    dots.forEach(function(d, i) {
+      var on = (i === current);
+      d.classList.toggle('active', on);
+      // Sync aria-selected so screen readers know which tab/dot is active
+      d.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
   }
   window._heroCurrentSlide = 0;
   window.goToSlide = goToSlide;
