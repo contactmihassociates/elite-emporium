@@ -7849,7 +7849,10 @@ body.festive-on .product-badge.new {
 
 .side-cart-footer {
   flex-shrink: 0;
-  padding: 14px 20px 18px;
+  /* Bottom padding lifts the checkout button above the iPhone home
+     indicator area when the drawer fills 100vh. env() resolves to 0
+     on non-iOS so other devices keep the original 18px. */
+  padding: 14px 20px calc(18px + env(safe-area-inset-bottom, 0));
   border-top: 1px solid var(--border, #e0e0e0);
   background: var(--bg, #fafafa);
 }
