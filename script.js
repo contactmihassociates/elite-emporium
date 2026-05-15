@@ -777,15 +777,23 @@ function updateCompareBar() {
     bar = document.createElement('div');
     bar.id = 'compareBar';
     bar.className = 'compare-bar';
+    // Screen-reader landmark so the bar's purpose is announced when it
+    // appears (and so users can jump to it via Find-by-region commands).
+    bar.setAttribute('role', 'region');
+    bar.setAttribute('aria-label', 'Product comparison tray');
     document.body.appendChild(bar);
   }
   const items = compareList.map(id => {
     const p = products.find(x => x.id === id);
     if (!p) return '';
+    const safeName = escapeHtml(p.name);
+    // Item already has the product name in the visible label, so the image
+    // is decorative — empty alt avoids the screen reader announcing the
+    // name twice.
     return `<div class="cmp-bar-item">
-      <img src="${p.image || ''}" alt="${escapeHtml(p.name)}" class="cmp-bar-img" />
+      <img src="${p.image || ''}" alt="" class="cmp-bar-img" />
       <span class="cmp-bar-name">${p.name.length > 22 ? p.name.slice(0, 22) + '…' : p.name}</span>
-      <button class="cmp-bar-remove" onclick="toggleCompare(${p.id},document.querySelector('.compare-btn[data-cmpid=\\'${p.id}\\']'));updateCompareBar()">✕</button>
+      <button type="button" class="cmp-bar-remove" aria-label="Remove ${safeName} from comparison" onclick="toggleCompare(${p.id},document.querySelector('.compare-btn[data-cmpid=\\'${p.id}\\']'));updateCompareBar()">✕</button>
     </div>`;
   }).join('');
   const disabledAttr = compareList.length < 2 ? 'disabled' : '';
@@ -793,8 +801,8 @@ function updateCompareBar() {
     <div class="cmp-bar-inner">
       <span class="cmp-bar-label">Compare (${compareList.length}/3)</span>
       <div class="cmp-bar-items">${items}</div>
-      <button class="cmp-bar-btn" ${disabledAttr} onclick="openCompareModal()">⚖️ Compare Now</button>
-      <button class="cmp-bar-clear" onclick="clearCompare()">Clear</button>
+      <button type="button" class="cmp-bar-btn" ${disabledAttr} onclick="openCompareModal()">⚖️ Compare Now</button>
+      <button type="button" class="cmp-bar-clear" onclick="clearCompare()">Clear</button>
     </div>`;
 }
 
