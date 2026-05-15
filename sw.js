@@ -4,7 +4,7 @@
    for pages and API calls.
    ============================================ */
 
-const CACHE_NAME = 'elite-emporium-v15';
+const CACHE_NAME = 'elite-emporium-v16';
 
 const STATIC_ASSETS = [
   '/',
@@ -39,11 +39,23 @@ const STATIC_ASSETS = [
 ];
 
 // ── INSTALL: pre-cache static shell ──────────
+// Use per-asset cache.add() instead of cache.addAll() so a single missing
+// file (renamed, deleted, typo'd) doesn't fail the whole install and leave
+// users with an empty SW cache. Each asset's failure is logged but doesn't
+// reject the install promise.
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(STATIC_ASSETS).catch(() => {});
-    })
+    caches.open(CACHE_NAME).then(cache =>
+      Promise.all(
+        STATIC_ASSETS.map(url =>
+          cache.add(url).catch(err => {
+            // Don't pollute production console with expected misses; keep
+            // it minimal and self-explanatory.
+            console.warn('[SW] pre-cache skipped:', url, err && err.message);
+          })
+        )
+      )
+    )
   );
   self.skipWaiting();
 });
