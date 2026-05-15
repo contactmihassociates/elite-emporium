@@ -61,7 +61,7 @@
     <div class="header-search">
       <form id="headerSearchForm">
         <input type="text" id="headerSearchInput" placeholder="Search for products, brands and more" autocomplete="off" aria-label="Search products" enterkeyhint="search" />
-        <button type="submit">🔍</button>
+        <button type="submit" aria-label="Search">🔍</button>
       </form>
     </div>
     <div class="header-actions">
@@ -380,7 +380,7 @@
 <div class="img-modal" id="imgModal" onclick="closeImageModal()">
   <div class="img-modal-inner" onclick="event.stopPropagation()">
     <img id="imgModalImg" src="" alt="Product zoom" loading="lazy" decoding="async" />
-    <button class="img-modal-close" onclick="closeImageModal()">✕</button>
+    <button class="img-modal-close" onclick="closeImageModal()" aria-label="Close image preview">✕</button>
   </div>
 </div>
 

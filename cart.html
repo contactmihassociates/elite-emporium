@@ -60,7 +60,7 @@
     <div class="header-search">
       <form id="headerSearchForm">
         <input type="text" id="headerSearchInput" placeholder="Search for products, brands and more" autocomplete="off" aria-label="Search products" enterkeyhint="search" />
-        <button type="submit">🔍</button>
+        <button type="submit" aria-label="Search">🔍</button>
       </form>
     </div>
     <div class="header-actions">
@@ -281,7 +281,7 @@
           </div>
           <div id="couponApplied" style="display:none;background:#E8F5E9;border:1px solid #C8E6C9;border-radius:4px;padding:8px 12px;font-size:12px;color:#388E3C;display:none;align-items:center;justify-content:space-between;gap:8px;">
             <span id="couponAppliedText">🎟️ Coupon applied!</span>
-            <button onclick="removeCoupon()" style="background:transparent;border:none;color:#c62828;cursor:pointer;font-size:13px;font-weight:700;padding:0;">✕</button>
+            <button onclick="removeCoupon()" aria-label="Remove coupon" style="background:transparent;border:none;color:#c62828;cursor:pointer;font-size:13px;font-weight:700;padding:0;">✕</button>
           </div>
           <div id="couponInput" style="display:flex;gap:6px;">
             <input id="couponCode" type="text" placeholder="Enter coupon code" style="flex:1;padding:8px 10px;border:1.5px solid #E0E0E0;border-radius:4px;font-size:12px;font-family:'Poppins',sans-serif;outline:none;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()" />
