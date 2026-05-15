@@ -61,9 +61,12 @@ body {
   padding-bottom: calc(62px + env(safe-area-inset-bottom, 0));
   animation: pageFadeIn 0.28s ease;
 }
-/* Keyboard navigation focus ring (only shows on Tab key, not mouse click) */
-body:not(.kbd-nav) *:focus { outline: none !important; }
-body.kbd-nav *:focus { outline: 2px solid var(--red) !important; outline-offset: 2px !important; }
+/* Legacy keyboard-focus fallback for Safari <15.4 (no :focus-visible support).
+   Specificity-only (no !important) so the modern :focus-visible rules below
+   — both the universal baseline and the per-class overrides — naturally win
+   on browsers that support them. */
+body:not(.kbd-nav) *:focus { outline: none; }
+body.kbd-nav *:focus { outline: 2px solid var(--red); outline-offset: 2px; }
 
 /* Modern :focus-visible baseline — works WITHOUT the JS-driven .kbd-nav class.
    The browser decides on its own whether the focus came from keyboard vs
@@ -7209,18 +7212,12 @@ kbd {
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
-/* ── Focus-visible polish (keyboard navigation only) ── */
-body.kbd-nav a:focus-visible,
-body.kbd-nav button:focus-visible,
-body.kbd-nav input:focus-visible,
-body.kbd-nav select:focus-visible,
-body.kbd-nav textarea:focus-visible,
-body.kbd-nav [role="button"]:focus-visible,
-body.kbd-nav [role="tab"]:focus-visible {
-  outline: 2px solid var(--red, #DB3022);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
+/* Note: a previous body.kbd-nav-scoped :focus-visible rule lived here. It
+   was superseded by the universal :focus-visible baseline at the top of
+   this file (iter 98). That older rule's body.kbd-nav prefix gave it
+   specificity 0,2,2 — strong enough to override the per-class focus rules
+   added in iters 91-96 (e.g. .cart-btn:focus-visible with a white outline).
+   Removing it lets per-class colors win again. */
 
 /* ── Anchor scroll offset so sticky header doesn't clip jump targets ── */
 html { scroll-padding-top: 80px; }
