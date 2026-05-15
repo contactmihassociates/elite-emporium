@@ -2819,7 +2819,7 @@ function openPriceAlertModal(p) {
         ${existing ? `<button class="pa-remove" onclick="removePriceAlert(${p.id});this.closest('.pa-backdrop').remove();showToast('Alert removed.');document.querySelector('.btn-price-alert').innerHTML='🔔 Set Price Drop Alert';document.querySelector('.btn-price-alert').classList.remove('active');">Remove Alert</button>` : ''}
         <button class="pa-save" onclick="
           const v=parseInt(document.getElementById('paTargetPrice').value);
-          if(!v||v<=0){alert('Enter a valid price.');return;}
+          if(!v||v<=0){showToast('⚠️ Enter a valid price.',2800,'error');return;}
           savePriceAlert(${p.id},v,'${p.name.replace(/'/g,"\\'")}',${p.price});
           this.closest('.pa-backdrop').remove();
           showToast('🔔 Alert set! We\\'ll notify you when price drops to ₹'+v.toLocaleString('en-IN')+'.');
