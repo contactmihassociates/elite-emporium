@@ -2,6 +2,36 @@
 
 All notable changes are tracked here. Authoritative source is `git log --oneline`.
 
+## 2026-05-15 — Autonomous Optimization Loop, tenth pass (iters 130-142)
+
+Thirteen iterations focused on modal a11y, button-type defensive sweep, and a key form-submit bug:
+
+### Real bug caught
+- **`<button class="sh-clear">Clear</button>` was submitting the search form** (iter 134) — buried inside an `innerHTML` template, lived inside `<form id="headerSearchForm">`, no `type=`. Clicking "Clear" navigated to `products.html?search=` instead of clearing history. Single-character fix; real bug.
+
+### Defensive sweep (locked in by CI)
+- **`type="button"` on all 57 remaining dynamic buttons** in script.js (iter 135) — script.js now has 94/94 `<button>` tags with explicit type=.
+- **CI gate** enforcing `type=` on every `<button>` in static HTML + script.js template strings (iter 136). Total gates: 20.
+
+### Modal a11y arc (4 iterations + CI gate)
+- **Image-zoom modal** (iter 137) — added role=dialog, aria-modal, aria-label on the wrapper; aria-live on the dynamic counter ("3 of 5") so prev/next clicks announce position.
+- **Quick-view modal** (iter 138) — same treatment on both index.html and products.html instances.
+- **Compare modal** (iter 139) — `cmp-modal` now has role=dialog + aria-labelledby pointing at the existing h3.
+- **Price-alert + keyboard-help modals** (iter 140) — completes the 6-of-6 sweep on dynamic modals.
+- **CI gate** for `.*-modal` class divs in script.js (iter 141). Total gates: 21.
+
+### Smaller a11y polish
+- **Compare bar** (iter 132) — role=region + aria-label on the wrapper, per-item ✕ buttons get aria-label="Remove <name> from comparison", item images switched to empty alt (decorative; visible label is the sibling span).
+- **Side-cart drawer** (iter 133) — aria-hidden on the decorative 🛒 emoji in empty state, type=button on close ✕.
+
+### Robustness
+- **Offline.html auto-reload loop guard** (iter 130) — sessionStorage flag prevents infinite SW-served-offline reload loops when the server is up but failing.
+- **`'use strict'`** on sw.js + firebase-config.js (iter 131).
+
+(See iter 73, 83, 94, 100, 108, 115, 124, 129 for prior entries.)
+
+---
+
 ## 2026-05-15 — Autonomous Optimization Loop, ninth pass (iters 125-129)
 
 Five iterations of UX polish + a11y fixes:
