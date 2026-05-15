@@ -3090,6 +3090,28 @@ footer { background:#172337; color:#9b9b9b; padding:40px 4% 18px; }
 .pd-eta-icon { font-size: 16px; }
 .pd-eta-free { margin-left: auto; font-size: 11px; color: #2e7d32; background: #e8f5e9; padding: 2px 8px; border-radius: 10px; font-weight: 700; letter-spacing: 0.2px; }
 [data-theme="dark"] .pd-eta-free { background: rgba(46, 125, 50, 0.25); color: #a5d6a7; }
+.pd-dispatch-line {
+  font-size: 12.5px;
+  color: var(--text2);
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 7px 11px;
+  margin-bottom: 8px;
+  letter-spacing: 0.1px;
+  font-variant-numeric: tabular-nums;
+  transition: background 0.3s, color 0.3s;
+}
+.pd-dispatch-line strong { color: var(--text); }
+.pd-dispatch-line.urgent {
+  background: #fff3e0;
+  color: #d84315;
+  animation: pdDispatchPulse 1.2s ease-in-out infinite;
+}
+.pd-dispatch-line.urgent strong { color: #bf360c; }
+[data-theme="dark"] .pd-dispatch-line.urgent { background: rgba(216, 67, 21, 0.18); color: #ffab91; }
+@keyframes pdDispatchPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.015); } }
+@media (prefers-reduced-motion: reduce) { .pd-dispatch-line.urgent { animation: none; } }
+
 .pd-eta-row { display: flex; gap: 6px; }
 .pd-eta-row input {
   flex: 1; min-width: 0;

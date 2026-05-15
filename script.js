@@ -4020,6 +4020,7 @@ function initProductDetailPage() {
           <strong>Delivery</strong>
           <span class="pd-eta-free">${p.price >= 499 ? 'FREE shipping' : 'FREE over ₹499'}</span>
         </div>
+        <div class="pd-dispatch-line" id="pdDispatchLine"></div>
         <div class="pd-eta-row">
           <input type="text" inputmode="numeric" maxlength="6" id="pdEtaPin" placeholder="Enter PIN code" value="${savedPin}" aria-label="Enter PIN code" />
           <button type="button" id="pdEtaCheckBtn">Check</button>
@@ -4060,6 +4061,35 @@ function initProductDetailPage() {
         if (v !== inp.value) inp.value = v;
         if (v.length === 6) renderEta(v);
       });
+
+      // ── Same-day dispatch countdown ─────────────────────────
+      // Updates the .pd-dispatch-line every second showing 'Order in
+      // the next HH:MM:SS for same-day dispatch' while the cutoff
+      // (4 PM IST = 16:00 local) hasn't passed; switches to
+      // 'Ships tomorrow' after cutoff. Cleanup on unload.
+      const dispatchEl = document.getElementById('pdDispatchLine');
+      if (dispatchEl) {
+        const tickDispatch = () => {
+          const now = new Date();
+          const cutoff = new Date(now);
+          cutoff.setHours(16, 0, 0, 0);
+          if (now >= cutoff) {
+            dispatchEl.innerHTML = `⏰ <strong>Ships tomorrow</strong> · Order before 4 PM tomorrow for same-day dispatch.`;
+            dispatchEl.classList.remove('urgent');
+            return;
+          }
+          const diff = cutoff - now;
+          const hh = String(Math.floor(diff / 3600000)).padStart(2, '0');
+          const mm = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+          const ss = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+          const tightWindow = diff < 30 * 60 * 1000; // <30 min left
+          dispatchEl.innerHTML = `⚡ Order in the next <strong>${hh}:${mm}:${ss}</strong> for <strong>same-day dispatch</strong>`;
+          dispatchEl.classList.toggle('urgent', tightWindow);
+        };
+        tickDispatch();
+        if (window.__pdDispatchInterval) clearInterval(window.__pdDispatchInterval);
+        window.__pdDispatchInterval = setInterval(tickDispatch, 1000);
+      }
     }
   }
 
