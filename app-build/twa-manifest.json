@@ -19,25 +19,25 @@
   "shortcuts": [
     {
       "name": "Shop products",
-      "short_name": "Shop",
+      "shortName": "Shop",
       "url": "/products.html?source=twa-shortcut",
       "chosenIconUrl": "https://elite-emporium-one.vercel.app/images/logo.png"
     },
     {
       "name": "View cart",
-      "short_name": "Cart",
+      "shortName": "Cart",
       "url": "/cart.html?source=twa-shortcut",
       "chosenIconUrl": "https://elite-emporium-one.vercel.app/images/logo.png"
     },
     {
       "name": "Track order",
-      "short_name": "Track",
+      "shortName": "Track",
       "url": "/track-order.html?source=twa-shortcut",
       "chosenIconUrl": "https://elite-emporium-one.vercel.app/images/logo.png"
     },
     {
       "name": "My orders",
-      "short_name": "Orders",
+      "shortName": "Orders",
       "url": "/orders.html?source=twa-shortcut",
       "chosenIconUrl": "https://elite-emporium-one.vercel.app/images/logo.png"
     }
