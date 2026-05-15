@@ -6355,11 +6355,32 @@ function initWishlistPage() {
     : 'No saved items yet';
 
   if (!wishlisted.length) {
-    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:#878787;">
-      <div style="font-size:60px;margin-bottom:16px;">🤍</div>
-      <h3 style="color:var(--red);font-size:18px;margin-bottom:8px;">Your wishlist is empty</h3>
+    // Suggest 6 popular items so the empty wishlist is a discovery surface
+    const suggestions = [...products]
+      .filter(p => p.inStock !== false && p.badge && p.image)
+      .sort((a, b) => (b.reviews || 0) - (a.reviews || 0))
+      .slice(0, 6);
+    const suggHtml = suggestions.length ? `
+      <div class="wl-empty-suggest">
+        <div class="wl-empty-suggest-head">✨ Popular picks to start with</div>
+        <div class="wl-empty-suggest-row">
+          ${suggestions.map(p => `
+            <div class="wl-empty-card">
+              <a href="product.html?id=${p.id}" class="wl-empty-link">
+                <img src="${cldUrl(p.image, 200)}" alt="${escapeHtml(p.name)}" loading="lazy" />
+                <div class="wl-empty-name">${escapeHtml(p.name)}</div>
+                <div class="wl-empty-price">₹${p.price.toLocaleString('en-IN')}</div>
+              </a>
+              <button type="button" class="wl-empty-add" onclick="toggleWishlist(${p.id});initWishlistPage();">🤍 Add</button>
+            </div>`).join('')}
+        </div>
+      </div>` : '';
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:36px 16px 12px;color:#878787;">
+      <div style="font-size:60px;margin-bottom:14px;">🤍</div>
+      <h3 style="color:var(--red);font-size:18px;margin-bottom:6px;">Your wishlist is empty</h3>
       <p style="margin-bottom:16px;">Tap the ❤️ on any product to save it here</p>
       <a href="products.html" style="display:inline-block;background:var(--red);color:white;padding:9px 22px;border-radius:20px;font-weight:600;font-size:13px;text-decoration:none;">Browse Products</a>
+      ${suggHtml}
     </div>`;
     return;
   }
