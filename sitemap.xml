@@ -4,93 +4,93 @@
   <!-- Core pages -->
   <url>
     <loc>https://elite-emporium-one.vercel.app/</loc>
-    <lastmod>2026-05-16</lastmod>
+    <lastmod>2026-05-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://elite-emporium-one.vercel.app/products.html</loc>
-    <lastmod>2026-05-16</lastmod>
+    <lastmod>2026-05-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://elite-emporium-one.vercel.app/collection.html</loc>
-    <lastmod>2026-05-16</lastmod>
+    <lastmod>2026-05-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://elite-emporium-one.vercel.app/hanii-dhanii.html</loc>
-    <lastmod>2026-05-16</lastmod>
+    <lastmod>2026-05-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://elite-emporium-one.vercel.app/about.html</loc>
-    <lastmod>2026-05-16</lastmod>
+    <lastmod>2026-05-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <!-- Festive collection deep-links — Google indexes these as separate pages -->
-  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=eid</loc><lastmod>2026-05-16</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=diwali</loc><lastmod>2026-05-16</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=christmas</loc><lastmod>2026-05-16</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=new-year</loc><lastmod>2026-05-16</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=pongal</loc><lastmod>2026-05-16</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=wedding</loc><lastmod>2026-05-16</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=summer</loc><lastmod>2026-05-16</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=monsoon</loc><lastmod>2026-05-16</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=kids</loc><lastmod>2026-05-16</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=eid</loc><lastmod>2026-05-15</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=diwali</loc><lastmod>2026-05-15</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=christmas</loc><lastmod>2026-05-15</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=new-year</loc><lastmod>2026-05-15</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=pongal</loc><lastmod>2026-05-15</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=wedding</loc><lastmod>2026-05-15</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=summer</loc><lastmod>2026-05-15</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=monsoon</loc><lastmod>2026-05-15</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/collection.html?theme=kids</loc><lastmod>2026-05-15</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
 
   <!-- Top-level category pages -->
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Bags</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Watches</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Clothing</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Abaiya</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Hijab</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Sarees</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Kurta%20Sets</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Mens%20Dress</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Kids%20Wear</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Footwear</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Perfumes</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Cosmetics</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Hair%20Care</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Home%20%26%20Kitchen</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Sports</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Wallets</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Belts</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Coolers</loc><lastmod>2026-05-16</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Bags</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Watches</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Clothing</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Abaiya</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Hijab</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Sarees</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Kurta%20Sets</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Mens%20Dress</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Kids%20Wear</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Footwear</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Perfumes</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Cosmetics</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Hair%20Care</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Home%20%26%20Kitchen</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Sports</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Wallets</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Belts</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?category=Coolers</loc><lastmod>2026-05-15</lastmod><priority>0.7</priority></url>
 
   <!-- Useful sort/filter deep-links -->
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?sort=new</loc><lastmod>2026-05-16</lastmod><priority>0.65</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?sort=discount</loc><lastmod>2026-05-16</lastmod><priority>0.65</priority></url>
-  <url><loc>https://elite-emporium-one.vercel.app/products.html?sort=popular</loc><lastmod>2026-05-16</lastmod><priority>0.65</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?sort=new</loc><lastmod>2026-05-15</lastmod><priority>0.65</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?sort=discount</loc><lastmod>2026-05-15</lastmod><priority>0.65</priority></url>
+  <url><loc>https://elite-emporium-one.vercel.app/products.html?sort=popular</loc><lastmod>2026-05-15</lastmod><priority>0.65</priority></url>
 
   <!-- Account / utility -->
   <url>
     <loc>https://elite-emporium-one.vercel.app/cart.html</loc>
-    <lastmod>2026-05-16</lastmod>
+    <lastmod>2026-05-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://elite-emporium-one.vercel.app/wishlist.html</loc>
-    <lastmod>2026-05-16</lastmod>
+    <lastmod>2026-05-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://elite-emporium-one.vercel.app/orders.html</loc>
-    <lastmod>2026-05-16</lastmod>
+    <lastmod>2026-05-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://elite-emporium-one.vercel.app/track-order.html</loc>
-    <lastmod>2026-05-16</lastmod>
+    <lastmod>2026-05-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -98,13 +98,13 @@
   <!-- Legal -->
   <url>
     <loc>https://elite-emporium-one.vercel.app/privacy.html</loc>
-    <lastmod>2026-05-16</lastmod>
+    <lastmod>2026-05-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://elite-emporium-one.vercel.app/terms.html</loc>
-    <lastmod>2026-05-16</lastmod>
+    <lastmod>2026-05-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
