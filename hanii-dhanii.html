@@ -190,8 +190,16 @@
       color: #666;
       white-space: nowrap;
       cursor: pointer;
+      border: 0;
+      background: transparent;
       border-bottom: 3px solid transparent;
       transition: all 0.2s;
+      font-family: inherit;
+    }
+    .hd-tab:focus-visible {
+      outline: 2px solid var(--hd-red);
+      outline-offset: -2px;
+      border-radius: 6px;
     }
 
     .hd-tab.active, .hd-tab:hover {
@@ -398,10 +406,10 @@
 
 <!-- ── CATEGORY TABS ─────────────────────── -->
 <main id="main">
-<div class="hd-tabs" id="hdTabs">
-  <div class="hd-tab active" onclick="filterHD('All')">✨ All</div>
-  <div class="hd-tab" onclick="filterHD('Jewellery')">💎 Jewellery</div>
-  <div class="hd-tab" onclick="filterHD('Cosmetics')">💄 Cosmetics</div>
+<div class="hd-tabs" id="hdTabs" role="tablist">
+  <button type="button" class="hd-tab active" role="tab" aria-selected="true"  onclick="filterHD('All')">✨ All</button>
+  <button type="button" class="hd-tab"        role="tab" aria-selected="false" onclick="filterHD('Jewellery')">💎 Jewellery</button>
+  <button type="button" class="hd-tab"        role="tab" aria-selected="false" onclick="filterHD('Cosmetics')">💄 Cosmetics</button>
 </div>
 
 <!-- ── MAIN CONTENT ───────────────────────── -->
@@ -578,9 +586,13 @@
 
   function filterHD(cat) {
     activeFilter = cat;
-    // Update tab styles
-    document.querySelectorAll('.hd-tab').forEach(t => t.classList.remove('active'));
+    // Update tab styles + aria-selected (a11y)
+    document.querySelectorAll('.hd-tab').forEach(t => {
+      t.classList.remove('active');
+      t.setAttribute('aria-selected', 'false');
+    });
     event.target.classList.add('active');
+    event.target.setAttribute('aria-selected', 'true');
     renderHD();
   }
 
