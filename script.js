@@ -1031,6 +1031,44 @@ function updateCartUI(animate) {
   } catch {}
 })();
 
+/* ─── CROSS-TAB SYNC FALLBACK ────────────────────────────────
+   For browsers where BroadcastChannel is undefined (some private
+   modes, very old Safari, locked-down WebViews), the cart and
+   wishlist channels above no-op and tabs would drift out of sync.
+   The 'storage' event fires natively in *other* tabs when
+   localStorage changes in *this* tab — perfect zero-cost fallback.
+   It also serves as belt-and-braces for BroadcastChannel-capable
+   browsers (harmless: we just re-read the same value).
+   ──────────────────────────────────────────────────────────── */
+(function initStorageFallback() {
+  if (typeof window === 'undefined' || !window.addEventListener) return;
+  window.addEventListener('storage', e => {
+    if (!e || !e.key) return;
+    if (e.key === 'eliteEmporiumCart') {
+      try {
+        cart = JSON.parse(e.newValue || '[]');
+        const total = cart.reduce((s, i) => s + (Number(i.quantity) || 0), 0);
+        document.querySelectorAll('.cart-count').forEach(el => {
+          el.textContent = total;
+          el.style.display = total > 0 ? 'flex' : 'none';
+        });
+        if (typeof renderCart === 'function' && document.getElementById('cartItems')) renderCart();
+        if (typeof renderSideCart === 'function' && document.getElementById('sideCartDrawer')?.classList.contains('open')) renderSideCart();
+      } catch {}
+    } else if (e.key === 'eliteEmporiumWishlist') {
+      try {
+        const fresh = JSON.parse(e.newValue || '[]');
+        wishlist.length = 0;
+        for (const id of fresh) wishlist.push(id);
+        if (typeof updateWishlistUI === 'function') updateWishlistUI();
+        if (typeof initWishlistPage === 'function' && document.getElementById('wishlistGrid')) {
+          initWishlistPage();
+        }
+      } catch {}
+    }
+  });
+})();
+
 // Close side cart on Esc
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && document.getElementById('sideCartDrawer')?.classList.contains('open')) {
