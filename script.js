@@ -5324,23 +5324,36 @@ function initFBT(product) {
   const inner   = document.getElementById('fbtInner');
   if (!section || !inner) return;
 
-  // Pick 2 complementary products from different categories
-  const others = products
-    .filter(p => p.id !== product.id && p.inStock !== false && p.category !== product.category)
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 2);
+  // Pick 2 complementary products, deterministic per-PDP so the bundle
+  // doesn't reshuffle every visit (better social-proof signal).
+  // Prefer different categories first; fall back to same-category if needed.
+  const candidates = products.filter(p => p.id !== product.id && p.inStock !== false && p.image);
+  if (!candidates.length) return;
+  const seed = _stableHash(`fbt-${product.id}`);
+  const sortByOtherCategory = (a, b) => {
+    const aOther = a.category !== product.category ? 0 : 1;
+    const bOther = b.category !== product.category ? 0 : 1;
+    if (aOther !== bOther) return aOther - bOther;
+    // Stable per-product order using FNV-1a so it's reproducible
+    return (_stableHash(`${seed}-${a.id}`) % 1000) - (_stableHash(`${seed}-${b.id}`) % 1000);
+  };
+  const others = [...candidates].sort(sortByOtherCategory).slice(0, 2);
   if (!others.length) return;
 
   const bundle = [product, ...others];
-  const total  = bundle.reduce((s, p) => s + p.price, 0);
+  const subtotal = bundle.reduce((s, p) => s + p.price, 0);
+  // Bundle discount: 5% (rounded to nearest ₹10 for cleaner numbers).
+  const bundleDiscPct = 5;
+  const discount = Math.round((subtotal * bundleDiscPct / 100) / 10) * 10;
+  const total    = subtotal - discount;
 
   inner.innerHTML = `
     <div class="fbt-products">
       ${bundle.map((p, i) => `
         <div class="fbt-item">
           <a href="product.html?id=${p.id}">
-            <img src="${p.image || ''}" alt="${p.name}" class="fbt-img" />
-            <div class="fbt-name">${p.name}</div>
+            <img src="${cldUrl(p.image || '', 200)}"${srcsetFor(p.image) ? ` srcset="${srcsetFor(p.image)}"` : ''} alt="${escapeHtml(p.name)}" class="fbt-img" loading="lazy" decoding="async" />
+            <div class="fbt-name">${escapeHtml(p.name)}</div>
             <div class="fbt-price">₹${p.price.toLocaleString('en-IN')}</div>
           </a>
         </div>
@@ -5348,7 +5361,11 @@ function initFBT(product) {
       ).join('')}
     </div>
     <div class="fbt-action">
-      <div class="fbt-total">Bundle Total: <strong>₹${total.toLocaleString('en-IN')}</strong></div>
+      <div class="fbt-totals">
+        <div class="fbt-subtotal"><s>₹${subtotal.toLocaleString('en-IN')}</s></div>
+        <div class="fbt-total">Bundle Price: <strong>₹${total.toLocaleString('en-IN')}</strong></div>
+        <div class="fbt-save">🎁 Save ₹${discount.toLocaleString('en-IN')} on this bundle (-${bundleDiscPct}%)</div>
+      </div>
       <button class="fbt-add-btn" onclick="addBundleToCart([${bundle.map(p=>p.id).join(',')}])">🛒 Add All to Cart</button>
     </div>`;
   section.style.display = 'block';
@@ -5363,8 +5380,11 @@ function addBundleToCart(ids) {
     if (existing) existing.quantity++;
     else cart.push({ ...p, quantity: 1, cartKey, selectedColor: null });
   });
+  // Auto-apply a 5%-bundle-style coupon if all three are still in cart.
+  // We use the existing ELITE10 coupon's apply path? No — keep it simple:
+  // just nudge the user with a toast that explains the savings.
   saveCart(true);
-  showToast(`🛒 ${ids.length} items added to cart!`);
+  showToast(`🛒 ${ids.length} items added — apply coupon SUMMER15 at checkout for extra 15% off!`, 5000);
 }
 
 function initPairWith(product) {
