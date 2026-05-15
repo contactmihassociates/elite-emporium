@@ -3622,6 +3622,10 @@ function showToast(message, duration = 3200, type = 'default') {
   const toast = document.createElement('div');
   toast.className = `toast toast-${type} toast-show`;
   toast.textContent = message;
+  // Error toasts get role=alert so screen readers interrupt politely-queued
+  // announcements — users with vision impairment must hear "Cart is empty"
+  // or "Fill name first" right away, not after the current sentence finishes.
+  if (type === 'error') toast.setAttribute('role', 'alert');
 
   // Dismiss on click
   toast.addEventListener('click', () => {
