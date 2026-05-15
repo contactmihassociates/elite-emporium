@@ -85,6 +85,20 @@ summary:focus-visible,
   outline-offset: 2px;
 }
 
+/* Universal reduced-motion safety net — strips animations + transitions for
+   users who set "Reduce motion" in their OS. Per-feature guards elsewhere
+   in this file remain as overrides for specific cases (e.g., pulse-dot
+   that's a meaningful indicator). Without this rule, the site has ~65
+   `animation:` declarations and only ~15 prefers-reduced-motion guards. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 @keyframes pageFadeIn  { from { opacity:0; transform:translateY(4px); } to   { opacity:1; transform:translateY(0); } }
 @keyframes pageFadeOut { from { opacity:1; transform:translateY(0); }   to   { opacity:0; transform:translateY(-4px); } }
 body.page-exiting { animation: pageFadeOut 0.2s ease forwards; pointer-events: none; }
