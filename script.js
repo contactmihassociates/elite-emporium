@@ -786,6 +786,12 @@ let wishlist = JSON.parse(localStorage.getItem('eliteEmporiumWishlist') || '[]')
 function saveWishlist() {
   localStorage.setItem('eliteEmporiumWishlist', JSON.stringify(wishlist));
   updateWishlistUI();
+  // Cross-tab sync — other open tabs re-read + re-render their badges
+  try {
+    if (window.__wishlistChannel) {
+      window.__wishlistChannel.postMessage({ type: 'wishlist-update', count: wishlist.length, at: Date.now() });
+    }
+  } catch {}
 }
 
 function updateWishlistUI() {
@@ -916,6 +922,36 @@ function updateCartUI(animate) {
         });
         if (typeof renderCart === 'function' && document.getElementById('cartItems')) renderCart();
         if (typeof renderSideCart === 'function' && document.getElementById('sideCartDrawer')?.classList.contains('open')) renderSideCart();
+      } catch {}
+    });
+  } catch {}
+})();
+
+/* ── BROADCASTCHANNEL: cross-tab wishlist sync ───────────────
+   Mirror of the cart channel above — keeps the 'wishlist-count'
+   badge + the wishlist page in sync across multiple open tabs.
+   Critical for the 'shareable wishlist deep-link' flow where the
+   recipient might already have the site open in another tab.
+   ──────────────────────────────────────────────────────────── */
+(function initWishlistChannel() {
+  if (typeof BroadcastChannel === 'undefined') return;
+  try {
+    const ch = new BroadcastChannel('elite-emporium-wishlist');
+    window.__wishlistChannel = ch;
+    ch.addEventListener('message', e => {
+      if (!e.data || e.data.type !== 'wishlist-update') return;
+      // Re-read wishlist from localStorage + re-render the local UI
+      try {
+        const fresh = JSON.parse(localStorage.getItem('eliteEmporiumWishlist') || '[]');
+        // Mutate the module-level `wishlist` array in place (don't
+        // reassign — other code holds a closure reference to it).
+        wishlist.length = 0;
+        for (const id of fresh) wishlist.push(id);
+        if (typeof updateWishlistUI === 'function') updateWishlistUI();
+        // If the user is currently on the wishlist page, re-render the grid.
+        if (typeof initWishlistPage === 'function' && document.getElementById('wishlistGrid')) {
+          initWishlistPage();
+        }
       } catch {}
     });
   } catch {}
