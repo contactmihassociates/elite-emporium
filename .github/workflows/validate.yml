@@ -95,6 +95,49 @@ jobs:
           fi
           echo "logo-96.png size: $SIZE bytes (PASS)"
 
+      - name: All <button> tags have explicit type=
+        run: |
+          # Iteration 136 — iter 134 caught a real bug: <button class=
+          # "sh-clear">Clear</button> was inside the header search form,
+          # so clicking it was actually submitting the form (no type=
+          # defaults to type="submit"). Iter 135 swept the remaining
+          # 57. This gate locks the invariant: every <button> tag must
+          # carry an explicit type= attribute.
+          FAIL=0
+          # Static HTML files
+          for f in 404.html about.html cart.html collection.html hanii-dhanii.html index.html offline.html order-success.html orders.html privacy.html product.html products.html profile.html terms.html track-order.html wishlist.html; do
+            if [ ! -f "$f" ]; then continue; fi
+            # Find <button followed by anything that doesn't already include type=
+            # (Python here is more reliable than grep regex for multiline lookahead)
+            if python3 -c "
+import re, sys, pathlib
+txt = pathlib.Path('$f').read_text(encoding='utf-8')
+bare = re.findall(r'<button\b(?![^>]*\btype=)[^>]*>', txt, re.DOTALL)
+sys.exit(len(bare))
+" 2>/dev/null; then
+              :  # exit 0 → no bare buttons
+            else
+              N=$?
+              echo "::error::$f has $N <button> tag(s) without type="
+              FAIL=1
+            fi
+          done
+          # script.js template strings
+          if python3 -c "
+import re, sys, pathlib
+txt = pathlib.Path('script.js').read_text(encoding='utf-8')
+bare = re.findall(r'<button\b(?![^>]*\btype=)[^>]*>', txt, re.DOTALL)
+sys.exit(len(bare))
+" 2>/dev/null; then
+            :  # exit 0 → no bare buttons
+          else
+            N=$?
+            echo "::error::script.js has $N <button> tag(s) without type= in template strings"
+            FAIL=1
+          fi
+          [ $FAIL -eq 0 ] && echo "type=button coverage: PASS"
+          exit $FAIL
+
       - name: Local image / favicon references resolve to real files
         run: |
           # Iteration 117 — scan every HTML page for src="images/..." and
