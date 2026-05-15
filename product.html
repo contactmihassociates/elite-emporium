@@ -119,7 +119,7 @@
     <!-- Left: Main Image -->
     <div class="pd-gallery">
       <div class="pd-main-image">
-        <img id="pdMainImage" src="" alt="Product Image" onclick="openImageModal(this.src)" style="cursor:zoom-in;" title="Click to zoom" />
+        <img id="pdMainImage" src="" alt="Product Image" onclick="openImageModal(this.src)" style="cursor:zoom-in;" title="Click to zoom" fetchpriority="high" decoding="async" />
       </div>
     </div>
 
@@ -359,7 +359,7 @@
 <!-- ── IMAGE ZOOM MODAL ──────────────────────── -->
 <div class="img-modal" id="imgModal" onclick="closeImageModal()">
   <div class="img-modal-inner" onclick="event.stopPropagation()">
-    <img id="imgModalImg" src="" alt="Product zoom" />
+    <img id="imgModalImg" src="" alt="Product zoom" loading="lazy" decoding="async" />
     <button class="img-modal-close" onclick="closeImageModal()">✕</button>
   </div>
 </div>
