@@ -839,13 +839,15 @@ function openCompareModal() {
     modal = document.createElement('div');
     modal.id = 'compareModal';
     modal.className = 'cmp-modal-backdrop';
+    // Outer wrapper is just the backdrop / dismissal zone — keep as <div>
+    // but mark the inner card as the actual dialog below.
     modal.onclick = e => { if (e.target === modal) closeCompareModal(); };
     document.body.appendChild(modal);
   }
-  modal.innerHTML = `<div class="cmp-modal">
+  modal.innerHTML = `<div class="cmp-modal" role="dialog" aria-modal="true" aria-labelledby="cmpModalTitle">
     <div class="cmp-modal-header">
-      <h3>⚖️ Product Comparison</h3>
-      <button type="button" class="cmp-modal-close" onclick="closeCompareModal()">✕</button>
+      <h3 id="cmpModalTitle">⚖️ Product Comparison</h3>
+      <button type="button" class="cmp-modal-close" onclick="closeCompareModal()" aria-label="Close comparison">✕</button>
     </div>
     <div class="cmp-modal-body">
       <table class="cmp-table"><thead>${headerRow}</thead><tbody>${bodyRows}</tbody></table>
