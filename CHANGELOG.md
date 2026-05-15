@@ -2,6 +2,19 @@
 
 All notable changes are tracked here. Authoritative source is `git log --oneline`.
 
+## 2026-05-15 — Autonomous Optimization Loop, ninth pass (iters 125-129)
+
+Five iterations of UX polish + a11y fixes:
+
+- **Enter key applies coupon** (iter 125) — coupon input now honors Enter via onkeydown + `enterkeyhint="go"`.
+- **Offline.html ARIA fix** (iter 126) — corrected the conflicting `role="alert"` + `aria-live="polite"` on the card; moved live-region semantics to the smaller `.off-status` strip where text actually changes.
+- **aria-label on .whatsapp-float** (iter 127) — 5 pages had the 💬 floating button with no accessible name. Iter 71 had fixed emoji-only `<button>` elements but missed `<a>` links.
+- **aria-label on back-to-top ↑** (iter 128) — same pattern: emoji-only button across 6 pages now has explicit aria-label.
+
+(See iters 73, 83, 94, 100, 108, 115, 124 for prior changelog entries.)
+
+---
+
 ## 2026-05-15 — Autonomous Optimization Loop, eighth pass (iters 117-124)
 
 Seven more iterations focused on hero-carousel a11y and SW robustness:
