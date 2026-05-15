@@ -1731,11 +1731,20 @@ function formatDeliveryDate(daysFromNow) {
   return d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
 }
 
-function getSubtotal() { return cart.reduce((s, i) => s + i.price * i.quantity, 0); }
-function getItemCount() { return cart.reduce((s, i) => s + i.quantity, 0); }
+// Cart helpers. All Number() coercion so a stray Firestore string-price
+// or undefined price can't NaN-poison the total.
+function getSubtotal() { return cart.reduce((s, i) => s + (Number(i.price) || 0) * (Number(i.quantity) || 0), 0); }
+function getItemCount() { return cart.reduce((s, i) => s + (Number(i.quantity) || 0), 0); }
 function getDelivery()  { const st = getSubtotal(); return st === 0 ? 0 : st < CONFIG.minFreeDelivery ? CONFIG.deliveryCharge : 0; }
 function getGiftWrap()  { return document.getElementById('giftWrap')?.checked ? 50 : 0; }
-function getTotal()     { return getSubtotal() + getDelivery() + getGiftWrap(); }
+// getTotal returns the user-facing cart total: subtotal + delivery +
+// giftwrap MINUS any active coupon discount. Used by the share-cart
+// WhatsApp message so the shared total matches the cart-page total.
+function getTotal() {
+  const sub  = getSubtotal();
+  const disc = (typeof getCouponDiscount === 'function') ? getCouponDiscount(sub) : 0;
+  return Math.max(0, sub + getDelivery() + getGiftWrap() - disc);
+}
 
 function toggleGiftWrap() {
   const checked = document.getElementById('giftWrap')?.checked;
