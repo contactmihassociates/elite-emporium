@@ -4,7 +4,7 @@
    for pages and API calls.
    ============================================ */
 
-const CACHE_NAME = 'elite-emporium-v8';
+const CACHE_NAME = 'elite-emporium-v9';
 
 const STATIC_ASSETS = [
   '/',
@@ -26,6 +26,10 @@ const STATIC_ASSETS = [
   '/script.js',
   '/manifest.json',
   '/images/logo.png',
+  '/images/logo-48.png',
+  '/images/logo-96.png',
+  '/images/logo-192.png',
+  '/images/logo-512.png',
 ];
 
 // ── INSTALL: pre-cache static shell ──────────

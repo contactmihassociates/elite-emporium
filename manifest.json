@@ -1,12 +1,17 @@
 {
   "id": "/?source=pwa",
-  "name": "Elite Emporium — Premium Shopping",
+  "name": "Elite Emporium \u00e2\u20ac\u201d Premium Shopping",
   "short_name": "Elite Emporium",
-  "description": "Premium Online Store — Bags, Watches, Perfumes, Fashion & Gifts from Kayalpattinam, Tamil Nadu. GST-registered. Free delivery above ₹499.",
+  "description": "Premium Online Store \u00e2\u20ac\u201d Bags, Watches, Perfumes, Fashion & Gifts from Kayalpattinam, Tamil Nadu. GST-registered. Free delivery above \u00e2\u201a\u00b9499.",
   "start_url": "/index.html?source=pwa",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui", "browser"],
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ],
   "background_color": "#F1F3F6",
   "theme_color": "#DB3022",
   "orientation": "portrait",
@@ -15,41 +20,45 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "images/logo.png",
+      "src": "images/logo-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "images/logo.png",
+      "src": "images/logo-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "images/logo.png",
+      "src": "images/logo-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "images/logo.png",
+      "src": "images/logo-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     }
   ],
-  "categories": ["shopping", "lifestyle", "business"],
+  "categories": [
+    "shopping",
+    "lifestyle",
+    "business"
+  ],
   "screenshots": [
     {
-      "src": "images/logo.png",
+      "src": "images/logo-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Elite Emporium home"
     },
     {
-      "src": "images/logo.png",
+      "src": "images/logo-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "wide",
@@ -62,28 +71,48 @@
       "short_name": "Shop",
       "description": "Browse all products",
       "url": "/products.html?source=pwa-shortcut",
-      "icons": [{ "src": "images/logo.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "images/logo-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "View cart",
       "short_name": "Cart",
       "description": "Your shopping cart",
       "url": "/cart.html?source=pwa-shortcut",
-      "icons": [{ "src": "images/logo.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "images/logo-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Track order",
       "short_name": "Track",
       "description": "Track your order",
       "url": "/track-order.html?source=pwa-shortcut",
-      "icons": [{ "src": "images/logo.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "images/logo-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "My orders",
       "short_name": "Orders",
       "description": "Order history",
       "url": "/orders.html?source=pwa-shortcut",
-      "icons": [{ "src": "images/logo.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "images/logo-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ],
   "related_applications": [],
