@@ -3702,7 +3702,7 @@ function initHeaderSearch() {
 
     let html = '';
     if (history.length) {
-      html += `<div class="sh-header"><span>Recent Searches</span><button onclick="clearSearchHistory()" class="sh-clear">Clear</button></div>`;
+      html += `<div class="sh-header"><span>Recent Searches</span><button type="button" onclick="clearSearchHistory()" class="sh-clear">Clear</button></div>`;
       html += history.map(t =>
         `<div class="sh-item" onclick="useSearchTerm('${t.replace(/'/g,"\\'")}')">🕐 ${t}</div>`
       ).join('');
