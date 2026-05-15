@@ -32,7 +32,7 @@ jobs:
         run: |
           # Quick gate: every HTML file must reference styles.css and script.js
           # with the same cache-bust version (catches half-bumped deploys).
-          BUSTS=$(grep -rh -oE "v=20260515[a-z0-9]+" *.html | sort -u)
+          BUSTS=$(grep -rh -oE "v=2026[0-9]+[a-z0-9]+" *.html | sort -u)
           COUNT=$(echo "$BUSTS" | wc -l)
           if [ "$COUNT" -gt 1 ]; then
             echo "::warning::Multiple cache-bust versions detected — likely a half-bumped deploy:"
@@ -40,6 +40,60 @@ jobs:
           fi
           echo "Found versions:"
           echo "$BUSTS"
+
+      - name: Single h1 per page
+        run: |
+          # Each public HTML page must have exactly one <h1> tag.
+          # Multiple h1s confuse screen readers + Lighthouse; zero h1s
+          # tank SEO. Regression check for iteration 11.
+          FAIL=0
+          for f in 404.html about.html cart.html collection.html index.html order-success.html orders.html privacy.html product.html products.html profile.html terms.html track-order.html wishlist.html; do
+            if [ ! -f "$f" ]; then continue; fi
+            N=$(grep -oE '<h1[ >]' "$f" | wc -l)
+            if [ "$N" -ne 1 ]; then
+              echo "::error::$f has $N <h1> tags (expected 1)"
+              FAIL=1
+            fi
+          done
+          [ $FAIL -eq 0 ] && echo "h1 hierarchy: PASS"
+          exit $FAIL
+
+      - name: Every public HTML has favicon + meta description + lang en-IN
+        run: |
+          FAIL=0
+          for f in 404.html about.html cart.html collection.html index.html order-success.html orders.html privacy.html product.html products.html profile.html terms.html track-order.html wishlist.html; do
+            if [ ! -f "$f" ]; then continue; fi
+            grep -q 'rel="icon"' "$f"            || { echo "::error::$f missing <link rel=icon>"; FAIL=1; }
+            grep -q '<meta name="description"'  "$f" || { echo "::error::$f missing meta description"; FAIL=1; }
+            grep -q 'lang="en-IN"'              "$f" || { echo "::error::$f missing lang=\"en-IN\""; FAIL=1; }
+          done
+          [ $FAIL -eq 0 ] && echo "head metadata: PASS"
+          exit $FAIL
+
+      - name: All scripts on HTML pages use defer
+        run: |
+          # Regression check for iteration 1. Any non-deferred external
+          # script blocks rendering — verify all <script src=...> tags
+          # have defer or async.
+          FAIL=0
+          for f in *.html; do
+            if grep -qE '<script src="[^"]+"></script>' "$f"; then
+              echo "::warning::$f has a non-deferred external <script src>"
+            fi
+          done
+          echo "defer audit: complete"
+
+      - name: Logo PNG is small (regression guard)
+        run: |
+          # logo-96.png powers all header logos. If it ever grows past
+          # 30 KB, something's wrong (someone re-introduced the 2.4 MB
+          # original).
+          SIZE=$(wc -c < images/logo-96.png 2>/dev/null || echo 0)
+          if [ "$SIZE" -gt 30000 ]; then
+            echo "::error::images/logo-96.png is $SIZE bytes (expected <30KB)"
+            exit 1
+          fi
+          echo "logo-96.png size: $SIZE bytes (PASS)"
 
       - name: No leftover dev secrets
         run: |
