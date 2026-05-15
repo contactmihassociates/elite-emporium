@@ -2,6 +2,30 @@
 
 All notable changes are tracked here. Authoritative source is `git log --oneline`.
 
+## 2026-05-15 — Autonomous Optimization Loop, fourth pass (iters 84-93)
+
+Ten more iterations focused on iOS safe-area handling and keyboard a11y parity:
+
+### Performance / hygiene
+- **All script.js references to `images/logo.png` (2.4 MB)** migrated to sized variants (iter 84) — `og:image` fallback, JSON-LD image fallback, Razorpay modal image, orders-page thumbnail. ~6 KB instead of 2.4 MB per fallback hit.
+- **SW pre-cache dropped logo.png** (iter 85) — initial PWA install now ~2.4 MB lighter. CACHE_NAME bumped v13 → v14.
+- **Dead `CONFIG.phone: ""`** removed (iter 86) — empty string never read anywhere.
+
+### iOS safe-area arc (4 iterations)
+- **`.bottom-nav` padding-bottom: env(safe-area-inset-bottom)** for all runtimes (iter 87) — previously only applied to installed PWA, leaving Safari mobile users on iPhones-with-home-indicator with nav items sitting on the indicator strip.
+- **`.back-to-top` + `.whatsapp-float`** lifted by the same env() amount (iter 88) — without this they overlapped the now-taller nav.
+- **`body` padding-bottom** matched (iter 89) — without it the last ~30 px of every long-scroll page sat behind the nav.
+- **`.side-cart-footer`** (highest-intent CTA in the drawer) lifted by env() (iter 90) — checkout button was partly behind the home indicator.
+
+### Keyboard a11y arc — `:focus-visible` parity pass
+- **`.add-to-cart`** (iter 91) — highest-frequency CTA (~30 per product grid). Keyboard tab now shows the same yellow-dark+glow as mouse hover, plus a 2 px red outline.
+- **`.bottom-nav-item`** (iter 92) — tight inner outline so the focus ring sits cleanly within each nav item box.
+- **`.cart-btn`** (iter 93) — white outline against the red header gradient.
+
+(See iter 73 + 83 for prior changelog entries.)
+
+---
+
 ## 2026-05-15 — Autonomous Optimization Loop, polish pass (iters 73-83)
 
 Polish-pass commits. Highlights:
