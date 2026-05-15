@@ -1508,7 +1508,9 @@ html[data-runtime="pwa"] .bottom-nav {
 .product-footer { display:flex; flex-direction:column; gap:8px; }
 .product-price { font-size:17px; font-weight:700; color:var(--text); }
 .add-to-cart { background:var(--yellow); color:var(--red-dark); border:none; padding:7px 12px; border-radius:var(--radius); cursor:pointer; font-size:12px; font-weight:700; transition:var(--transition); font-family:'Poppins',sans-serif; display:flex; align-items:center; gap:4px; white-space:nowrap; }
-.add-to-cart:hover { background:var(--yellow-dark); box-shadow:0 2px 8px rgba(255,229,0,0.5); }
+.add-to-cart:hover,
+.add-to-cart:focus-visible { background:var(--yellow-dark); box-shadow:0 2px 8px rgba(255,229,0,0.5); }
+.add-to-cart:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 .add-to-cart:active { transform: scale(0.96); }
 .add-to-cart.added { background:var(--green); color:white; }
 
