@@ -453,7 +453,9 @@ header.scrolled .logo-img { height: 52px; }
   transition: var(--transition);
   white-space: nowrap;
 }
-.cart-btn:hover { background: rgba(255,255,255,0.18); }
+.cart-btn:hover,
+.cart-btn:focus-visible { background: rgba(255,255,255,0.18); }
+.cart-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .cart-count {
   background: var(--yellow);
   color: var(--red-dark);
