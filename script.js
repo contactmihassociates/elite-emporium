@@ -4758,33 +4758,6 @@ function initProductDetailPage() {
     askBtn.innerHTML = '❓ Ask a Question';
     actions.appendChild(askBtn);
 
-    // Native Share button (PDP) — uses navigator.share where available,
-    // falls back to a clipboard copy + WhatsApp share if not.
-    const shareBtn = document.createElement('button');
-    shareBtn.className = 'btn-pd-share';
-    shareBtn.type = 'button';
-    shareBtn.innerHTML = '📤 Share';
-    shareBtn.title = 'Share this product';
-    const productUrl = `https://elite-emporium-one.vercel.app/product.html?id=${p.id}`;
-    const shareText  = `Check out *${p.name}* on Elite Emporium — ₹${p.price.toLocaleString('en-IN')}\n${productUrl}`;
-    shareBtn.onclick = async () => {
-      hapticTap();
-      if (navigator.share) {
-        try {
-          await navigator.share({ title: p.name, text: shareText, url: productUrl });
-          hapticSuccess();
-          return;
-        } catch (e) { /* user cancelled — fall through */ }
-      }
-      // Fallback: copy URL + toast
-      try {
-        await navigator.clipboard.writeText(productUrl);
-        showToast('🔗 Link copied — paste anywhere to share');
-      } catch {
-        window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
-      }
-    };
-    actions.appendChild(shareBtn);
   }
 
   // Related categories chip strip — appended to description tab
@@ -6135,19 +6108,36 @@ function selectThumb(el) {
 }
 
 // ── SHARE PRODUCT ─────────────────────────────
-function shareProduct() {
-  const title = document.getElementById('pdTitle')?.textContent || 'Elite Emporium Product';
-  const url   = window.location.href;
+async function shareProduct() {
+  const title    = document.getElementById('pdTitle')?.textContent || 'Elite Emporium Product';
+  const priceEl  = document.getElementById('pdPrice');
+  const priceStr = priceEl?.textContent || '';
+  const url      = window.location.href;
+  const text     = `Check out *${title}* on Elite Emporium — ${priceStr}`;
+  hapticTap();
   if (navigator.share) {
-    navigator.share({ title, text: `Check out ${title} on Elite Emporium!`, url })
-      .catch(() => copyToClipboard(url));
-  } else {
-    copyToClipboard(url);
+    try {
+      await navigator.share({ title, text, url });
+      hapticSuccess();
+      return;
+    } catch (e) { /* user cancelled or unsupported — fall through */ }
   }
+  copyToClipboard(url);
 }
 function copyToClipboard(text) {
-  navigator.clipboard?.writeText(text).then(() => showToast('🔗 Link copied to clipboard!'))
-    .catch(() => showToast('🔗 Copy this link: ' + text));
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => { showToast('🔗 Link copied to clipboard!'); hapticSuccess(); })
+      .catch(() => showToast('🔗 Copy this link: ' + text));
+  } else {
+    // Final fallback for very old browsers
+    try {
+      const t = document.createElement('textarea');
+      t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+      document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove();
+      showToast('🔗 Link copied!');
+    } catch { showToast('🔗 Copy this link: ' + text); }
+  }
 }
 
 // ── IMAGE ZOOM MODAL ──────────────────────────

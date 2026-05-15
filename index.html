@@ -22,9 +22,9 @@
   <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
   <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
-  <link rel="preload" href="styles.css?v=20260515r" as="style" />
+  <link rel="preload" href="styles.css?v=20260515s" as="style" />
   <link rel="preload" href="images/logo.png" as="image" />
-  <link rel="stylesheet" href="styles.css?v=20260515r" />
+  <link rel="stylesheet" href="styles.css?v=20260515s" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#DB3022" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -110,8 +110,55 @@
     ]
   }
   </script>
+  <style>
+    /* App-shell splash — shown on cold start (TWA / PWA / first web visit),
+       fades when window 'load' fires. Inline so it paints immediately. */
+    #appShellSplash {
+      position: fixed; inset: 0; z-index: 99999;
+      background: linear-gradient(135deg, #1a1a2e 0%, #DB3022 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+    #appShellSplash.hide { opacity: 0; visibility: hidden; }
+    #appShellSplash img { width: 96px; height: 96px; border-radius: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.30); animation: assPop 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.4); }
+    @keyframes assPop { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    #appShellSplash .ass-name { color: #fff; font-weight: 800; font-size: 18px; margin-top: 14px; letter-spacing: 0.5px; }
+    #appShellSplash .ass-tag { color: rgba(255,255,255,0.7); font-size: 11px; margin-top: 4px; letter-spacing: 1.5px; text-transform: uppercase; }
+    #appShellSplash .ass-spinner {
+      margin-top: 18px;
+      width: 22px; height: 22px;
+      border: 3px solid rgba(255,255,255,0.25);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: assSpin 0.8s linear infinite;
+    }
+    @keyframes assSpin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) {
+      #appShellSplash img { animation: none; }
+      #appShellSplash .ass-spinner { animation: none; }
+    }
+  </style>
 </head>
-<body><div id="scrollProgress"></div>
+<body>
+<div id="appShellSplash" aria-hidden="true">
+  <img src="images/logo.png" alt="" />
+  <div class="ass-name">Elite Emporium</div>
+  <div class="ass-tag">Premium Online Store</div>
+  <div class="ass-spinner"></div>
+</div>
+<script>
+  // Hide the splash as soon as the window is interactive
+  (function () {
+    const splash = document.getElementById('appShellSplash');
+    if (!splash) return;
+    const hide = () => splash.classList.add('hide');
+    // Hide when load completes, or fall back after 1.6s
+    if (document.readyState === 'complete') { setTimeout(hide, 100); }
+    else { window.addEventListener('load', () => setTimeout(hide, 200), { once: true }); }
+    setTimeout(hide, 1600); // safety net
+  })();
+</script>
+<div id="scrollProgress"></div>
 
 <!-- ── HEADER ─────────────────────────────── -->
 <header>
@@ -1109,7 +1156,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="script.js?v=20260515r"></script>
+<script src="script.js?v=20260515s"></script>
 
 <script>
 // Hero Slideshow with swipe support
