@@ -1365,6 +1365,12 @@ const _origUpdateCartUI = typeof updateCartUI === 'function' ? updateCartUI : nu
 function initMiniCart() {
   const cartBtnEl = document.querySelector('.cart-btn');
   if (!cartBtnEl || window.location.pathname.includes('cart.html')) return;
+  // Idempotent — re-calling this function (bfcache restore / future
+  // SPA-style nav) must not append duplicate dropdowns or stack
+  // hover listeners. Same defensive pattern as initSideCartDrawer.
+  if (cartBtnEl.dataset.miniCartWired === '1') return;
+  cartBtnEl.dataset.miniCartWired = '1';
+
   cartBtnEl.style.position = 'relative';
   const wrap = document.createElement('div');
   wrap.className = 'mini-cart-wrap';
