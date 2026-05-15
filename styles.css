@@ -1467,7 +1467,7 @@ html[data-runtime="pwa"] .bottom-nav {
 @media (prefers-reduced-motion: reduce) {
   .sk-img::after, .sk-line::after { animation: none; opacity: 0.4; }
 }
-.product-card { background:var(--white); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); transition:box-shadow 0.2s,transform 0.2s; position:relative; display:flex; flex-direction:column; border:1px solid var(--border); min-width:170px; }
+.product-card { background:var(--white); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); transition:box-shadow 0.2s,transform 0.2s; position:relative; display:flex; flex-direction:column; border:1px solid var(--border); min-width:170px; content-visibility:auto; contain-intrinsic-size:auto 320px; }
 .product-card:hover { box-shadow:var(--shadow-md); transform:translateY(-2px); }
 .product-badge { position:absolute; top:8px; left:8px; background:var(--orange); color:white; padding:2px 8px; border-radius:3px; font-size:10px; font-weight:700; z-index:2; text-transform:uppercase; }
 .product-badge.new        { background:var(--green); }
