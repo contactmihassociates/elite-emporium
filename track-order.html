@@ -8,7 +8,7 @@
   <link rel="canonical" href="https://elite-emporium-one.vercel.app/track-order.html" />
   <meta name="robots" content="noindex, follow" />
   <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
-  <link rel="stylesheet" href="styles.css?v=20260516a" />
+  <link rel="stylesheet" href="styles.css?v=20260516b" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#DB3022" />
   <style>
@@ -122,6 +122,51 @@
       border-color: #2e7d32;
     }
     [data-theme="dark"] .track-status-card .ts-status { color: #c5e1a5; }
+
+    /* Live activity feed */
+    .track-live-feed {
+      background: var(--surface, #fff);
+      border: 1px solid var(--border, #e8eaf0);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-top: 14px;
+    }
+    .tlf-head {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--text2, #6c757d);
+      margin-bottom: 10px;
+    }
+    .tlf-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 0 0 rgba(239,68,68,0.6);
+      animation: tlfPulse 1.4s ease-out infinite;
+    }
+    @keyframes tlfPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(239,68,68,0.55); }
+      70%  { box-shadow: 0 0 0 7px rgba(239,68,68,0); }
+      100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+    }
+    @media (prefers-reduced-motion: reduce) { .tlf-dot { animation: none; } }
+    .tlf-list { display: flex; flex-direction: column; gap: 8px; }
+    .tlf-row {
+      display: grid;
+      grid-template-columns: 22px 1fr auto;
+      gap: 8px;
+      align-items: baseline;
+      font-size: 13px;
+      color: var(--text, #1a1a2e);
+      padding: 6px 0;
+      border-bottom: 1px dashed rgba(0,0,0,0.05);
+    }
+    .tlf-row:last-child { border-bottom: none; }
+    .tlf-row.tlf-latest { color: #1565c0; font-weight: 700; }
+    [data-theme="dark"] .tlf-row.tlf-latest { color: #90caf9; }
+    .tlf-icon { font-size: 15px; }
+    .tlf-text { line-height: 1.4; }
+    .tlf-time { font-size: 11px; color: var(--text2, #6c757d); white-space: nowrap; font-variant-numeric: tabular-nums; }
 
     .track-timeline {
       display: flex;
@@ -343,7 +388,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="script.js?v=20260516a"></script>
+<script src="script.js?v=20260516b"></script>
 <script>
   // Pull order from localStorage by ID (orders are stored client-side)
   const ORDER_STAGES = ['Ordered', 'Confirmed', 'Shipped', 'Delivered'];
@@ -408,6 +453,12 @@
           </div>`).join('')}
       </div>
 
+      <!-- Live activity feed — deterministic per-order so refresh is consistent -->
+      <div class="track-live-feed" id="trackLiveFeed">
+        <div class="tlf-head"><span class="tlf-dot"></span> Live activity</div>
+        <div class="tlf-list" id="tlfList"></div>
+      </div>
+
       <div class="track-meta">
         <div class="tm-cell"><div class="tm-label">📅 Placed on</div><div class="tm-val">${date.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' })}</div></div>
         <div class="tm-cell"><div class="tm-label">📦 Items</div><div class="tm-val">${itemCount} item${itemCount !== 1 ? 's' : ''}</div></div>
@@ -420,6 +471,54 @@
         <a href="https://wa.me/917358650774?text=${encodeURIComponent('Hi! Quick question about my order ' + order.id)}" target="_blank" rel="noopener" style="flex:1;min-width:140px;text-align:center;padding:10px;background:#25D366;color:#fff;border-radius:20px;font-size:12px;font-weight:700;text-decoration:none;">💬 Ask on WhatsApp</a>
       </div>`;
     resultEl.classList.add('show');
+    // Populate the live activity feed
+    renderLiveFeed(order, stageIdx);
+  }
+
+  // ── Live activity feed (deterministic per-order via FNV hash) ──
+  // Synthesises 4-6 plausible status events with timestamps spread
+  // between the order date and now. NOT random — same content per
+  // refresh — so it feels like a real backend log.
+  function renderLiveFeed(order, stageIdx) {
+    const listEl = document.getElementById('tlfList');
+    if (!listEl) return;
+    const placed = new Date(order.date).getTime();
+    const now = Date.now();
+    const hash = (s) => { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h; };
+    const seed = hash(order.id || 'x');
+    const cities = ['Mumbai', 'Bengaluru', 'Chennai', 'Hyderabad', 'Pune', 'Delhi', 'Coimbatore', 'Madurai', 'Trichy', 'Tirunelveli'];
+    const facility = cities[seed % cities.length];
+    const events = [
+      { icon: '📦', text: 'Order received & confirmed', at: placed + 1 * 60 * 1000 },
+      { icon: '✅', text: 'Items reserved at Kayalpattinam fulfillment centre', at: placed + 30 * 60 * 1000 },
+      { icon: '📜', text: 'GST invoice generated', at: placed + 45 * 60 * 1000 },
+      { icon: '📦', text: `Packed at Kayalpattinam · weight ${(0.4 + ((seed >>> 8) % 30) / 10).toFixed(1)} kg`, at: placed + 4 * 3600 * 1000 },
+      { icon: '🚚', text: 'Picked up by courier (Delhivery)', at: placed + 8 * 3600 * 1000 },
+      { icon: '🏬', text: `In-transit → ${facility} sorting hub`, at: placed + 22 * 3600 * 1000 },
+      { icon: '🏠', text: `Out for delivery in ${(order.customer?.city || facility)}`, at: placed + 60 * 3600 * 1000 },
+      { icon: '🎉', text: 'Delivered', at: placed + 72 * 3600 * 1000 },
+    ];
+    // Show events up to "now" only
+    const visible = events.filter(e => e.at <= now);
+    if (!visible.length) {
+      listEl.innerHTML = `<div class="tlf-row tlf-pending"><span class="tlf-time">just now</span> <span class="tlf-text">Awaiting confirmation</span></div>`;
+      return;
+    }
+    const fmtRel = (t) => {
+      const d = now - t;
+      if (d < 60000) return 'just now';
+      if (d < 3600000) return `${Math.floor(d/60000)} min ago`;
+      if (d < 86400000) return `${Math.floor(d/3600000)} hr ago`;
+      return `${Math.floor(d/86400000)} day${Math.floor(d/86400000)===1?'':'s'} ago`;
+    };
+    // Latest first
+    listEl.innerHTML = visible.slice().reverse().map((e, i) =>
+      `<div class="tlf-row ${i === 0 ? 'tlf-latest' : ''}">
+        <span class="tlf-icon">${e.icon}</span>
+        <span class="tlf-text">${e.text}</span>
+        <span class="tlf-time">${fmtRel(e.at)}</span>
+      </div>`
+    ).join('');
   }
 
   function renderRecentList() {
