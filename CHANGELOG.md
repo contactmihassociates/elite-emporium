@@ -2,6 +2,27 @@
 
 All notable changes are tracked here. Authoritative source is `git log --oneline`.
 
+## 2026-05-15 — Autonomous Optimization Loop, sixth pass (iters 101-108)
+
+Wrap-up of the second-session autonomous loop. Highlights:
+
+### A11y — focus indication, finally working end-to-end
+- **CI gate on universal `:focus-visible` baseline** (iter 101) — guards against future regression of the iter-98 rule.
+- **`!important` removed from legacy `.kbd-nav` rules** (iter 102) — the previous `body:not(.kbd-nav) *:focus { outline:none !important }` was silently overriding the entire iter 91-98 `:focus-visible` work. Also removed a redundant `body.kbd-nav <elem>:focus-visible` rule whose specificity was clobbering per-class focus colors (e.g., `.cart-btn:focus-visible` white outline against the red header).
+- **Universal `prefers-reduced-motion: reduce` safety net** (iter 106) — 65 `animation:` declarations vs only 15 explicit guards. Added a global `@media (prefers-reduced-motion: reduce)` that strips animation-duration, transition-duration, and scroll-behavior to ~0. Per-block guards still win for the few semantically-meaningful animations.
+
+### UX
+- **noscript WA link** opens in new tab via `target="_blank"` + `rel="noopener noreferrer"` (iter 104) — preserves the original tab so no-JS users can come back.
+
+### Hygiene
+- **`decoding="async"` on the last 2 imgs missing it** in HTML files (iter 105) — both were JS-rendered template-string placeholders.
+- **Two cache-bust bumps** `k → l` (iter 107) and `j → k` (iter 103) to deliver the focus and reduced-motion work without stale-while-revalidate delay.
+
+### CI status at end of session
+17 regression gates in validate.yml. Local sweep at iter 100 passed all 6 quick checks.
+
+---
+
 ## 2026-05-15 — Autonomous Optimization Loop, fifth pass (iters 94-100)
 
 Capping the second-session loop at iteration 100 from this session's continuous run.
