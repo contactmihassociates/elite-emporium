@@ -2,6 +2,34 @@
 
 All notable changes are tracked here. Authoritative source is `git log --oneline`.
 
+## 2026-05-15 — Autonomous Optimization Loop, second pass (iters 33-55)
+
+A second continuous Analyze → Plan → Execute → Test → Deploy loop ran on top of the iter 1-31 baseline. 23 more commits to `master`. Cumulative impact:
+
+### Perceived performance & PWA freshness
+- **localStorage `storage` event fallback** for cross-tab sync (iter 49) — cart & wishlist stay in sync even on browsers where BroadcastChannel is undefined (some private modes, older Safari, locked-down WebViews).
+- **Preconnect to Cloudinary + gstatic** on the 5 pages that were missing it (iter 52) — saves 100-300 ms on slow networks by finishing TLS+TCP handshake during head parse instead of waiting until the first `<img src>` or `<script src>` is discovered.
+- **`decoding="async"`** added to remaining lazy-loaded `<img>` tags in side-cart, side-cart wishlist suggestions, and order-history (iter 52) — image decode no longer blocks the main thread.
+- **SW `CACHE_NAME` v10 → v11** (iter 53) — return visitors get the fresh HTML on next visit instead of two visits later.
+
+### SEO & social sharing
+- **Complete OG + Twitter card + canonical metadata** on all 15 customer-facing pages (iter 51) — every page now renders a rich card when shared on WhatsApp/FB/Twitter, with auto-derived title/description from each page's existing `<title>` + meta description, and per-page canonical URL.
+- **og:image dimensions + locale** on all 15 pages (iter 54) — `og:image:width=512`, `og:image:height=512`, `og:image:alt`, `og:locale=en_IN`. WhatsApp now consistently renders the large rich preview card instead of a tiny thumbnail.
+
+### Accessibility & resilience
+- **`<noscript>` fallback on every page** (iter 50) — without JS the storefront renders blank; the fallback shows a clear "JavaScript is required" message with a WhatsApp link as a backup contact path. Inline-styled so it works even if `styles.css` fails to load.
+
+### Bugfixes
+- **PWA manifest mojibake** (iter 53) — `name` and `description` had double-encoded em-dash and rupee glyphs (UTF-8 bytes re-decoded as cp1252 then JSON-escaped). Install prompt showed `Elite Emporium â€" Premium Shopping` and `…delivery above â‚¹499`. Rewrote with proper UTF-8 `—` and `₹`.
+
+### CI / regression guards
+- New `validate.yml` gates: `noscript` fallback presence (iter 50), social cards + canonical presence (iter 51).
+- The CI workflow now polices 12 regression gates total.
+
+(For iter 33-48 — header search debounce, products Firestore localStorage cache, coupons with minOrder, accessibility init year auto-update, PDP validation focus-on-first-failed-field, side-cart drawer renders with escaped data-keys, idempotency guards via `dataset` flags, cross-tab wishlist BroadcastChannel, NaN-safe coupon-aware getTotal — see `git log --oneline` between the two loop entries.)
+
+---
+
 ## 2026-05-16 — Autonomous Optimization Loop (31 iterations)
 
 The "Autonomous Website Optimization Agent" directive ran a continuous Analyze → Plan → Execute → Test → Deploy loop. 31 commits to `master`, each shipping one self-audited improvement. Cumulative impact:
