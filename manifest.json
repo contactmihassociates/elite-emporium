@@ -1,8 +1,8 @@
 {
   "id": "/?source=pwa",
-  "name": "Elite Emporium \u00e2\u20ac\u201d Premium Shopping",
+  "name": "Elite Emporium \u2014 Premium Shopping",
   "short_name": "Elite Emporium",
-  "description": "Premium Online Store \u00e2\u20ac\u201d Bags, Watches, Perfumes, Fashion & Gifts from Kayalpattinam, Tamil Nadu. GST-registered. Free delivery above \u00e2\u201a\u00b9499.",
+  "description": "Premium Online Store \u2014 Bags, Watches, Perfumes, Fashion & Gifts from Kayalpattinam, Tamil Nadu. GST-registered. Free delivery above \u20b9499.",
   "start_url": "/index.html?source=pwa",
   "scope": "/",
   "display": "standalone",
