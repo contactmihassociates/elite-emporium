@@ -1217,6 +1217,18 @@
     wrap.addEventListener('mouseenter', function() { clearInterval(autoTimer); });
     wrap.addEventListener('mouseleave', resetAuto);
   }
+
+  // Pause when the tab is hidden — saves CPU/battery for background tabs.
+  // Resume when visible again. Also pauses reflow-heavy progress-bar restart.
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) clearInterval(autoTimer);
+    else                 resetAuto();
+  });
+
+  // Respect prefers-reduced-motion — don't auto-advance at all.
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    clearInterval(autoTimer);
+  }
 })();
 </script>
 
