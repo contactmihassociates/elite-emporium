@@ -810,7 +810,7 @@ function openCompareModal() {
   if (compareList.length < 2) return;
   const items = compareList.map(id => products.find(x => x.id === id)).filter(Boolean);
   const fields = [
-    { label: 'Image',    render: p => `<img src="${p.image||''}" style="width:80px;height:80px;object-fit:cover;border-radius:10px;" />` },
+    { label: 'Image',    render: p => `<img src="${p.image||''}" alt="${escapeHtml(p.name || '')}" loading="lazy" decoding="async" style="width:80px;height:80px;object-fit:cover;border-radius:10px;" />` },
     { label: 'Name',     render: p => `<strong style="font-size:12px;">${p.name}</strong>` },
     { label: 'Price',    render: p => `<span style="color:var(--red);font-weight:700;font-size:15px;">₹${p.price.toLocaleString('en-IN')}</span>` },
     { label: 'MRP',      render: p => p.mrp ? `<s style="color:#878787;">₹${p.mrp.toLocaleString('en-IN')}</s>` : '—' },
@@ -1929,6 +1929,7 @@ function renderProducts(list, containerId) {
       const swatches = p.variants.map((v, i) =>
         `<img src="${cldUrl(v.image, 120)}"
               data-fullsrc="${v.image}"
+              alt="${escapeHtml(p.name)} – ${escapeHtml(v.color)}"
               class="vswatch${i === 0 ? ' vactive' : ''}"
               onclick="swapVariant(this,'${pid}','vlbl_${pid}','${btnId}')"
               title="${v.color}" loading="lazy" decoding="async" />`
