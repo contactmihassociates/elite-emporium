@@ -2648,8 +2648,9 @@ function placeOrder() {
   const now      = new Date();
 
   // Save to order history before clearing cart
+  const _orderId = generateOrderId();
   saveOrderToHistory({
-    id:        generateOrderId(),
+    id:        _orderId,
     date:      now.toISOString(),
     status:    'Sent via WhatsApp',
     customer:  { name, phone, address, city, state, pincode, notes },
@@ -2678,7 +2679,7 @@ function placeOrder() {
   window.open(waUrl, '_blank');
   showToast('🎉 Order sent! Redirecting to WhatsApp…');
 
-  setTimeout(() => { window.location.href = 'orders.html'; }, 2800);
+  setTimeout(() => { window.location.href = `order-success.html?id=${encodeURIComponent(_orderId)}`; }, 2800);
 }
 
 // ── TOAST ─────────────────────────────────────
@@ -4991,7 +4992,7 @@ function openUPIPaymentModal(ctx) {
     launchConfetti?.();
     showToast('🎉 Payment confirmed! Opening WhatsApp…', 4000, 'success');
     window.open(waUrl, '_blank');
-    setTimeout(() => { close(); window.location.href = 'orders.html'; }, 2500);
+    setTimeout(() => { close(); window.location.href = `order-success.html?id=${encodeURIComponent(orderId)}`; }, 2500);
   });
 
   // Auto-focus the txn ID field when mobile user returns from UPI app
@@ -5122,7 +5123,7 @@ async function payOnline() {
           showToast(`🎉 Payment successful! Redirecting…`, 4000, 'success');
           // Background: open WA with the payment confirmation message (merchant gets a notice)
           try { window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${successMsg}`, '_blank'); } catch {}
-          setTimeout(() => { window.location.href = 'orders.html'; }, 2200);
+          setTimeout(() => { window.location.href = `order-success.html?id=${encodeURIComponent(orderId)}`; }, 2200);
         },
         modal: {
           ondismiss: function () {

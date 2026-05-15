@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Placed Successfully – Elite Emporium</title>
+  <meta name="description" content="Your order has been placed at Elite Emporium. Thank you!" />
+  <meta name="robots" content="noindex,follow" />
+  <link rel="stylesheet" href="styles.css?v=20260515l" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#DB3022" />
+  <style>
+    .os-page { max-width: 720px; margin: 0 auto; padding: 32px 4% 100px; }
+    .os-hero {
+      background: linear-gradient(135deg, #1B5E20 0%, #43A047 50%, #66BB6A 100%);
+      color: #fff;
+      border-radius: 22px;
+      padding: 36px 28px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(67, 160, 71, 0.22);
+    }
+    .os-hero::after {
+      content: '✓';
+      position: absolute;
+      top: -32px; right: -8px;
+      font-size: 180px;
+      opacity: 0.07;
+      transform: rotate(8deg);
+    }
+    .os-tick {
+      width: 78px; height: 78px;
+      background: rgba(255,255,255,0.18);
+      border: 3px solid rgba(255,255,255,0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      font-size: 40px;
+      animation: osPop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.4);
+    }
+    @keyframes osPop { from { transform: scale(0); } to { transform: scale(1); } }
+    .os-hero h1 { font-size: 26px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.5px; }
+    .os-hero p { font-size: 14px; opacity: 0.94; line-height: 1.55; max-width: 480px; margin: 0 auto; }
+    .os-order-id {
+      display: inline-block;
+      background: rgba(255,255,255,0.18);
+      padding: 6px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      margin-top: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+    .os-section {
+      background: var(--surface, #fff);
+      border: 1px solid var(--border, #e8eaf0);
+      border-radius: 16px;
+      padding: 20px 22px;
+      margin-top: 16px;
+    }
+    .os-section h2 { font-size: 15px; font-weight: 800; margin-bottom: 12px; color: var(--text); }
+    .os-timeline {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 4px;
+    }
+    .os-tl-step { flex: 1; text-align: center; position: relative; }
+    .os-tl-dot {
+      width: 18px; height: 18px;
+      background: #d4d4d4;
+      border: 3px solid #fff;
+      border-radius: 50%;
+      margin: 0 auto 6px;
+      box-shadow: 0 0 0 2px #d4d4d4;
+    }
+    .os-tl-step.current .os-tl-dot { background: #DB3022; box-shadow: 0 0 0 2px #DB3022; animation: osDotPulse 1.5s ease-out infinite; }
+    .os-tl-step.done .os-tl-dot { background: #43A047; box-shadow: 0 0 0 2px #43A047; }
+    @keyframes osDotPulse { 0%, 100% { box-shadow: 0 0 0 2px #DB3022; } 50% { box-shadow: 0 0 0 7px rgba(219, 48, 34, 0.25); } }
+    .os-tl-line { height: 3px; background: #d4d4d4; flex: 1; margin-top: -22px; }
+    .os-tl-line.done { background: #43A047; }
+    .os-tl-label { font-size: 11px; color: var(--text2); font-weight: 600; }
+    .os-tl-step.done .os-tl-label, .os-tl-step.current .os-tl-label { color: var(--text); }
+
+    .os-eta-line {
+      background: linear-gradient(90deg, #fff8e1 0%, #ffecb3 100%);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #6d4c00;
+      font-weight: 600;
+      margin-top: 14px;
+      text-align: center;
+    }
+    [data-theme="dark"] .os-eta-line { background: rgba(245, 127, 23, 0.16); color: #ffcc80; }
+
+    .os-cta-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    @media (max-width: 460px) { .os-cta-row { grid-template-columns: 1fr; } }
+    .os-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 700;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .os-cta-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08); }
+    .os-cta-primary { background: linear-gradient(135deg, #128C7E 0%, #25D366 100%); color: #fff; }
+    .os-cta-secondary { background: #1a1a2e; color: #fff; }
+    .os-cta-tertiary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+
+    .os-next {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+    @media (max-width: 600px) { .os-next { grid-template-columns: 1fr; } }
+    .os-next-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+      text-decoration: none;
+      color: var(--text);
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .os-next-card:hover { transform: translateY(-2px); border-color: var(--red); }
+    .os-next-icon { font-size: 30px; line-height: 1; margin-bottom: 6px; }
+    .os-next-card strong { display: block; font-size: 14px; margin-bottom: 2px; }
+    .os-next-card span { font-size: 11.5px; color: var(--text2); line-height: 1.4; }
+
+    .os-error {
+      background: #fff3e0;
+      border: 1px solid #ffcc80;
+      border-radius: 12px;
+      padding: 22px;
+      text-align: center;
+      color: #6d4c00;
+    }
+  </style>
+</head>
+<body><div id="scrollProgress"></div>
+
+<header>
+  <div class="header-main">
+    <a href="index.html" class="logo">
+      <img src="images/logo.png" class="logo-img" alt="Elite Emporium" />
+    </a>
+    <div class="header-search">
+      <form id="headerSearchForm">
+        <input type="text" id="headerSearchInput" placeholder="Search products, brands and more" autocomplete="off" />
+        <button type="submit">🔍</button>
+      </form>
+    </div>
+    <div class="header-actions">
+      <a href="cart.html" class="cart-btn">🛒 Cart <span class="cart-count">0</span></a>
+    </div>
+  </div>
+</header>
+
+<main class="os-page" id="main">
+
+  <div id="osHero" class="os-hero">
+    <div class="os-tick">✓</div>
+    <h1 id="osHeroTitle">Order placed successfully!</h1>
+    <p id="osHeroSub">Thanks for shopping with us. We'll confirm your order shortly on WhatsApp.</p>
+    <div id="osOrderIdWrap" class="os-order-id" style="display:none;">Order ID: <span id="osOrderId">—</span></div>
+  </div>
+
+  <div class="os-section" id="osTimelineCard" style="display:none;">
+    <h2>📦 Order Status</h2>
+    <div class="os-timeline" id="osTimeline"></div>
+    <div class="os-eta-line" id="osEtaLine">📅 Expected delivery: <strong id="osEtaText">3–7 business days</strong></div>
+  </div>
+
+  <div class="os-section">
+    <h2>What's next?</h2>
+    <div class="os-cta-row">
+      <a id="osWhatsAppBtn" href="https://wa.me/917358650774" target="_blank" rel="noopener" class="os-cta-btn os-cta-primary">💬 Message us on WhatsApp</a>
+      <a id="osTrackBtn" href="track-order.html" class="os-cta-btn os-cta-secondary">🔎 Track this order</a>
+    </div>
+    <div class="os-cta-row" style="margin-top:8px;">
+      <a href="orders.html" class="os-cta-btn os-cta-tertiary">📋 View all orders</a>
+      <a href="products.html" class="os-cta-btn os-cta-tertiary">🛍️ Continue shopping</a>
+    </div>
+  </div>
+
+  <div class="os-section">
+    <h2>While you wait…</h2>
+    <div class="os-next">
+      <a href="wishlist.html" class="os-next-card">
+        <div class="os-next-icon">❤️</div>
+        <strong>Your wishlist</strong>
+        <span>Saved items waiting to be bought next</span>
+      </a>
+      <a href="products.html?sort=new" class="os-next-card">
+        <div class="os-next-icon">✨</div>
+        <strong>New arrivals</strong>
+        <span>Fresh stock added this week</span>
+      </a>
+      <a href="https://wa.me/917358650774?text=Hi%21%20Please%20add%20me%20to%20your%20offers%20channel." target="_blank" rel="noopener" class="os-next-card">
+        <div class="os-next-icon">📢</div>
+        <strong>WhatsApp channel</strong>
+        <span>Get flash sales & early access</span>
+      </a>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-bottom">
+    <span>© 2026 Elite Emporium. All rights reserved.</span>
+    <span><a href="about.html" style="color:inherit;">About</a> · <a href="privacy.html" style="color:inherit;">Privacy</a> · <a href="terms.html" style="color:inherit;">Terms</a></span>
+  </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="script.js?v=20260515l"></script>
+
+<script>
+  /* Render the order specifics from the most recent order in history,
+     or fall back to a generic success state. */
+  document.addEventListener('DOMContentLoaded', () => {
+    let order = null;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const wantedId = params.get('id');
+      const orders = JSON.parse(localStorage.getItem('eliteEmporiumOrders') || '[]');
+      if (wantedId) {
+        order = orders.find(o => o.id === wantedId) || null;
+      }
+      if (!order && orders.length) {
+        order = orders[0]; // most recent
+      }
+    } catch (e) { /* ignore */ }
+
+    if (order) {
+      document.getElementById('osOrderIdWrap').style.display = 'inline-block';
+      document.getElementById('osOrderId').textContent = order.id;
+      document.getElementById('osTimelineCard').style.display = '';
+
+      const tlEl = document.getElementById('osTimeline');
+      const stages = ['Ordered', 'Confirmed', 'Shipped', 'Delivered'];
+      const stageIdx = 0;
+      tlEl.innerHTML = stages.map((s, i) => {
+        const dotCls = i < stageIdx ? 'done' : i === stageIdx ? 'current' : '';
+        const stepCls = i < stageIdx ? 'done' : i === stageIdx ? 'current' : '';
+        return `${i > 0 ? `<div class="os-tl-line ${i <= stageIdx ? 'done' : ''}"></div>` : ''}
+                <div class="os-tl-step ${stepCls}">
+                  <div class="os-tl-dot"></div>
+                  <div class="os-tl-label">${s}</div>
+                </div>`;
+      }).join('');
+
+      // ETA from saved customer pincode if available
+      try {
+        const eta = (typeof getDeliveryETA === 'function') ? getDeliveryETA(order.customer?.pincode) : null;
+        if (eta) {
+          const earliest = (typeof formatDeliveryDate === 'function') ? formatDeliveryDate(eta.minDays) : null;
+          const latest   = (typeof formatDeliveryDate === 'function') ? formatDeliveryDate(eta.maxDays) : null;
+          if (earliest && latest) {
+            document.getElementById('osEtaText').innerHTML = `${earliest} – ${latest} · ${eta.zone}`;
+          }
+        }
+      } catch (e) { /* ignore */ }
+
+      document.getElementById('osTrackBtn').href = `track-order.html?id=${encodeURIComponent(order.id)}`;
+      document.getElementById('osWhatsAppBtn').href = `https://wa.me/917358650774?text=${encodeURIComponent('Hi! Following up on order ' + order.id)}`;
+
+      // Confetti celebration
+      if (typeof launchConfetti === 'function') {
+        setTimeout(launchConfetti, 250);
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
