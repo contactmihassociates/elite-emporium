@@ -7950,6 +7950,15 @@ window.addEventListener('appinstalled', () => {
 
 // ── SCROLL REVEAL ─────────────────────────────
 function initAccessibility() {
+  // Auto-update footer copyright year so we don't have to remember to
+  // bump it every Jan 1. <span class="copy-year">2026</span> in HTML
+  // is the fallback for non-JS / pre-hydration; JS overwrites with the
+  // current year. Multiple footer occurrences supported.
+  try {
+    const y = String(new Date().getFullYear());
+    document.querySelectorAll('.copy-year').forEach(el => { el.textContent = y; });
+  } catch {}
+
   // Inject a "Skip to main content" link for keyboard users (once)
   if (!document.getElementById('skipToMain')) {
     const skip = document.createElement('a');
