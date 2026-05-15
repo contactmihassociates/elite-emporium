@@ -55,8 +55,8 @@
   "isMetaQuest": false,
   "fullScopeUrl": "https://elite-emporium-one.vercel.app/",
   "minSdkVersion": 21,
-  "appVersion": "14.0.0",
-  "appVersionCode": 14,
+  "appVersion": "15.0.0",
+  "appVersionCode": 15,
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "./android.keystore",

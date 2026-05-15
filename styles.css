@@ -1015,6 +1015,65 @@ header nav a:hover, header nav a.active { color:white; border-bottom-color:var(-
   padding: 4px 8px;
 }
 
+/* ── Review filter chips (PDP) ── */
+.rv-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 14px;
+}
+.rv-filter-chip {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e8eaf0);
+  color: var(--text, #1a1a2e);
+  padding: 5px 12px;
+  border-radius: 14px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s, transform 0.12s;
+}
+.rv-filter-chip:hover { border-color: var(--red); transform: translateY(-1px); }
+.rv-filter-chip.active {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red);
+}
+
+/* ── Live visitor count badge (site-wide) ── */
+.live-visitor-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(90deg, rgba(46, 125, 50, 0.08), rgba(46, 125, 50, 0.02));
+  border: 1px solid rgba(46, 125, 50, 0.18);
+  color: #1b5e20;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 0;
+  margin: 0;
+  width: 100%;
+  justify-content: center;
+  letter-spacing: 0.2px;
+}
+[data-theme="dark"] .live-visitor-badge { background: linear-gradient(90deg, rgba(76, 175, 80, 0.10), rgba(76, 175, 80, 0.02)); color: #a5d6a7; border-color: rgba(76, 175, 80, 0.25); }
+.lvb-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #2e7d32;
+  box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.6);
+  animation: lvbPulse 1.6s ease-out infinite;
+}
+@keyframes lvbPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.55); }
+  70%  { box-shadow: 0 0 0 8px rgba(46, 125, 50, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0); }
+}
+@media (prefers-reduced-motion: reduce) { .lvb-dot { animation: none; } }
+.live-visitor-badge strong { color: #1b5e20; font-weight: 800; font-variant-numeric: tabular-nums; }
+[data-theme="dark"] .live-visitor-badge strong { color: #c5e1a5; }
+
 /* ── 'Continue where you left off' floating banner ── */
 .continue-banner {
   position: fixed;
