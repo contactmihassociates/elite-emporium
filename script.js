@@ -1485,7 +1485,9 @@ function cldUrl(url, width) {
   if (!url.includes('res.cloudinary.com') || !url.includes('/image/upload/')) return url;
   // Skip if a transform is already present (avoid double-splicing).
   if (/\/upload\/[a-z]_[^/]+\//i.test(url)) return url;
-  const w = Number(width) || 400;
+  // Network-aware downscale: on save-data / 2g / 3g, request smaller images.
+  const scale = (typeof _imgScale === 'number') ? _imgScale : 1;
+  const w = Math.max(80, Math.round((Number(width) || 400) * scale));
   return url.replace('/image/upload/', `/image/upload/f_auto,q_auto,w_${w}/`);
 }
 function srcsetFor(url) {
@@ -2872,6 +2874,81 @@ function placeOrder() {
 }
 
 // ── TOAST ─────────────────────────────────────
+/* ── NETWORK-AWARE IMAGE QUALITY ─────────────────────────────
+   On slow networks (effective 2g / save-data), cldUrl uses smaller
+   widths to save bandwidth. We pre-shrink the per-page max
+   resolution by a factor depending on connection.info.
+
+   Returns a scale factor (e.g. 0.6 means 'request 60%% of the
+   nominal width').
+   ──────────────────────────────────────────────────────────── */
+function networkImageScale() {
+  try {
+    const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (!c) return 1;
+    if (c.saveData) return 0.55;
+    const t = (c.effectiveType || '').toLowerCase();
+    if (t === 'slow-2g' || t === '2g') return 0.45;
+    if (t === '3g') return 0.7;
+    return 1;
+  } catch { return 1; }
+}
+// One-off scale captured at script-load. (Re-check on online events.)
+let _imgScale = networkImageScale();
+window.addEventListener('online', () => { _imgScale = networkImageScale(); });
+
+/* ── TYPO-TOLERANT SEARCH SCORING ────────────────────────────
+   For products.html?search=<q>, rank matches by:
+   1. Exact substring in name (high)
+   2. Exact substring in category (mid)
+   3. All words present in name (mid)
+   4. Levenshtein distance ≤ 2 on any name word (typo tolerance)
+   Returns a score; higher = more relevant.
+   ──────────────────────────────────────────────────────────── */
+function _lev(a, b) {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  if (Math.abs(a.length - b.length) > 2) return 3; // shortcut
+  const v0 = new Array(b.length + 1);
+  const v1 = new Array(b.length + 1);
+  for (let j = 0; j <= b.length; j++) v0[j] = j;
+  for (let i = 0; i < a.length; i++) {
+    v1[0] = i + 1;
+    for (let j = 0; j < b.length; j++) {
+      const cost = a[i] === b[j] ? 0 : 1;
+      v1[j + 1] = Math.min(v1[j] + 1, v0[j + 1] + 1, v0[j] + cost);
+    }
+    for (let j = 0; j <= b.length; j++) v0[j] = v1[j];
+  }
+  return v0[b.length];
+}
+function fuzzyScore(p, q) {
+  if (!q) return 0;
+  const name = (p.name || '').toLowerCase();
+  const cat  = (p.category || '').toLowerCase();
+  const ql   = q.toLowerCase().trim();
+  if (!ql) return 0;
+  let s = 0;
+  if (name.includes(ql)) s += 100;
+  if (cat.includes(ql))  s += 60;
+  const words = ql.split(/\s+/).filter(Boolean);
+  if (words.length > 1 && words.every(w => name.includes(w))) s += 40;
+  // Typo tolerance — for short queries, check against each name word
+  if (s === 0 && ql.length >= 3) {
+    const nameWords = name.split(/\s+/);
+    for (const nw of nameWords) {
+      if (Math.abs(nw.length - ql.length) > 2) continue;
+      const d = _lev(nw, ql);
+      if (d === 1) { s += 30; break; }
+      if (d === 2 && ql.length >= 5) { s += 15; break; }
+    }
+  }
+  // Tie-breaker: popularity
+  s += Math.log10((p.reviews || 0) + 1) * 2;
+  return s;
+}
+
 /* ── PWA / TWA RUNTIME DETECTION ─────────────────────────────
    Sets <html data-runtime="..."> to one of: 'web' | 'pwa' | 'twa'.
    - 'twa'  = installed Android app via Trusted Web Activity
@@ -3319,12 +3396,22 @@ function initProductsPage() {
     let list = [...products];
     if (activeCat !== 'All') list = list.filter(p => p.category === activeCat);
     if (searchQuery) {
+      // Use fuzzy scoring (typo tolerance + ranked by relevance).
+      // Fall back to plain substring match if fuzzyScore unavailable.
       const q = searchQuery.toLowerCase();
-      list = list.filter(p =>
-        p.name.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q) ||
-        p.desc.toLowerCase().includes(q)
-      );
+      if (typeof fuzzyScore === 'function') {
+        list = list
+          .map(p => ({ p, score: fuzzyScore(p, q) || (p.desc && p.desc.toLowerCase().includes(q) ? 10 : 0) }))
+          .filter(x => x.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .map(x => x.p);
+      } else {
+        list = list.filter(p =>
+          p.name.toLowerCase().includes(q) ||
+          p.category.toLowerCase().includes(q) ||
+          (p.desc || '').toLowerCase().includes(q)
+        );
+      }
     }
     if (_priceMin !== null) list = list.filter(p => p.price >= _priceMin);
     if (_priceMax !== null) list = list.filter(p => p.price <= _priceMax);
