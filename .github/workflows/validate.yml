@@ -95,6 +95,31 @@ jobs:
           fi
           echo "logo-96.png size: $SIZE bytes (PASS)"
 
+      - name: Local image / favicon references resolve to real files
+        run: |
+          # Iteration 117 — scan every HTML page for src="images/..." and
+          # href="images/..." references plus the bare favicon.ico path,
+          # confirm each referenced file actually exists on disk. Catches
+          # deleted assets, typo'd paths, and case-mismatches (some
+          # filesystems care).
+          FAIL=0
+          for f in 404.html about.html cart.html collection.html hanii-dhanii.html index.html offline.html order-success.html orders.html privacy.html product.html products.html profile.html terms.html track-order.html wishlist.html; do
+            if [ ! -f "$f" ]; then continue; fi
+            # Extract images/<path> and favicon.ico references
+            REFS=$(grep -oE '(src|href)="(images/[^"?]+|favicon\.ico)"' "$f" | sed -E 's/^(src|href)="([^"]+)"/\2/' | sort -u)
+            for ref in $REFS; do
+              # Strip query/hash if any
+              path="${ref%%\?*}"
+              path="${path%%#*}"
+              if [ ! -f "$path" ]; then
+                echo "::error::$f references missing asset: $path"
+                FAIL=1
+              fi
+            done
+          done
+          [ $FAIL -eq 0 ] && echo "Asset reference integrity: PASS"
+          exit $FAIL
+
       - name: Every public HTML has social cards + canonical
         run: |
           # Iteration 51 — enforce OG + Twitter card + canonical URL
