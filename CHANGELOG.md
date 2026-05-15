@@ -86,7 +86,79 @@ A single long session that shipped ~25 batches. Grouped by theme; commit hashes 
 - Duplicate `const setMeta` inside `initProductDetailPage()`.
 - PAN-Aadhaar quote unescape fix in the toolkit page (earlier session).
 
-### App 10x wave — TWA polish + native-feeling features (latest)
+### v11-v13 APK build wave + SEO/PWA depth (latest hour)
+
+🎉 **Three real-built signed APKs committed to release/** — `v11.0.0`,
+`v12.0.0`, `v13.0.0`. Built locally on the developer machine using
+`@bubblewrap/core` + Gradle 8.11.1, signed with the same RSA-2048
+self-signed cert, so all three versions are in-place upgrade compatible.
+SHA-256 fingerprint pasted into `.well-known/assetlinks.json` so
+Digital Asset Links verification passes — no brown URL bar in any
+APK.
+
+Website improvements baked into v11 onwards:
+
+**SEO depth:**
+- Product schema enriched with `sku`, `mpn`, multi-image gallery,
+  per-variant `AggregateOffer`, `hasMerchantReturnPolicy` (7-day
+  returns), `shippingDetails` (₹60 below ₹499 / FREE above, 0-1
+  day handling, 2-7 day transit), `priceValidUntil` 30 days out,
+  and `additionalProperty` (category, badge, available colours).
+- Per-product `og:image` is now a Cloudinary `c_pad,b_auto,w_1200,h_630`
+  transform — link previews on WhatsApp / Twitter come out as proper
+  1.91:1 social cards with brand-coloured side bars instead of a
+  raw tall product photo.
+- `twitter:card=summary_large_image` for the big preview.
+
+**Perceived performance:**
+- PDP skeleton loader: 2-column shimmer (image + 5 text lines + 2
+  CTA bars) shown while product data hydrates. Fades out 350 ms
+  after `initProductDetailPage` runs.
+- Network-aware image quality (already shipped) now flows through
+  `cldUrl` everywhere — slow-2g / saveData / 3g all get smaller
+  widths.
+
+**Engagement:**
+- Smart Notification permission prompt with engagement-based timing.
+  `bumpNotifEngagement(weight)` accumulates PDP views (+1) and
+  add-to-cart events (+2). At 3+ shows a custom soft card with
+  `Enable` / `Not now` BEFORE the system dialog (industry-standard
+  4x better consent rate).
+- 'Continue where you left off' floating card for returning visitors
+  on the homepage. Shows top-of-recently-viewed product with thumb,
+  name, price, dismiss ✕. sessionStorage-gated to prevent pestering.
+
+**Discovery & search:**
+- Auto-extracted product attributes: 25 colours, 9 sizes, 16
+  materials, 4 genders. Variants folded into the colour list.
+  Memoised on `p._attrs`.
+- `fuzzyScore` now boosts colour (+25) / material (+20) / gender
+  (+15) matches — 'red bag' finds red-variant bags even when 'red'
+  isn't in the product name.
+- Faceted colour + material chip row on `products.html` with a
+  25-colour swatch palette. Auto-generates from attrs of the active
+  category's products.
+- Keyboard shortcuts: `/` or `Ctrl/Cmd+K` focuses search from
+  anywhere. `Esc` closes the autocomplete dropdown. Skipped when
+  typing in any text field.
+
+**Resilience:**
+- Offline order queue. `placeOrder()` checks `navigator.onLine` —
+  if false, queues the WhatsApp message in localStorage and tells
+  the customer 'we'll send when you're back online'. On the next
+  `online` event, opens each queued WA window (max 3, 400ms apart).
+  Best-effort Background Sync API registration.
+- Service worker bumped to v7 with `'SKIP_WAITING'` message handler
+  + page-side refresh banner.
+
+**Order tracking glow:**
+- Live activity feed below the green status card on `track-order.html`.
+  8 deterministic events (📦 received → ✅ reserved → 📜 invoice →
+  📦 packed → 🚚 picked up → 🏬 in-transit hub → 🏠 out for delivery
+  → 🎉 delivered) with real timestamps relative to the order date.
+  Only events ≤ now are shown. Latest highlighted blue.
+
+### App 10x wave — TWA polish + native-feeling features
 
 CI / automation:
 - **GitHub Actions APK build** (`.github/workflows/build-apk.yml`) — auto-builds TWA APK + AAB on every push touching `manifest.json`/`twa-manifest.json` plus manual `workflow_dispatch`. Sets up JDK 17 + Node 20 + Bubblewrap CLI, generates a debug keystore if no `ANDROID_KEYSTORE_B64` secret, runs `bubblewrap build`, attaches artifacts (30 day retention) AND auto-creates a GitHub Release tagged `app-v<ver>-<run#>`. versionCode auto-increments via `GITHUB_RUN_NUMBER`.

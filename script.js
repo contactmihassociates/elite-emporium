@@ -8188,6 +8188,18 @@ function initOrdersPage() {
   // Customer stats dashboard (above the order list)
   const totalSpent = orders.reduce((s, o) => s + (o.total || 0), 0);
   const totalItems = orders.reduce((s, o) => s + (o.items || []).reduce((x, i) => x + (i.quantity || 1), 0), 0);
+  // Lifetime savings — sum of (MRP - paid price) across every item ever
+  // ordered, plus free-delivery savings, plus coupon discounts.
+  const totalSaved = orders.reduce((s, o) => {
+    const itemSavings = (o.items || []).reduce((acc, i) => {
+      const live = products.find(p => p.id === i.id);
+      const mrp  = (live && live.mrp) || i.price;
+      return acc + Math.max(0, (mrp - i.price) * (i.quantity || 1));
+    }, 0);
+    const couponSavings   = o.discount || 0;
+    const deliverySavings = (o.delivery === 0 && o.subtotal > 0) ? 60 : 0;
+    return s + itemSavings + couponSavings + deliverySavings;
+  }, 0);
   const catCount   = {};
   orders.forEach(o => (o.items || []).forEach(i => {
     const c = (products.find(p => p.id === i.id) || {}).category;
@@ -8205,10 +8217,10 @@ function initOrdersPage() {
         <div class="oh-stat-val">₹${totalSpent.toLocaleString('en-IN')}</div>
         <div class="oh-stat-label">Total spent</div>
       </div>
-      <div class="oh-stat-card">
-        <div class="oh-stat-icon">📦</div>
-        <div class="oh-stat-val">${totalItems}</div>
-        <div class="oh-stat-label">Items ordered</div>
+      <div class="oh-stat-card" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);">
+        <div class="oh-stat-icon">🎉</div>
+        <div class="oh-stat-val" style="color:#1b5e20;">₹${totalSaved.toLocaleString('en-IN')}</div>
+        <div class="oh-stat-label" style="color:#2e7d32;">You've saved with us</div>
       </div>
       <div class="oh-stat-card">
         <div class="oh-stat-icon">${topCat ? '❤️' : '🛍️'}</div>
@@ -8218,7 +8230,7 @@ function initOrdersPage() {
       <div class="oh-stat-card oh-tier" style="--tier-color:${tier.color};">
         <div class="oh-stat-icon">${tier.emoji}</div>
         <div class="oh-stat-val">${tier.label}</div>
-        <div class="oh-stat-label">Customer tier · ${orders.length} order${orders.length > 1 ? 's' : ''}</div>
+        <div class="oh-stat-label">${tier.label} · ${orders.length} order${orders.length > 1 ? 's' : ''} · ${totalItems} items</div>
       </div>
     </div>
     <a href="https://wa.me/?text=${encodeURIComponent(`Hey! I shop at Elite Emporium and the products are great. Check them out: ${window.location.origin}/`)}" target="_blank" rel="noopener" class="oh-refer">
