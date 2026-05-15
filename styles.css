@@ -65,6 +65,23 @@ body {
 body:not(.kbd-nav) *:focus { outline: none !important; }
 body.kbd-nav *:focus { outline: 2px solid var(--red) !important; outline-offset: 2px !important; }
 
+/* Modern :focus-visible baseline — works WITHOUT the JS-driven .kbd-nav class.
+   The browser decides on its own whether the focus came from keyboard vs
+   mouse, so we don't need a listener. Class-specific :focus-visible rules
+   elsewhere in the stylesheet keep winning thanks to specificity. */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible,
+[tabindex]:not([tabindex="-1"]):focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+
 @keyframes pageFadeIn  { from { opacity:0; transform:translateY(4px); } to   { opacity:1; transform:translateY(0); } }
 @keyframes pageFadeOut { from { opacity:1; transform:translateY(0); }   to   { opacity:0; transform:translateY(-4px); } }
 body.page-exiting { animation: pageFadeOut 0.2s ease forwards; pointer-events: none; }
