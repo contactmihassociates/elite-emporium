@@ -1584,9 +1584,41 @@ function renderStars(rating) {
 }
 
 // ── RENDER PRODUCTS (Flipkart style) ─────────
+/* ── SKELETON LOADERS ─────────────────────────────────────────
+   Shows shimmering placeholder cards in a product grid before
+   the real cards render. Big perceived-perf win on slow networks
+   (Firestore can take 1-3s on cold start). Used by:
+   - initSkeletons() at DOMContentLoaded (before products load)
+   - renderProducts() (cleared right before the real innerHTML)
+   ──────────────────────────────────────────────────────────── */
+function injectSkeletons(containerId, count) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (el.children.length) return; // already has content
+  const sk = Array.from({length: count}, () =>
+    `<div class="skeleton-card" aria-hidden="true">
+       <div class="sk-img"></div>
+       <div class="sk-line sk-line-name"></div>
+       <div class="sk-line sk-line-name short"></div>
+       <div class="sk-line sk-line-price"></div>
+       <div class="sk-line sk-line-btn"></div>
+     </div>`).join('');
+  el.innerHTML = sk;
+  el.classList.add('skeleton-active');
+}
+function initSkeletons() {
+  // Only inject if we're still waiting for products to load.
+  if (Array.isArray(products) && products.length) return;
+  injectSkeletons('featuredProducts', 8);
+  injectSkeletons('productsGrid',     12);
+  injectSkeletons('forYouStrip',      6);
+  injectSkeletons('newArrivalsStrip', 6);
+}
+
 function renderProducts(list, containerId) {
   const el = document.getElementById(containerId);
   if (!el) return;
+  el.classList.remove('skeleton-active');
 
   if (!list.length) {
     const popularCats = ['Bags','Watches','Clothing','Abaiya','Cosmetics'];
@@ -2734,6 +2766,15 @@ function placeOrder() {
 }
 
 // ── TOAST ─────────────────────────────────────
+/* ── HAPTIC FEEDBACK ──────────────────────────────────────────
+   navigator.vibrate(...) is a no-op on iOS Safari and desktop; it
+   gives a real bzzzt on Android Chrome / installed TWA / installed
+   PWA. Used liberally for tactile feedback on add-to-cart, etc.
+   ──────────────────────────────────────────────────────────── */
+function hapticTap()     { try { navigator.vibrate?.(8); }     catch {} }
+function hapticSuccess() { try { navigator.vibrate?.([0, 30, 50, 30]); } catch {} }
+function hapticError()   { try { navigator.vibrate?.([0, 60, 30, 60]); } catch {} }
+
 function showToast(message, duration = 3200, type = 'default') {
   // Auto-detect type from message prefix
   if (type === 'default') {
@@ -2741,6 +2782,10 @@ function showToast(message, duration = 3200, type = 'default') {
     else if (message.startsWith('❌') || message.startsWith('⚠️'))                       type = 'error';
     else if (message.startsWith('🔔') || message.startsWith('ℹ️'))                       type = 'info';
   }
+  // Haptic ping matched to toast type (Android + installed PWA only)
+  if      (type === 'success') hapticSuccess();
+  else if (type === 'error')   hapticError();
+  else                          hapticTap();
 
   let stack = document.getElementById('toastStack');
   if (!stack) {
@@ -2934,6 +2979,139 @@ function useSearchTerm(q) {
   document.getElementById('searchHistoryDropdown').style.display = 'none';
   saveSearchTerm(q);
   window.location.href = `products.html?search=${encodeURIComponent(q)}`;
+}
+
+/* ── VOICE SEARCH ────────────────────────────────────────────
+   Adds a 🎤 button next to the header search input. On click,
+   starts the Web Speech API; transcribed text fills the input
+   and submits the form. Skips gracefully on unsupported browsers
+   (iOS Safari, Firefox, etc).
+   ──────────────────────────────────────────────────────────── */
+function initVoiceSearch() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  const form = document.getElementById('headerSearchForm');
+  if (!form) return;
+  if (form.querySelector('.voice-search-btn')) return;
+  const inp = form.querySelector('input');
+  const submit = form.querySelector('button[type="submit"]');
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'voice-search-btn';
+  btn.setAttribute('aria-label', 'Search by voice');
+  btn.title = 'Search by voice';
+  btn.innerHTML = '🎤';
+  // Insert before the submit button so it sits inside the search bar
+  if (submit) form.insertBefore(btn, submit); else form.appendChild(btn);
+
+  let listening = false;
+  const rec = new SR();
+  rec.lang = 'en-IN';
+  rec.continuous = false;
+  rec.interimResults = false;
+  rec.maxAlternatives = 1;
+
+  btn.addEventListener('click', () => {
+    if (listening) { try { rec.stop(); } catch {} return; }
+    try { rec.start(); listening = true; btn.classList.add('listening'); btn.innerHTML = '🔴'; hapticTap(); } catch {}
+  });
+  rec.addEventListener('result', e => {
+    const q = (e.results?.[0]?.[0]?.transcript || '').trim();
+    if (q && inp) {
+      inp.value = q;
+      hapticSuccess();
+      // Tiny delay so the listening UI snaps off first
+      setTimeout(() => form.dispatchEvent(new Event('submit', { cancelable: true })), 50);
+    }
+  });
+  rec.addEventListener('end',   () => { listening = false; btn.classList.remove('listening'); btn.innerHTML = '🎤'; });
+  rec.addEventListener('error', () => { listening = false; btn.classList.remove('listening'); btn.innerHTML = '🎤'; hapticError(); });
+}
+
+/* ── PULL-TO-REFRESH ─────────────────────────────────────────
+   On touch devices: when user pulls down from scroll-top, show an
+   arc/spinner that grows with the pull distance. Release past
+   the threshold = page reload. Skipped on desktop, when scrolled,
+   and inside text inputs. PDP, cart, checkout pages opt out.
+   ──────────────────────────────────────────────────────────── */
+function initPullToRefresh() {
+  if (!('ontouchstart' in window)) return;
+  // Opt-out on pages where pulling = unintended (forms, modals)
+  const pathname = location.pathname || '';
+  if (pathname.endsWith('cart.html') || pathname.endsWith('checkout.html')) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  let startY = 0;
+  let pulling = false;
+  let dist = 0;
+  const THRESHOLD = 75;
+  const MAX = 130;
+
+  const indicator = document.createElement('div');
+  indicator.className = 'ptr-indicator';
+  indicator.setAttribute('aria-hidden', 'true');
+  indicator.innerHTML = `<div class="ptr-spinner">↓</div>`;
+  document.body.appendChild(indicator);
+
+  window.addEventListener('touchstart', e => {
+    if (window.scrollY > 0) return;
+    if (e.target.closest('input, textarea, select, [contenteditable], .img-modal, .qv-modal, .side-cart-drawer')) return;
+    startY = e.touches[0].clientY;
+    pulling = true;
+    dist = 0;
+  }, { passive: true });
+
+  window.addEventListener('touchmove', e => {
+    if (!pulling) return;
+    const y = e.touches[0].clientY;
+    dist = Math.max(0, y - startY);
+    if (dist <= 0) { indicator.style.opacity = '0'; return; }
+    const shown = Math.min(MAX, dist);
+    indicator.style.transform = `translate(-50%, ${shown}px) rotate(${Math.min(360, dist * 3)}deg)`;
+    indicator.style.opacity = String(Math.min(1, dist / THRESHOLD));
+    indicator.classList.toggle('ready', dist >= THRESHOLD);
+  }, { passive: true });
+
+  window.addEventListener('touchend', () => {
+    if (!pulling) return;
+    if (dist >= THRESHOLD) {
+      indicator.classList.add('refreshing');
+      indicator.querySelector('.ptr-spinner').innerHTML = '🔄';
+      hapticSuccess();
+      setTimeout(() => location.reload(), 150);
+    } else {
+      indicator.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
+      indicator.style.transform = 'translate(-50%, 0)';
+      indicator.style.opacity = '0';
+      setTimeout(() => { indicator.style.transition = ''; }, 280);
+    }
+    pulling = false;
+  });
+}
+
+/* ── TAP-TO-CALL SHORTCUT ────────────────────────────────────
+   Adds a 'Call us' line to the existing WhatsApp chat card so
+   customers (often on cellular) can dial without copying. Uses
+   tel: deep link — works on every mobile OS.
+   ──────────────────────────────────────────────────────────── */
+function initTapToCallShortcut() {
+  // Defer until the chat card actually exists (initWhatsAppChatCard
+  // runs in DOMContentLoaded too, ordering is not guaranteed).
+  let attempts = 0;
+  const tick = () => {
+    attempts++;
+    const card = document.querySelector('.wa-chat-card');
+    if (!card) { if (attempts < 20) setTimeout(tick, 250); return; }
+    if (card.querySelector('.wa-call-line')) return;
+    const callLine = document.createElement('a');
+    callLine.className = 'wa-call-line';
+    callLine.href = 'tel:+917358650774';
+    callLine.innerHTML = '📞 Call <strong>+91 73586 50774</strong> directly';
+    callLine.addEventListener('click', () => hapticTap());
+    card.appendChild(callLine);
+  };
+  setTimeout(tick, 800);
 }
 
 function clearSearchHistory() {
@@ -7397,9 +7575,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   initDarkMode();
   initPageTransitions();
   initAccessibility();
+  initSkeletons(); // before products load — shows shimmer placeholders
   updateCartUI();
   updateWishlistUI();
   initHeaderSearch();
+  initVoiceSearch();          // 🎤 mic button next to search input
+  initPullToRefresh();        // pull-down-to-reload on touch devices
+  initTapToCallShortcut();    // 'Call us' inside the WhatsApp chat card
   initLazyImageFade();
   initScrollReveal();
   initBackToTop();
