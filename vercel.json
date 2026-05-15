@@ -29,6 +29,14 @@
           "value": "max-age=31536000; includeSubDomains"
         },
         {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin"
+        },
+        {
+          "key": "X-Permitted-Cross-Domain-Policies",
+          "value": "none"
+        },
+        {
           "key": "Content-Security-Policy",
           "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://res.cloudinary.com https://elite-emporium-one.vercel.app https://api.qrserver.com https://quickchart.io; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.cloudinary.com https://api.razorpay.com; font-src 'self' data:; manifest-src 'self'; frame-src https://*.razorpay.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https://wa.me https://api.whatsapp.com; object-src 'none'; upgrade-insecure-requests"
         }
