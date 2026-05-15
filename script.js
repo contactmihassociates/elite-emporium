@@ -1097,7 +1097,7 @@ function renderSideCart() {
     return;
   }
 
-  body.innerHTML = cart.map(item => {
+  const cartItemsHtml = cart.map(item => {
     const key = (item.cartKey || '').replace(/"/g, '&quot;');
     const lineTotal = (item.price * item.quantity).toLocaleString('en-IN');
     return `
@@ -1119,6 +1119,36 @@ function renderSideCart() {
         <div class="side-cart-item-price">₹${lineTotal}</div>
       </div>`;
   }).join('');
+
+  // 'From your wishlist' strip — items that are in wishlist but NOT in cart
+  // Lets customer one-tap-add a wishlist item without leaving the drawer.
+  let wishlistStripHtml = '';
+  try {
+    const wl = JSON.parse(localStorage.getItem('eliteEmporiumWishlist') || '[]');
+    const cartIds = new Set(cart.map(i => i.id));
+    const wlItems = (Array.isArray(products) ? products : [])
+      .filter(p => wl.includes(p.id) && !cartIds.has(p.id) && p.inStock !== false && p.image)
+      .slice(0, 4);
+    if (wlItems.length) {
+      wishlistStripHtml = `
+        <div class="side-cart-wl-strip">
+          <div class="scwl-head">❤️ From your wishlist</div>
+          <div class="scwl-row">
+            ${wlItems.map(p => `
+              <div class="scwl-card">
+                <a href="product.html?id=${p.id}" class="scwl-link">
+                  <img src="${cldUrl(p.image, 160)}" alt="${escapeHtml(p.name)}" class="scwl-img" loading="lazy" />
+                  <div class="scwl-name">${escapeHtml(p.name)}</div>
+                  <div class="scwl-price">₹${p.price.toLocaleString('en-IN')}</div>
+                </a>
+                <button class="scwl-add" type="button" onclick="addToCart(${p.id});renderSideCart();">+ Add</button>
+              </div>`).join('')}
+          </div>
+        </div>`;
+    }
+  } catch { /* ignore */ }
+
+  body.innerHTML = cartItemsHtml + wishlistStripHtml;
 
   const sub = getSubtotal();
   const minFree = (typeof CONFIG !== 'undefined' && CONFIG.minFreeDelivery) || 499;
