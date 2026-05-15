@@ -2,6 +2,24 @@
 
 All notable changes are tracked here. Authoritative source is `git log --oneline`.
 
+## 2026-05-15 — Autonomous Optimization Loop, eighth pass (iters 117-124)
+
+Seven more iterations focused on hero-carousel a11y and SW robustness:
+
+### Hero carousel (WAI-ARIA Carousel pattern)
+- **Full ARIA carousel structure on hero slideshow** (iter 118) — `role="region"` + `aria-roledescription="carousel"` on wrapper; per-slide `role="group"` + `aria-roledescription="slide"` + `aria-label="Slide N of 5: <Headline>"`; tablist on dots with numbered+described `aria-label`s; `aria-controls="heroSlides"` linking the prev/next/dot buttons to the slide container. `goToSlide()` now syncs `aria-selected` on every change.
+- **Manual play/pause button + live reduced-motion** (iter 119) — bottom-right ⏸/▶ circular button with `aria-pressed`, per-tab `sessionStorage` persistence. Live `prefers-reduced-motion` listener via MediaQueryList so toggling OS pref pauses the carousel without a reload.
+- **Pause on keyboard focus too** (iter 122) — `focusin`/`focusout` listeners alongside the existing `mouseenter`/`mouseleave`. `focusout` uses `relatedTarget` to only resume when focus actually leaves the carousel, not when bouncing between internal controls. Also fixed `mouseleave` to respect the user's explicit pause state.
+
+### CI & SW robustness
+- **Asset-reference integrity CI gate** (iter 117) — scans every HTML page's `<img src="images/...">` and favicon references, fails the build if any referenced file is missing on disk. Total CI gates: 19.
+- **Per-asset SW `cache.add()`** (iter 123) — replaced `cache.addAll()` (atomic, fails the whole install on one bad URL) with `Promise.all(STATIC_ASSETS.map(cache.add(url).catch(log)))` so one missing asset no longer leaves users with an empty SW cache. `CACHE_NAME` bumped v15 → v16.
+
+### Maintenance
+- **Cache-bust `m`** (iter 120) — invalidates 30 CSS refs across 15 pages to deliver carousel ARIA + play/pause CSS immediately.
+
+---
+
 ## 2026-05-15 — Autonomous Optimization Loop, seventh pass (iters 109-115)
 
 Seven iterations shipping the offline-fallback feature, perf hints, and SEO polish:
