@@ -407,9 +407,9 @@
 <!-- ── CATEGORY TABS ─────────────────────── -->
 <main id="main">
 <div class="hd-tabs" id="hdTabs" role="tablist">
-  <button type="button" class="hd-tab active" role="tab" aria-selected="true"  onclick="filterHD('All')">✨ All</button>
-  <button type="button" class="hd-tab"        role="tab" aria-selected="false" onclick="filterHD('Jewellery')">💎 Jewellery</button>
-  <button type="button" class="hd-tab"        role="tab" aria-selected="false" onclick="filterHD('Cosmetics')">💄 Cosmetics</button>
+  <button type="button" class="hd-tab active" role="tab" aria-selected="true"  onclick="filterHD(this,'All')">✨ All</button>
+  <button type="button" class="hd-tab"        role="tab" aria-selected="false" onclick="filterHD(this,'Jewellery')">💎 Jewellery</button>
+  <button type="button" class="hd-tab"        role="tab" aria-selected="false" onclick="filterHD(this,'Cosmetics')">💄 Cosmetics</button>
 </div>
 
 <!-- ── MAIN CONTENT ───────────────────────── -->
@@ -584,15 +584,17 @@
     }).join('');
   }
 
-  function filterHD(cat) {
+  function filterHD(btn, cat) {
     activeFilter = cat;
     // Update tab styles + aria-selected (a11y)
     document.querySelectorAll('.hd-tab').forEach(t => {
       t.classList.remove('active');
       t.setAttribute('aria-selected', 'false');
     });
-    event.target.classList.add('active');
-    event.target.setAttribute('aria-selected', 'true');
+    if (btn) {
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+    }
     renderHD();
   }
 
