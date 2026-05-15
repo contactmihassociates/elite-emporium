@@ -4,7 +4,7 @@
    for pages and API calls.
    ============================================ */
 
-const CACHE_NAME = 'elite-emporium-v13';
+const CACHE_NAME = 'elite-emporium-v14';
 
 const STATIC_ASSETS = [
   '/',
@@ -26,7 +26,10 @@ const STATIC_ASSETS = [
   '/styles.css',
   '/script.js',
   '/manifest.json',
-  '/images/logo.png',
+  // Note: /images/logo.png (2.4 MB original) is no longer pre-cached.
+  // All HTML pages + script.js reference the sized variants below.
+  // The original PNG is kept on disk for the TWA Android build (Bubblewrap
+  // downloads it at build time + bakes resized icons into the APK).
   '/images/logo-48.png',
   '/images/logo-96.png',
   '/images/logo-192.png',
