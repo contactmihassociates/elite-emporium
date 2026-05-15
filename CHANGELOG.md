@@ -86,7 +86,17 @@ A single long session that shipped ~25 batches. Grouped by theme; commit hashes 
 - Duplicate `const setMeta` inside `initProductDetailPage()`.
 - PAN-Aadhaar quote unescape fix in the toolkit page (earlier session).
 
-### Final wave — full deep audit + v10 APK package (this batch)
+### Conversion stack — perf + social proof + ETA (latest batch)
+- **Cloudinary responsive srcset** — new `cldUrl(url, width)` + `srcsetFor(url)` helpers splice `f_auto,q_auto,w_<N>` into `/image/upload/` paths. Wired into product cards (sizes=50vw mobile / 33vw tablet / 280px desktop), Just Landed strip, Editor's Picks, FBT thumbnails. Variant swatches now load at 120w (~80% smaller). `swapVariant()` reads `data-fullsrc` so colour swaps restore the full-res main image with a regenerated srcset. Non-Cloudinary URLs pass through unchanged.
+- **PDP live social-proof pills** — 'X viewing now' with red pulsing dot + 'X sold today' green pill, both deterministic per-product (per-hour and per-day respectively, via FNV-1a) so the numbers don't randomly flicker between page-loads. Viewer count drifts ±1 every 15-22s for liveness. Biased by Bestseller badge + review count.
+- **Rating distribution bar chart** — new `.rv-dist-card` at the top of the review list. Big avg ★ score on the left, 5★ → 1★ horizontal bars with count + percentage fill on the right. 600 ms ease-in animation. Mobile collapses to tighter layout.
+- **PDP delivery ETA card** — themed green card with PIN-code zone heuristic. Pre-fills the customer's last-known PIN, accepts 6-digit input, auto-fires on completion. Indian zone map: same-city → 1 day, same-state TN → 2-3, neighbouring south → 3-4, west/central → 4-6, north/NE → 5-8 days. Honours 4 PM same-day-dispatch cutoff. Format: 'Tamil Nadu · Delivers Sun, 17 May – Tue, 19 May'.
+- **FBT bundle 5% discount** — deterministic per-PDP product pair (FNV-1a), prefers different categories. Struck-through subtotal + bold discounted bundle price + green 'Save ₹X (-5%)' pill. Discount rounded to nearest ₹10 for clean numbers.
+- **Recent sales ticker** — dark-themed homepage marquee under the red announcement-bar. 14 'Aarav from Chennai just bought [Product] · 3 min ago' entries, deterministic per-day-hour seed (consistent within the same browsing session). 34 Indian first names × 27 cities × bias toward badged products. 80 s loop, pauses on hover, reduced-motion-safe (becomes horizontally swipeable).
+- **Scarcity stock chip** — 'Only 4 left' on product cards (existing) upgraded to show a deterministic-per-day count (2-7) with a ⚡ icon. Added the same chip next to '✅ In Stock' on PDP, with a subtle 2 s pulse animation.
+- Cache-bust cadence: v=20260515b → c → d → e → f as each wave shipped, so Vercel-deployed clients pick up the new JS/CSS immediately without SW staleness.
+
+### Full deep audit + v10 APK package
 - **Deep audit pass** — `node --check` clean, all onclick handlers cross-referenced and resolved, 173 unique global functions / 21 unique consts (zero duplicates), all 14 HTML pages have balanced div tags, all `<img>` tags have `alt` (admin variant-preview placeholders excepted by design).
 - **Phone-number regression sweep** — `+91 80721 73467` had re-appeared in 6 places between earlier removals and now: `terms.html`, `privacy.html`, `orders.html` footer, `index.html` JSON-LD `telephone`, `README.md` §1, and the invoice-print template inside `script.js`. Replaced everywhere with the primary WhatsApp number plus the alt (`+91 73587 19774`) where appropriate.
 - **Cache-bust + SW cache bump** — bumped 23 `?v=20260515a` → `?v=20260515b` across all 11 HTML files; bumped `CACHE_NAME` from `elite-emporium-v4` → `elite-emporium-v5` in `sw.js`. Old SW caches auto-purge on activate.

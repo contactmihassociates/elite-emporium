@@ -1616,12 +1616,18 @@ function renderProducts(list, containerId) {
 
     const isOos     = p.inStock === false;
     const wishlisted = isWishlisted(p.id);
+    // Low-stock: deterministic count (2-7) for popular items, shifts on
+    // hour-of-day so it slowly ticks down across the day for the same
+    // visitor (without ever hitting 0 — minimum clamp of 2).
     const isLowStock = !isOos && (p.badge === 'Bestseller' || (p.reviews && p.reviews > 30));
+    const lowStockN  = isLowStock
+      ? 2 + (_stableHash(`lowstock-${p.id}-${new Date().toISOString().slice(0,10)}`) % 6) // 2..7, per-day
+      : 0;
     return `
     <div class="product-card${isOos ? ' oos' : ''}${hidden}">
       ${p.badge ? `<span class="product-badge ${badgeClass}">${p.badge}</span>` : ''}
       ${isOos ? `<div class="oos-overlay"><div class="oos-ribbon">Out of Stock</div></div>` : ''}
-      ${isLowStock ? `<div class="card-low-stock">Only a few left!</div>` : ''}
+      ${isLowStock ? `<div class="card-low-stock">⚡ Only ${lowStockN} left!</div>` : ''}
       <button class="wishlist-btn${wishlisted ? ' active' : ''}"
         onclick="event.preventDefault();toggleWishlist(${p.id},this)"
         title="${wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}">${wishlisted ? '❤️' : '🤍'}</button>
@@ -3828,8 +3834,13 @@ function initProductDetailPage() {
       const cls = p.badge === 'New' ? 'new' : p.badge === 'Bestseller' ? 'hot' : p.badge === 'Premium' ? 'premium' : '';
       return `<span class="product-badge ${cls}" style="position:static;display:inline-block;">${p.badge}</span>`;
     })() : '';
+    // Scarcity scarcity-badge for popular in-stock items (deterministic per-day)
+    const pdIsPopular = p.inStock !== false && (p.badge === 'Bestseller' || (p.reviews && p.reviews > 30));
+    const pdLowStockN = pdIsPopular
+      ? 2 + (_stableHash(`lowstock-${p.id}-${new Date().toISOString().slice(0,10)}`) % 6)
+      : 0;
     const stockHtml = p.inStock !== false
-      ? `<span class="pd-stock-badge">✅ In Stock</span>`
+      ? `<span class="pd-stock-badge">✅ In Stock</span>${pdIsPopular ? ` <span class="pd-stock-badge low">⚡ Only ${pdLowStockN} left</span>` : ''}`
       : `<span class="pd-stock-badge oos">❌ Out of Stock</span>`;
     bw.innerHTML = `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">${badgeHtml}${stockHtml}</div>`;
 
