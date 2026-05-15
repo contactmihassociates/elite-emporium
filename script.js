@@ -1079,6 +1079,10 @@ function initSideCartDrawer() {
     const bd = document.createElement('div');
     bd.id = 'sideCartBackdrop';
     bd.className = 'side-cart-backdrop';
+    // Initially inert + aria-hidden so keyboard users + screen readers
+    // skip the (closed) drawer until openSideCart() runs.
+    bd.setAttribute('inert', '');
+    bd.setAttribute('aria-hidden', 'true');
     bd.addEventListener('click', closeSideCart);
     document.body.appendChild(bd);
 
@@ -1086,7 +1090,10 @@ function initSideCartDrawer() {
     drawer.id = 'sideCartDrawer';
     drawer.className = 'side-cart-drawer';
     drawer.setAttribute('role', 'dialog');
+    drawer.setAttribute('aria-modal', 'true');
     drawer.setAttribute('aria-label', 'Shopping cart');
+    drawer.setAttribute('inert', '');
+    drawer.setAttribute('aria-hidden', 'true');
     drawer.innerHTML = `
       <header class="side-cart-header">
         <h3>🛒 Your Cart <span class="side-cart-count-pill" id="sideCartCountPill">0</span></h3>
@@ -1106,16 +1113,42 @@ function initSideCartDrawer() {
   cartBtn.setAttribute('role', 'button');
 }
 
+let _sideCartLastFocus = null;
 function openSideCart() {
   renderSideCart();
-  document.getElementById('sideCartBackdrop')?.classList.add('show');
-  document.getElementById('sideCartDrawer')?.classList.add('open');
+  // Remember what was focused so we can restore on close (focus-trap pattern)
+  try { _sideCartLastFocus = document.activeElement; } catch { _sideCartLastFocus = null; }
+  const bd = document.getElementById('sideCartBackdrop');
+  const dr = document.getElementById('sideCartDrawer');
+  if (bd) { bd.classList.add('show'); bd.removeAttribute('inert'); bd.removeAttribute('aria-hidden'); }
+  if (dr) {
+    dr.classList.add('open');
+    dr.removeAttribute('inert');
+    dr.removeAttribute('aria-hidden');
+    dr.setAttribute('role', 'dialog');
+    dr.setAttribute('aria-modal', 'true');
+    dr.setAttribute('aria-label', 'Shopping cart');
+    // Move focus to the drawer for screen-reader announcement + keyboard control
+    setTimeout(() => {
+      const firstFocusable = dr.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (firstFocusable) firstFocusable.focus({ preventScroll: true });
+    }, 50);
+  }
   document.body.style.overflow = 'hidden';
 }
 function closeSideCart() {
-  document.getElementById('sideCartBackdrop')?.classList.remove('show');
-  document.getElementById('sideCartDrawer')?.classList.remove('open');
+  const bd = document.getElementById('sideCartBackdrop');
+  const dr = document.getElementById('sideCartDrawer');
+  // Move focus OUT of the drawer BEFORE we set inert (setting inert
+  // on an element containing the active element fires a blur but
+  // doesn't always restore focus to a sensible location).
+  if (dr && dr.contains(document.activeElement)) {
+    (_sideCartLastFocus || document.querySelector('.cart-btn') || document.body).focus({ preventScroll: true });
+  }
+  if (bd) { bd.classList.remove('show'); bd.setAttribute('inert', ''); bd.setAttribute('aria-hidden', 'true'); }
+  if (dr) { dr.classList.remove('open'); dr.setAttribute('inert', ''); dr.setAttribute('aria-hidden', 'true'); }
   document.body.style.overflow = '';
+  _sideCartLastFocus = null;
 }
 function renderSideCart() {
   const body  = document.getElementById('sideCartBody');
