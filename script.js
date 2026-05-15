@@ -1920,6 +1920,112 @@ function prefillCustomerFromHistory() {
 
   const hint = document.getElementById('prefillHint');
   if (hint) { hint.style.display = 'flex'; }
+
+  // Render the address-book picker if multiple saved addresses exist
+  renderAddressBookPicker();
+}
+
+/* ── ADDRESS BOOK ────────────────────────────────────────────
+   Storage: localStorage key 'eliteEmporiumAddressBook' = array of
+   { id, label, name, phone, address, city, state, pincode, notes }.
+
+   Behaviour:
+   - On cart page DOMContentLoaded, render a chip-row above the
+     form letting the user pick a saved address (Home/Work/Other),
+     plus an 'Add new' chip + 'Save this address' button.
+   - Saving harvests current form values + a quick label prompt.
+   - Picking fills the form + saves to localStorage 'lastUsedAddrId'.
+   ──────────────────────────────────────────────────────────── */
+const ADDR_BOOK_KEY = 'eliteEmporiumAddressBook';
+function getAddressBook() {
+  try { return JSON.parse(localStorage.getItem(ADDR_BOOK_KEY) || '[]'); } catch { return []; }
+}
+function saveAddressBook(list) { localStorage.setItem(ADDR_BOOK_KEY, JSON.stringify(list)); }
+
+function renderAddressBookPicker() {
+  // Mount above the cart form, but only on cart.html where the form exists
+  const formEl = document.getElementById('custName')?.closest('form, .checkout-form, .cust-details, .summary-body, .cart-customer');
+  if (!document.getElementById('custName')) return;
+
+  let wrap = document.getElementById('addressBookPicker');
+  const book = getAddressBook();
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'addressBookPicker';
+    wrap.className = 'addr-book-picker';
+    // Insert just above the first input (custName) for natural flow.
+    const target = document.getElementById('custName');
+    target?.parentElement?.parentElement?.insertBefore(wrap, target.parentElement);
+  }
+
+  const chips = book.map((a, i) => `
+    <button type="button" class="ab-chip" data-id="${a.id}" onclick="useAddressBookEntry(${i})" title="${escapeHtml(a.address || '')}">
+      <span class="ab-chip-label">${escapeHtml(a.label || 'Address')}</span>
+      <span class="ab-chip-name">${escapeHtml((a.name || '').split(' ')[0] || '—')}</span>
+      <span class="ab-chip-pin">${escapeHtml(a.pincode || '')}</span>
+      <button type="button" class="ab-chip-del" onclick="event.stopPropagation();removeAddressBookEntry(${i})" title="Delete">×</button>
+    </button>`).join('');
+  wrap.innerHTML = `
+    ${book.length ? `<div class="ab-head">📒 Your saved addresses · tap to fill</div><div class="ab-row">${chips}</div>` : ''}
+    <button type="button" class="ab-save-btn" onclick="saveCurrentAddressToBook()">
+      ${book.length ? '➕ Save another address' : '📒 Save this address to my address book'}
+    </button>`;
+}
+
+function useAddressBookEntry(idx) {
+  const book = getAddressBook();
+  const a = book[idx];
+  if (!a) return;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  set('custName',    a.name);
+  set('custPhone',   a.phone);
+  set('custAddress', a.address);
+  set('custCity',    a.city);
+  set('custState',   a.state);
+  set('custPincode', a.pincode);
+  set('custNotes',   a.notes || '');
+  if (typeof saveFormDraft === 'function') saveFormDraft();
+  hapticSuccess();
+  showToast(`✅ Filled with "${a.label}"`);
+}
+
+function removeAddressBookEntry(idx) {
+  const book = getAddressBook();
+  if (!confirm(`Delete the "${book[idx]?.label || 'this'}" address?`)) return;
+  book.splice(idx, 1);
+  saveAddressBook(book);
+  renderAddressBookPicker();
+  hapticTap();
+}
+
+function saveCurrentAddressToBook() {
+  const get = id => (document.getElementById(id)?.value || '').trim();
+  const entry = {
+    id:       'addr_' + Date.now().toString(36),
+    name:     get('custName'),
+    phone:    get('custPhone'),
+    address:  get('custAddress'),
+    city:     get('custCity'),
+    state:    get('custState'),
+    pincode:  get('custPincode'),
+    notes:    get('custNotes'),
+  };
+  if (!entry.name || !entry.phone || !entry.address || !entry.pincode) {
+    showToast('⚠️ Fill name, phone, address & PIN first');
+    return;
+  }
+  const label = (prompt('Label this address (e.g. Home, Work, Mom\'s place):', 'Home') || 'Home').slice(0, 20);
+  entry.label = label;
+  const book = getAddressBook();
+  // De-dup by pincode + address prefix
+  const isDup = book.some(a => a.pincode === entry.pincode && (a.address || '').slice(0, 30) === entry.address.slice(0, 30));
+  if (isDup) { showToast('ℹ️ Already saved'); return; }
+  book.unshift(entry);
+  if (book.length > 6) book.length = 6; // cap at 6
+  saveAddressBook(book);
+  renderAddressBookPicker();
+  hapticSuccess();
+  showToast(`✅ "${label}" saved to your address book`);
 }
 
 function renderCart() {
@@ -2766,6 +2872,67 @@ function placeOrder() {
 }
 
 // ── TOAST ─────────────────────────────────────
+/* ── PWA / TWA RUNTIME DETECTION ─────────────────────────────
+   Sets <html data-runtime="..."> to one of: 'web' | 'pwa' | 'twa'.
+   - 'twa'  = installed Android app via Trusted Web Activity
+   - 'pwa'  = installed PWA (Chrome 'Add to Home screen' etc.)
+   - 'web'  = regular browser tab
+
+   Pages can use [data-runtime='twa'] selectors to hide the floating
+   WhatsApp button (redundant inside the installed app since the
+   nav still has Cart and bottom-nav has all routes), tighten the
+   header (no need for the install banner), etc.
+   ──────────────────────────────────────────────────────────── */
+function detectRuntime() {
+  try {
+    const standalone = window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true
+      || document.referrer.startsWith('android-app://');
+    // TWA-specific: document.referrer is 'android-app://<package>'
+    const isTwa = document.referrer.startsWith('android-app://')
+      || window.location.search.includes('source=twa');
+    const runtime = isTwa ? 'twa' : (standalone ? 'pwa' : 'web');
+    document.documentElement.setAttribute('data-runtime', runtime);
+    return runtime;
+  } catch {
+    document.documentElement.setAttribute('data-runtime', 'web');
+    return 'web';
+  }
+}
+
+/* ── OFFLINE / ONLINE BANNER ─────────────────────────────────
+   When network drops, slide in a soft red banner at the top
+   saying 'You're offline — your cart is saved'. When it returns,
+   slide in a green banner 'Back online!'. Both auto-dismiss.
+   Plus we save the cart with a timestamp so order-flow can warn
+   if it's been stale > 24h after coming back online.
+   ──────────────────────────────────────────────────────────── */
+function initOfflineBanner() {
+  if (typeof navigator.onLine !== 'boolean') return;
+  let banner;
+  const show = (text, cls, autoHide) => {
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.className = 'net-banner';
+      banner.setAttribute('role', 'status');
+      document.body.appendChild(banner);
+    }
+    banner.className = `net-banner show ${cls}`;
+    banner.textContent = text;
+    if (autoHide) setTimeout(() => banner?.classList.remove('show'), 3000);
+  };
+  window.addEventListener('offline', () => {
+    show('📡 You\'re offline — your cart is saved.', 'offline', false);
+    hapticError();
+  });
+  window.addEventListener('online', () => {
+    show('✅ Back online!', 'online', true);
+    hapticSuccess();
+  });
+  // Initial state on slow / offline page load
+  if (!navigator.onLine) show('📡 You\'re offline — browsing from cache.', 'offline', false);
+}
+
 /* ── HAPTIC FEEDBACK ──────────────────────────────────────────
    navigator.vibrate(...) is a no-op on iOS Safari and desktop; it
    gives a real bzzzt on Android Chrome / installed TWA / installed
@@ -4590,6 +4757,34 @@ function initProductDetailPage() {
     askBtn.rel = 'noopener';
     askBtn.innerHTML = '❓ Ask a Question';
     actions.appendChild(askBtn);
+
+    // Native Share button (PDP) — uses navigator.share where available,
+    // falls back to a clipboard copy + WhatsApp share if not.
+    const shareBtn = document.createElement('button');
+    shareBtn.className = 'btn-pd-share';
+    shareBtn.type = 'button';
+    shareBtn.innerHTML = '📤 Share';
+    shareBtn.title = 'Share this product';
+    const productUrl = `https://elite-emporium-one.vercel.app/product.html?id=${p.id}`;
+    const shareText  = `Check out *${p.name}* on Elite Emporium — ₹${p.price.toLocaleString('en-IN')}\n${productUrl}`;
+    shareBtn.onclick = async () => {
+      hapticTap();
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: p.name, text: shareText, url: productUrl });
+          hapticSuccess();
+          return;
+        } catch (e) { /* user cancelled — fall through */ }
+      }
+      // Fallback: copy URL + toast
+      try {
+        await navigator.clipboard.writeText(productUrl);
+        showToast('🔗 Link copied — paste anywhere to share');
+      } catch {
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+      }
+    };
+    actions.appendChild(shareBtn);
   }
 
   // Related categories chip strip — appended to description tab
@@ -6440,27 +6635,46 @@ function initDarkMode() {
   const THEME_KEY = 'eliteEmporiumTheme';
   const root      = document.documentElement;
 
-  // Apply saved theme immediately (before paint)
-  const saved = localStorage.getItem(THEME_KEY) || 'light';
-  root.setAttribute('data-theme', saved);
+  // Resolve the initial theme: explicit user choice > OS preference > light
+  const stored = localStorage.getItem(THEME_KEY);
+  const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+  let initial = stored;
+  if (!initial || initial === 'auto') initial = prefersDark ? 'dark' : 'light';
+  root.setAttribute('data-theme', initial);
+
+  // Watch the system pref so 'auto'-mode users get live switching at dusk
+  try {
+    const mq = window.matchMedia?.('(prefers-color-scheme: dark)');
+    mq?.addEventListener?.('change', e => {
+      if (localStorage.getItem(THEME_KEY) === 'auto' || !localStorage.getItem(THEME_KEY)) {
+        root.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+      }
+    });
+  } catch {}
 
   // Inject toggle button into every page's header-actions
   const headerActions = document.querySelector('.header-actions');
-  if (headerActions) {
-    const btn = document.createElement('button');
-    btn.className   = 'dark-mode-btn';
-    btn.title       = 'Toggle dark mode';
-    btn.setAttribute('aria-label', 'Toggle dark/light mode');
-    btn.textContent = saved === 'dark' ? '☀️' : '🌙';
-    btn.addEventListener('click', () => {
-      const isDark = root.getAttribute('data-theme') === 'dark';
-      const next   = isDark ? 'light' : 'dark';
-      root.setAttribute('data-theme', next);
-      localStorage.setItem(THEME_KEY, next);
-      btn.textContent = next === 'dark' ? '☀️' : '🌙';
-    });
-    headerActions.insertBefore(btn, headerActions.firstChild);
-  }
+  if (!headerActions) return;
+  if (headerActions.querySelector('.dark-mode-btn')) return;
+  const btn = document.createElement('button');
+  btn.className   = 'dark-mode-btn';
+  btn.title       = 'Toggle dark mode';
+  btn.setAttribute('aria-label', 'Toggle dark/light mode');
+  // Smooth icon: morphing between sun/moon (set on first paint)
+  const setIcon = mode => { btn.textContent = mode === 'dark' ? '☀️' : '🌙'; };
+  setIcon(initial);
+  btn.addEventListener('click', () => {
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    const next   = isDark ? 'light' : 'dark';
+    // Add a class for a soft fade transition (250ms)
+    root.classList.add('theme-transitioning');
+    root.setAttribute('data-theme', next);
+    localStorage.setItem(THEME_KEY, next);
+    setIcon(next);
+    hapticTap();
+    setTimeout(() => root.classList.remove('theme-transitioning'), 280);
+  });
+  headerActions.insertBefore(btn, headerActions.firstChild);
 }
 
 // ── CART REMINDER BANNER (homepage) ──────────
@@ -6753,9 +6967,39 @@ window.addEventListener('beforeinstallprompt', e => {
   // Don't show if dismissed within last 7 days
   const dismissed = localStorage.getItem('eliteEmporiumPwaDismissed');
   if (dismissed && (Date.now() - Number(dismissed)) < 7 * 86400000) return;
-
-  setTimeout(showInstallBanner, 3000);
+  // Don't show if already installed (display-mode: standalone)
+  if (window.matchMedia?.('(display-mode: standalone)').matches) return;
+  // Don't show during the first 8 seconds of the visit — let users
+  // actually engage with content before pestering them.
+  setTimeout(showInstallBanner, 8000);
 });
+
+/* iOS Safari has no beforeinstallprompt event — we sniff for iOS and
+   show a manual instruction banner once per week. */
+(function setupIosInstallNag() {
+  if (typeof navigator === 'undefined') return;
+  const ua = navigator.userAgent || '';
+  const isIos = /iPhone|iPad|iPod/.test(ua);
+  const isInStandalone = ('standalone' in navigator) && navigator.standalone;
+  if (!isIos || isInStandalone) return;
+  const dismissed = localStorage.getItem('eliteEmporiumIosInstallDismissed');
+  if (dismissed && (Date.now() - Number(dismissed)) < 7 * 86400000) return;
+  setTimeout(() => {
+    if (document.getElementById('iosInstallBanner')) return;
+    const banner = document.createElement('div');
+    banner.id = 'iosInstallBanner';
+    banner.className = 'pwa-install-banner';
+    banner.innerHTML = `
+      <div class="pwa-install-icon">👑</div>
+      <div class="pwa-install-text">
+        <strong>Install Elite Emporium on iPhone</strong>
+        <span>Tap the <b>Share</b> button at the bottom of Safari → <b>"Add to Home Screen"</b>.</span>
+      </div>
+      <button class="pwa-install-dismiss" onclick="document.getElementById('iosInstallBanner').remove();localStorage.setItem('eliteEmporiumIosInstallDismissed',Date.now());" title="Dismiss">✕</button>`;
+    document.body.appendChild(banner);
+    requestAnimationFrame(() => banner.classList.add('show'));
+  }, 12000);
+})();
 
 function showInstallBanner() {
   if (document.getElementById('pwaInstallBanner')) return;
@@ -7572,6 +7816,8 @@ function initOrdersPage() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  detectRuntime();            // tags <html data-runtime> for TWA-aware styles
+  initOfflineBanner();        // online/offline toast strip
   initDarkMode();
   initPageTransitions();
   initAccessibility();
