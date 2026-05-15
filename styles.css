@@ -2904,6 +2904,11 @@ footer { background:#172337; color:#9b9b9b; padding:40px 4% 18px; }
   display: flex;
   z-index: 1002;
   box-shadow: 0 -3px 14px rgba(0,0,0,0.1);
+  /* Always honor the home-indicator safe area, not just inside the PWA wrapper.
+     iPhones with home indicator viewing in Safari otherwise sit nav items
+     directly under the indicator. The PWA-runtime block below adds a touch
+     more on top for installed apps. */
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 .bottom-nav-item {
   flex: 1;
