@@ -3,6 +3,7 @@
    Cache-first for static assets, network-first
    for pages and API calls.
    ============================================ */
+'use strict';
 
 const CACHE_NAME = 'elite-emporium-v16';
 

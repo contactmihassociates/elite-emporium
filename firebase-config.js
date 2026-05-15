@@ -1,6 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────
 //  ELITE EMPORIUM — Firebase Configuration
 // ─────────────────────────────────────────────────────────────────────────
+'use strict';
 
 const firebaseConfig = {
   apiKey:            "AIzaSyCj96lYHZWfbJzGCdt9VpD-bWiAKll329A",
