@@ -2811,10 +2811,10 @@ function openPriceAlertModal(p) {
   backdrop.className = 'pa-backdrop';
   const suggested = Math.floor(p.price * 0.9);
   backdrop.innerHTML = `
-    <div class="pa-modal">
+    <div class="pa-modal" role="dialog" aria-modal="true" aria-labelledby="paModalTitle">
       <div class="pa-modal-head">
-        <span>🔔 Set Price Drop Alert</span>
-        <button type="button" class="pa-close" onclick="this.closest('.pa-backdrop').remove()">✕</button>
+        <span id="paModalTitle">🔔 Set Price Drop Alert</span>
+        <button type="button" class="pa-close" onclick="this.closest('.pa-backdrop').remove()" aria-label="Close price alert dialog">✕</button>
       </div>
       <p class="pa-desc">${p.name.slice(0,50)}${p.name.length > 50 ? '…' : ''}</p>
       <div class="pa-current">Current price: <strong>₹${p.price.toLocaleString('en-IN')}</strong></div>
@@ -8185,10 +8185,10 @@ function openShortcutHelp() {
   modal.id        = 'kbdHelpModal';
   modal.className = 'kbd-help-backdrop';
   modal.innerHTML = `
-    <div class="kbd-help-modal">
+    <div class="kbd-help-modal" role="dialog" aria-modal="true" aria-labelledby="kbdHelpTitle">
       <div class="kbd-help-head">
-        <h3>⌨️ Keyboard Shortcuts</h3>
-        <button type="button" class="kbd-help-close" onclick="document.getElementById('kbdHelpModal').style.display='none'">✕</button>
+        <h3 id="kbdHelpTitle">⌨️ Keyboard Shortcuts</h3>
+        <button type="button" class="kbd-help-close" onclick="document.getElementById('kbdHelpModal').style.display='none'" aria-label="Close keyboard shortcuts">✕</button>
       </div>
       <div class="kbd-help-body">
         <div class="kbd-row"><kbd>/</kbd><span>Focus search bar</span></div>
