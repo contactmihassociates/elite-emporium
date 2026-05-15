@@ -59,7 +59,7 @@
     </a>
     <div class="header-search">
       <form id="headerSearchForm">
-        <input type="text" id="headerSearchInput" placeholder="Search for products, brands and more" autocomplete="off" aria-label="Search products" />
+        <input type="text" id="headerSearchInput" placeholder="Search for products, brands and more" autocomplete="off" aria-label="Search products" enterkeyhint="search" />
         <button type="submit">🔍</button>
       </form>
     </div>
@@ -155,23 +155,23 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="custName">Full Name <span class="req">*</span></label>
-            <input type="text" id="custName" class="form-input" placeholder="Enter your full name" autocomplete="name" autocapitalize="words" required />
+            <input type="text" id="custName" class="form-input" placeholder="Enter your full name" autocomplete="name" autocapitalize="words" enterkeyhint="next" required />
           </div>
           <div class="form-group">
             <label class="form-label" for="custPhone">Phone Number <span class="req">*</span></label>
-            <input type="tel" id="custPhone" class="form-input" placeholder="10-digit mobile number" maxlength="10" autocomplete="tel-national" inputmode="numeric" pattern="[0-9]{10}" required />
+            <input type="tel" id="custPhone" class="form-input" placeholder="10-digit mobile number" maxlength="10" autocomplete="tel-national" inputmode="numeric" pattern="[0-9]{10}" enterkeyhint="next" required />
           </div>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="custAddress">Delivery Address <span class="req">*</span></label>
-          <textarea id="custAddress" class="form-input" rows="2" placeholder="House No., Street Name, Area, Landmark…" autocomplete="street-address" required></textarea>
+          <textarea id="custAddress" class="form-input" rows="2" placeholder="House No., Street Name, Area, Landmark…" autocomplete="street-address" enterkeyhint="next" required></textarea>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="custCity">City / Town <span class="req">*</span></label>
-            <input type="text" id="custCity" class="form-input" placeholder="City or Town" autocomplete="address-level2" autocapitalize="words" required />
+            <input type="text" id="custCity" class="form-input" placeholder="City or Town" autocomplete="address-level2" autocapitalize="words" enterkeyhint="next" required />
           </div>
           <div class="form-group">
             <label class="form-label" for="custState">State <span class="req">*</span></label>
@@ -200,7 +200,7 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="custPincode">PIN Code <span class="req">*</span></label>
-            <input type="text" id="custPincode" class="form-input" placeholder="6-digit PIN code" maxlength="6" autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{6}" required />
+            <input type="text" id="custPincode" class="form-input" placeholder="6-digit PIN code" maxlength="6" autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{6}" enterkeyhint="done" required />
           </div>
           <div class="form-group">
             <label class="form-label" for="custNotes">Order Notes <small style="font-weight:400;text-transform:none;">(optional)</small></label>
