@@ -12,7 +12,6 @@ const CONFIG = {
   gst: "33DWGPN3169G1ZF",
   udyam: "UDYAM-TN-26-0090343",
   email: "eliteemporium112024@gmail.com",
-  phone: "",
   minFreeDelivery: 499,
   deliveryCharge: 60,
 
