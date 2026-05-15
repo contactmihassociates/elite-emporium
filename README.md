@@ -25,8 +25,8 @@ Treat this as the default for autonomous sessions: pick high-impact UX improveme
 
 ## 2. Tech stack
 
-- **Frontend:** Plain HTML5 + vanilla JS (no framework, no build step) + Google Fonts (Inter + Apple system stack).
-- **Styling:** A single `styles.css` (~4500 lines). Apple-inspired aesthetic — pill kickers, soft shadows, 18px card radius.
+- **Frontend:** Plain HTML5 + vanilla JS (no framework, no build step) + Google Fonts (Poppins 300-700, loaded via `<link rel="stylesheet">` with preconnect to googleapis/gstatic).
+- **Styling:** A single `styles.css` (~8300 lines). Apple-inspired aesthetic — pill kickers, soft shadows, 18px card radius.
 - **Data:** Firebase Firestore (`products` collection). Pre-seed of "hardcoded" products lives in `script.js` as `HARDCODED_PRODUCTS`; admin-added products in Firestore are merged on top.
 - **Auth:** Firebase Authentication (email/password) — only used by the admin panel.
 - **Images:** Cloudinary (`dwygvtjad` cloud, `ml_default` unsigned preset, folder `elite-emporium`).
@@ -54,8 +54,8 @@ elite-emporium/
 ├── admin.html              # 10x admin panel (Firebase Auth gated) — manage products
 ├── hanii-dhanii.html       # Partner brand storefront
 ├── hanii-dhanii-admin.html # Partner brand admin panel (parity with main admin)
-├── script.js               # ALL frontend JS (~4400 lines)
-├── styles.css              # ALL styles (~4900 lines)
+├── script.js               # ALL frontend JS (~8900 lines)
+├── styles.css              # ALL styles (~8300 lines)
 ├── firebase-config.js      # Firebase web config (committed; key is public)
 ├── manifest.json           # PWA manifest
 ├── sw.js                   # Service worker (v2) with network→cache→404 navigation chain
@@ -123,7 +123,7 @@ Dark mode is driven by `data-theme="dark"` on `<html>`, toggled by `initDarkMode
 This list is approximate — `git log --oneline` is authoritative for what landed and when. See also **CHANGELOG-style commits** like `feat(admin):`, `feat(cart):`, `perf+a11y:`, `feat(seo):`, etc.
 
 ### Original wave (Apple-style refresh era)
-- Apple-style refresh: pill buttons, larger hero, soft shadows, 18px card radius, Inter + Apple system stack.
+- Apple-style refresh: pill buttons, larger hero, soft shadows, 18px card radius, Poppins typeface (later migrated from CSS `@import` to a parallel `<link rel="stylesheet">` for faster paint — see iter 59).
 - 15 long-form Insights briefs added.
 - Hanii Dhanii partner brand integration (storefront + admin + linked product cards).
 - Rich HTML descriptions for ~27 newer products.
