@@ -3818,6 +3818,34 @@ function initProductsPage() {
     renderFilterChips();
     renderFacetChips();
     syncStateToURL();
+    syncPageMeta(list.length);
+  }
+
+  // Dynamic <title>, <meta description>, and OpenGraph based on the
+  // active category + search query. Each filter combo becomes its own
+  // crawlable SERP entry once Google indexes the URL state.
+  function syncPageMeta(count) {
+    let title, desc;
+    if (searchQuery) {
+      title = `'${searchQuery}' search results – Elite Emporium`;
+      desc  = `${count} product${count === 1 ? '' : 's'} matching '${searchQuery}' at Elite Emporium. GST-registered store, free delivery above ₹499.`;
+    } else if (activeCat && activeCat !== 'All') {
+      title = `${activeCat} – Buy Online | Elite Emporium`;
+      desc  = `Shop ${count} ${activeCat.toLowerCase()} product${count === 1 ? '' : 's'} at Elite Emporium, Kayalpattinam. GST-registered store, free delivery above ₹499, easy WhatsApp ordering.`;
+    } else {
+      title = 'All Products – Elite Emporium';
+      desc  = `Browse ${count} products at Elite Emporium – Bags, Watches, Fashion, Abaiya, Sarees, Kitchen & more. Order via WhatsApp, free delivery above ₹499.`;
+    }
+    document.title = title;
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', desc);
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', title);
+    const ogDesc  = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', desc);
+    // Update canonical to the URL state we just synced
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.setAttribute('href', window.location.href);
   }
 
   // Faceted colour / material chips — built from attributes of products
