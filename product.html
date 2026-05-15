@@ -378,7 +378,7 @@
 </nav>
 
 <!-- ── IMAGE ZOOM MODAL ──────────────────────── -->
-<div class="img-modal" id="imgModal" onclick="closeImageModal()">
+<div class="img-modal" id="imgModal" onclick="closeImageModal()" role="dialog" aria-modal="true" aria-label="Product image zoom">
   <div class="img-modal-inner" onclick="event.stopPropagation()">
     <img id="imgModalImg" src="" alt="Product zoom" loading="lazy" decoding="async" />
     <button type="button" class="img-modal-close" onclick="closeImageModal()" aria-label="Close image preview">✕</button>

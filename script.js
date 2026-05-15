@@ -7075,9 +7075,9 @@ function openImageModal(src) {
   if (!document.getElementById('imgModalPrev') && _imgModalGallery.length > 1) {
     const inner = modal.querySelector('.img-modal-inner') || modal;
     inner.insertAdjacentHTML('beforeend', `
-      <button type="button" id="imgModalPrev" class="img-modal-nav prev" onclick="imgModalStep(-1)" aria-label="Previous">‹</button>
-      <button type="button" id="imgModalNext" class="img-modal-nav next" onclick="imgModalStep(1)" aria-label="Next">›</button>
-      <div id="imgModalCounter" class="img-modal-counter"></div>
+      <button type="button" id="imgModalPrev" class="img-modal-nav prev" onclick="imgModalStep(-1)" aria-label="Previous image">‹</button>
+      <button type="button" id="imgModalNext" class="img-modal-nav next" onclick="imgModalStep(1)" aria-label="Next image">›</button>
+      <div id="imgModalCounter" class="img-modal-counter" role="status" aria-live="polite"></div>
     `);
   }
   updateImgModalCounter();
