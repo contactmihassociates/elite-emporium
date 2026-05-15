@@ -154,15 +154,24 @@
   <div class="ass-spinner"></div>
 </div>
 <script>
-  // Hide the splash as soon as the window is interactive
+  // Hide the splash as soon as the page is interactive.
+  // Trigger on DOMContentLoaded (HTML parsed + deferred scripts run) +
+  // a tiny delay — much faster than waiting for window.load which fires
+  // AFTER every product card image is decoded (can be 2-3s on 3G).
+  // The underlying page has skeleton loaders visible during product
+  // hydration, so hiding the splash early shows skeletons → real
+  // products — a much smoother progression than 1.6s of static splash
+  // followed by a sudden flash to the loaded page.
   (function () {
     const splash = document.getElementById('appShellSplash');
     if (!splash) return;
     const hide = () => splash.classList.add('hide');
-    // Hide when load completes, or fall back after 1.6s
-    if (document.readyState === 'complete') { setTimeout(hide, 100); }
-    else { window.addEventListener('load', () => setTimeout(hide, 200), { once: true }); }
-    setTimeout(hide, 1600); // safety net
+    if (document.readyState === 'interactive' || document.readyState === 'complete') {
+      setTimeout(hide, 100);
+    } else {
+      document.addEventListener('DOMContentLoaded', () => setTimeout(hide, 150), { once: true });
+    }
+    setTimeout(hide, 800); // safety net (was 1.6s; DCL is much faster than load)
   })();
 </script>
 <div id="scrollProgress"></div>
