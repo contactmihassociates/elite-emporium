@@ -2,6 +2,47 @@
 
 All notable changes are tracked here. Authoritative source is `git log --oneline`.
 
+## 2026-05-15 — Autonomous Optimization Loop, third pass (iters 56-72)
+
+The autonomous loop continued. 17 more commits to `master`. Highlights:
+
+### Accessibility
+- **`<button>` instead of `<div onclick>`** for hanii-dhanii filter tabs (iter 68) — keyboard tab order + screen-reader semantics + role=tab/tablist + aria-selected. Filter tabs were previously invisible to keyboard users.
+- **`aria-current="page"`** on every active bottom-nav item (iter 58) — screen readers now announce "Cart, current page, link" instead of just "Cart, link".
+- **`role="alert"` on error toasts** (iter 63) — error messages like "Cart is empty" now interrupt the speech queue instead of waiting in a polite queue.
+- **`aria-label` on 19 emoji-only buttons** (iter 71) — every 🔍 search button and ✕ close button on every page now has a meaningful name for screen readers.
+- **`alt` on 2 dynamic `<img>` tags** (iter 62) — compare-table thumbnail and PDP color-variant swatch.
+- **Skip-link target fix on products.html** (iter 67) — page had `href="#main"` but no `<main id="main">`. CI gate added.
+
+### Performance
+- **CSS `@import` → HTML `<link>` for Poppins** (iter 59) — the previous `@import` was render-blocking AND silently CSP-blocked (Poppins never loaded in production). Replaced with parallel `<link rel="preconnect">` + `<link rel="stylesheet">` in every HTML page, plus updated CSP to allow `fonts.googleapis.com` / `fonts.gstatic.com`. **One round-trip faster + the typeface actually loads now.**
+- **`content-visibility: auto` on `.product-card`** (iter 69) — offscreen cards skip layout/paint until they near the viewport. Big TBT win on long product grids. Paired with `contain-intrinsic-size: 320px` so reserved space is correct.
+- **SW pre-cache `hanii-dhanii.html`** (iter 64) — partner brand page was the only customer page not in the pre-cache list.
+- **SW cache bump v12 → v13** (iter 64) + **v11 → v12** (iter 60) — return visitors get fresh assets in one round trip instead of two.
+- **Cache-bust `v=20260516h` → `v=20260516i`** (iter 70) — invalidates browser cache for the script.js + styles.css changes that landed since the last bump. Also fixed `hanii-dhanii.html` which referenced `styles.css` with no cache-bust at all — vercel.json's `immutable` cache directive was locking partner-brand visitors to stale CSS forever.
+- **`enterkeyhint`** on search inputs + checkout form (iter 65) — mobile keyboard shows 🔍 / ↩ / ✓ instead of a generic Enter key.
+
+### Security
+- **`Cross-Origin-Opener-Policy: same-origin`** + **`X-Permitted-Cross-Domain-Policies: none`** (iter 57) — added to the HTML response headers. COOP isolates browsing context (mitigates tab-nabbing via `window.opener`); the latter blocks legacy Adobe Flash/Acrobat plugins from honoring any cross-domain policy from our origin.
+- **Fabricated WhatsApp number caught + fixed** (iter 61) — the noscript fallback I introduced in iter 50 used `918708276960` (a number I made up), not the canonical Elite Emporium number `917358650774`. CI gate added: every `wa.me/91...` link must be one of the two known business numbers, anything else fails the build.
+
+### PWA
+- **Apple/mobile-web-app meta tags on every page** (iter 56) — only index.html had them; iOS users adding any product / cart / wishlist page to home screen got the Safari-chrome version instead of standalone PWA.
+- **Manifest mojibake fixed** (iter 53) — `name` and `description` had double-encoded em-dash + rupee glyphs. Install prompt showed `Elite Emporium â€" Premium Shopping` and `…delivery above â‚¹499`.
+
+### Cleanup
+- **Dead `chart.googleapis.com` QR fallback removed** (iter 72) — was deprecated tech AND CSP-blocked, so it was dead code in two ways.
+- **README stale references fixed** (iter 66) — line counts halved (4400→8900, 4900→8300) and typeface corrected (Inter → Poppins).
+
+### CI guards added
+- noscript fallback presence (iter 50)
+- social cards + canonical presence (iter 51)
+- skip-link target `<main id="main">` (iter 67)
+- WhatsApp number allowlist (iter 61)
+- Total: now **15 regression gates** in `validate.yml`.
+
+---
+
 ## 2026-05-15 — Autonomous Optimization Loop, second pass (iters 33-55)
 
 A second continuous Analyze → Plan → Execute → Test → Deploy loop ran on top of the iter 1-31 baseline. 23 more commits to `master`. Cumulative impact:
