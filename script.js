@@ -3923,7 +3923,7 @@ function initPullToRefresh() {
       setTimeout(() => { indicator.style.transition = ''; }, 280);
     }
     pulling = false;
-  });
+  }, { passive: true });
 }
 
 /* ── TAP-TO-CALL SHORTCUT ────────────────────────────────────
