@@ -4,7 +4,7 @@
    for pages and API calls.
    ============================================ */
 
-const CACHE_NAME = 'elite-emporium-v9';
+const CACHE_NAME = 'elite-emporium-v10';
 
 const STATIC_ASSETS = [
   '/',
@@ -85,21 +85,26 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // HTML pages — network-first with cache fallback, finally 404
+  // HTML pages — stale-while-revalidate for instant return-visit loads.
+  // Strategy: respond from cache immediately if we have it (visible
+  // paint in <50ms), then update the cache in the background so the
+  // NEXT visit gets the fresh copy. On first visit: network. On
+  // network failure: cache → 404 → index fallback chain.
   if (request.destination === 'document') {
     event.respondWith(
-      fetch(request)
-        .then(resp => {
-          // Only cache successful navigations
+      caches.match(request).then(cached => {
+        const networkFetch = fetch(request).then(resp => {
           if (resp && resp.ok) {
             const clone = resp.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+            caches.open(CACHE_NAME).then(cache => cache.put(request, clone)).catch(() => {});
           }
           return resp;
-        })
-        .catch(() => caches.match(request).then(r =>
-          r || caches.match('/404.html').then(p => p || caches.match('/index.html'))
-        ))
+        }).catch(() =>
+          cached || caches.match('/404.html').then(p => p || caches.match('/index.html'))
+        );
+        // Return cache immediately if present (stale), else wait for network (fresh).
+        return cached || networkFetch;
+      })
     );
     return;
   }
