@@ -176,10 +176,23 @@
       document.getElementById('netStatus').textContent = 'Back online — reloading…';
       setTimeout(() => location.reload(), 600);
     });
-    // Inverse: if shown via SW fallback but network is already up, try reload once.
-    if (navigator.onLine) {
-      setTimeout(() => { if (navigator.onLine) location.reload(); }, 1500);
-    }
+    // Inverse: if shown via SW fallback but navigator.onLine is true, try
+    // reload once per session. Guarded against infinite reload loops in
+    // edge cases where navigator.onLine reports true but server is down.
+    try {
+      if (navigator.onLine && !sessionStorage.getItem('offlineAutoReloaded')) {
+        sessionStorage.setItem('offlineAutoReloaded', '1');
+        setTimeout(() => { if (navigator.onLine) location.reload(); }, 1500);
+      }
+    } catch {}
+    // Clear the guard when the user explicitly clicks Try again — they're
+    // committing to a fresh attempt, and the next auto-reload should work
+    // again on the next genuinely fresh visit.
+    document.addEventListener('click', e => {
+      if (e.target.closest('.off-btn-primary')) {
+        try { sessionStorage.removeItem('offlineAutoReloaded'); } catch {}
+      }
+    });
   </script>
 </body>
 </html>
