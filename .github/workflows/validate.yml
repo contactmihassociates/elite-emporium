@@ -95,6 +95,18 @@ jobs:
           fi
           echo "logo-96.png size: $SIZE bytes (PASS)"
 
+      - name: Every public HTML has noscript fallback
+        run: |
+          # Iteration 50 — without JS the storefront is blank. Every
+          # page must show a friendly fallback explaining how to recover.
+          FAIL=0
+          for f in 404.html about.html cart.html collection.html index.html order-success.html orders.html privacy.html product.html products.html profile.html terms.html track-order.html wishlist.html; do
+            if [ ! -f "$f" ]; then continue; fi
+            grep -q '<noscript>' "$f" || { echo "::error::$f missing <noscript> fallback"; FAIL=1; }
+          done
+          [ $FAIL -eq 0 ] && echo "noscript fallback: PASS"
+          exit $FAIL
+
       - name: No leftover dev secrets
         run: |
           # Fail if anyone accidentally commits a real Razorpay live key,
