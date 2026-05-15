@@ -4,7 +4,7 @@
    for pages and API calls.
    ============================================ */
 
-const CACHE_NAME = 'elite-emporium-v14';
+const CACHE_NAME = 'elite-emporium-v15';
 
 const STATIC_ASSETS = [
   '/',
@@ -23,6 +23,7 @@ const STATIC_ASSETS = [
   '/collection.html',
   '/hanii-dhanii.html',
   '/404.html',
+  '/offline.html',
   '/styles.css',
   '/script.js',
   '/manifest.json',
@@ -107,7 +108,9 @@ self.addEventListener('fetch', event => {
           }
           return resp;
         }).catch(() =>
-          cached || caches.match('/404.html').then(p => p || caches.match('/index.html'))
+          // Offline → prefer cached version of the requested page, else dedicated
+          // offline page (clearer than 404), else the homepage shell as last resort.
+          cached || caches.match('/offline.html').then(p => p || caches.match('/index.html'))
         );
         // Return cache immediately if present (stale), else wait for network (fresh).
         return cached || networkFetch;
