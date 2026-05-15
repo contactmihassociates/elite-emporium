@@ -1214,11 +1214,17 @@ function initSideCartDrawer() {
     document.body.appendChild(drawer);
   }
 
-  // Hijack the cart button click
-  cartBtn.addEventListener('click', e => {
-    e.preventDefault();
-    openSideCart();
-  });
+  // Hijack the cart button click. Guard with a dataset flag so
+  // re-calling initSideCartDrawer() (e.g. on bfcache restore, future
+  // SPA-style nav, or any other init pathway) doesn't double-bind
+  // the listener — that would call openSideCart() N times per click.
+  if (!cartBtn.dataset.sideCartBound) {
+    cartBtn.addEventListener('click', e => {
+      e.preventDefault();
+      openSideCart();
+    });
+    cartBtn.dataset.sideCartBound = '1';
+  }
   // Treat cart-btn link as button for a11y
   cartBtn.setAttribute('role', 'button');
 }
