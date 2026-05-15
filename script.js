@@ -1103,7 +1103,7 @@ function renderSideCart() {
     return `
       <div class="side-cart-item">
         ${item.image
-          ? `<img src="${item.image}" alt="${escapeHtml(item.name)}" class="side-cart-img" />`
+          ? `<img src="${cldUrl(item.image, 160)}" alt="${escapeHtml(item.name)}" class="side-cart-img" loading="lazy" />`
           : `<div class="side-cart-img side-cart-img-fallback">🛍️</div>`}
         <div class="side-cart-item-info">
           <div class="side-cart-item-name">${escapeHtml(item.name)}</div>
@@ -1112,6 +1112,7 @@ function renderSideCart() {
             <button class="scq-btn" onclick="updateQuantity('${key}', -1);renderSideCart();" aria-label="Decrease quantity">−</button>
             <span class="scq-val">${item.quantity}</span>
             <button class="scq-btn" onclick="updateQuantity('${key}', 1);renderSideCart();" aria-label="Increase quantity">+</button>
+            <button class="scq-save" onclick="saveForLater('${key}', ${item.id});" aria-label="Save for later" title="Save for later">🤍</button>
             <button class="scq-remove" onclick="removeFromCart('${key}');renderSideCart();" aria-label="Remove" title="Remove">🗑️</button>
           </div>
         </div>
@@ -1288,8 +1289,20 @@ function cardQtyChange(productId, delta) {
 }
 
 function saveForLater(cartKey, productId) {
-  removeFromCart(cartKey);
-  toggleWishlist(Number(productId), null);
+  // Move the item from cart → wishlist. ADD-only — never toggle off
+  // a product the customer was about to buy.
+  const pid = Number(productId);
+  const wl = JSON.parse(localStorage.getItem('eliteEmporiumWishlist') || '[]');
+  if (!wl.includes(pid)) {
+    wl.unshift(pid);
+    localStorage.setItem('eliteEmporiumWishlist', JSON.stringify(wl));
+    if (typeof updateWishlistUI === 'function') updateWishlistUI();
+  }
+  // Remove from cart silently (no undo toast — the save toast covers it).
+  cart = cart.filter(i => i.cartKey !== cartKey);
+  saveCart();
+  if (typeof renderCart === 'function') renderCart();
+  if (typeof renderSideCart === 'function') renderSideCart();
   showToast('🤍 Saved to wishlist for later!');
 }
 

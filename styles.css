@@ -7172,20 +7172,24 @@ body.festive-on .product-badge.new {
   font-weight: 700;
   color: var(--text, #1a1a1a);
 }
-.scq-remove {
+.scq-remove,
+.scq-save {
   background: none;
   border: none;
   font-size: 14px;
   cursor: pointer;
   padding: 4px 6px;
-  margin-left: 4px;
+  margin-left: 2px;
   opacity: 0.55;
   transition: opacity 0.15s, transform 0.15s;
 }
-.scq-remove:hover {
+.scq-save { margin-left: 6px; }
+.scq-remove:hover,
+.scq-save:hover {
   opacity: 1;
-  transform: scale(1.1);
+  transform: scale(1.12);
 }
+.scq-save:hover { color: var(--red, #DB3022); }
 .side-cart-item-price {
   font-size: 13px;
   font-weight: 800;
