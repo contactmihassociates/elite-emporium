@@ -2,6 +2,26 @@
 
 All notable changes are tracked here. Authoritative source is `git log --oneline`.
 
+## 2026-05-15 — Autonomous Optimization Loop, fifth pass (iters 94-100)
+
+Capping the second-session loop at iteration 100 from this session's continuous run.
+
+### Keyboard a11y — `:focus-visible` parity (continued)
+- **`.btn-primary`** (iter 95) — default CTA used on 404, empty cart, wishlist, product page, multiple others.
+- **`.qty-btn` + `.wishlist-btn` + `.btn-outline` + `.filter-option`** (iter 96) — 4 more high-frequency interactive classes.
+- **Universal `:focus-visible` baseline** (iter 98) — replaces 155 missing per-class rules with one rule covering `button`, `a`, `input`, `select`, `textarea`, `summary`, plus `[role="button|tab"]` and `[tabindex]:not([tabindex="-1"])`. Class-specific rules continue to win via specificity. Importantly: this **works without the JS `.kbd-nav` class** — modern browsers natively distinguish keyboard vs mouse focus. The legacy `.kbd-nav` scheme stays as fallback for Safari <15.4.
+- Total `:focus-visible` rules in stylesheet: **38** (from 10 at iter 90).
+
+### iOS safe-area arc (continued)
+- **`.cart-mobile-bar`** (iter 99) — the mobile-only "Proceed →" sticky bar on cart.html now lifted by `env(safe-area-inset-bottom)` to clear the (taller-since-iter-87) bottom-nav.
+
+### Maintenance
+- **Cache-bust v=20260516i → v=20260516j** (iter 97) — invalidates 30 CSS refs to pick up the iter 87-96 batch immediately.
+- **CHANGELOG fourth-pass entry** (iter 94).
+- **CHANGELOG fifth-pass entry — this one** (iter 100).
+
+---
+
 ## 2026-05-15 — Autonomous Optimization Loop, fourth pass (iters 84-93)
 
 Ten more iterations focused on iOS safe-area handling and keyboard a11y parity:
