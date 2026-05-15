@@ -710,7 +710,7 @@ function updateCompareBar() {
     const p = products.find(x => x.id === id);
     if (!p) return '';
     return `<div class="cmp-bar-item">
-      <img src="${p.image || ''}" alt="${p.name}" class="cmp-bar-img" />
+      <img src="${p.image || ''}" alt="${escapeHtml(p.name)}" class="cmp-bar-img" />
       <span class="cmp-bar-name">${p.name.length > 22 ? p.name.slice(0, 22) + '…' : p.name}</span>
       <button class="cmp-bar-remove" onclick="toggleCompare(${p.id},document.querySelector('.compare-btn[data-cmpid=\\'${p.id}\\']'));updateCompareBar()">✕</button>
     </div>`;
@@ -1049,7 +1049,7 @@ function updateMiniCart() {
   }
   const itemsHtml = cart.slice(0, 4).map(item => `
     <div class="mini-cart-item">
-      ${item.image ? `<img src="${item.image}" alt="${item.name}" class="mini-cart-img" />` : '<div class="mini-cart-img" style="background:#f0f0f0;display:flex;align-items:center;justify-content:center;">🛍️</div>'}
+      ${item.image ? `<img src="${item.image}" alt="${escapeHtml(item.name)}" class="mini-cart-img" />` : '<div class="mini-cart-img" style="background:#f0f0f0;display:flex;align-items:center;justify-content:center;">🛍️</div>'}
       <div class="mini-cart-info">
         <div class="mini-cart-name">${item.name}</div>
         <div class="mini-cart-meta">Qty ${item.quantity} × ₹${item.price.toLocaleString('en-IN')}</div>
@@ -1736,13 +1736,13 @@ function renderProducts(list, containerId) {
       const vSrcset = srcsetFor(vSrc);
       imageHtml = `<a href="${detailLink}" class="product-img-link">
         <div class="product-image product-image-photo">
-          <img id="${pid}" src="${cldUrl(vSrc, 450)}"${vSrcset ? ` srcset="${vSrcset}" sizes="${cardSizes}"` : ''} alt="${p.name}" loading="lazy" decoding="async" onerror="${imgFallback}" />
+          <img id="${pid}" src="${cldUrl(vSrc, 450)}"${vSrcset ? ` srcset="${vSrcset}" sizes="${cardSizes}"` : ''} alt="${escapeHtml(p.name)}" loading="lazy" decoding="async" onerror="${imgFallback}" />
         </div></a>`;
     } else if (p.image) {
       const iSrcset = srcsetFor(p.image);
       imageHtml = `<a href="${detailLink}" class="product-img-link">
         <div class="product-image product-image-photo">
-          <img id="${pid}" src="${cldUrl(p.image, 450)}"${iSrcset ? ` srcset="${iSrcset}" sizes="${cardSizes}"` : ''} alt="${p.name}" loading="lazy" decoding="async" onerror="${imgFallback}" />
+          <img id="${pid}" src="${cldUrl(p.image, 450)}"${iSrcset ? ` srcset="${iSrcset}" sizes="${cardSizes}"` : ''} alt="${escapeHtml(p.name)}" loading="lazy" decoding="async" onerror="${imgFallback}" />
         </div></a>`;
     } else {
       imageHtml = `<a href="${detailLink}" class="product-img-link">
@@ -2120,7 +2120,7 @@ function renderCart() {
            <div style="font-weight:700;color:var(--text);margin-bottom:12px;font-size:14px;">🔥 Popular Right Now</div>
            <div class="products-grid" style="grid-template-columns:repeat(2,1fr);gap:10px;">${suggestions.map(p =>
              `<a href="product.html?id=${p.id}" style="background:white;border:1px solid var(--border);border-radius:var(--radius-md);padding:10px;text-decoration:none;color:inherit;display:block;">
-               <img src="${p.image}" alt="${p.name}" style="width:100%;height:100px;object-fit:contain;border-radius:var(--radius);margin-bottom:6px;" />
+               <img src="${p.image}" alt="${escapeHtml(p.name)}" style="width:100%;height:100px;object-fit:contain;border-radius:var(--radius);margin-bottom:6px;" />
                <div style="font-size:12px;font-weight:600;color:var(--text);line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${p.name}</div>
                <div style="font-size:13px;font-weight:700;color:var(--red);margin-top:4px;">₹${p.price.toLocaleString('en-IN')}</div>
              </a>`).join('')}
@@ -2158,7 +2158,7 @@ function renderCart() {
 
   container.innerHTML = cart.map(item => {
     const cartImageHtml = item.image
-      ? `<div class="cart-item-image cart-item-image-photo"><img src="${item.image}" alt="${item.name}" loading="lazy" /></div>`
+      ? `<div class="cart-item-image cart-item-image-photo"><img src="${item.image}" alt="${escapeHtml(item.name)}" loading="lazy" /></div>`
       : `<div class="cart-item-image" style="background:${item.bg}">${item.emoji}</div>`;
     const escKey = (item.cartKey || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
     return `
@@ -8003,7 +8003,7 @@ function initSocialProof() {
     const city = SOCIAL_PROOF_CITIES[Math.floor(Math.random() * SOCIAL_PROOF_CITIES.length)];
     const mins = Math.floor(Math.random() * 55) + 5;
     container.innerHTML = `
-      ${p.image ? `<img src="${p.image}" alt="${p.name}" class="sp-thumb" />` : '<span style="font-size:24px;">🛍️</span>'}
+      ${p.image ? `<img src="${p.image}" alt="${escapeHtml(p.name)}" class="sp-thumb" />` : '<span style="font-size:24px;">🛍️</span>'}
       <div class="sp-body">
         <div class="sp-name"><strong>${name}</strong> from ${city}</div>
         <div class="sp-text">just ordered <em>${p.name}</em></div>
