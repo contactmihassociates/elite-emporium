@@ -4122,6 +4122,55 @@ footer { background:#172337; color:#9b9b9b; padding:40px 4% 18px; }
   color: var(--text-light);
   margin-top: 2px;
 }
+.oh-item-review-btn {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #f57f17;
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  padding: 3px 9px;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.12s;
+}
+.oh-item-review-btn:hover { background: #ffecb3; transform: translateY(-1px); }
+[data-theme="dark"] .oh-item-review-btn { background: rgba(245, 127, 23, 0.16); color: #ffcc80; border-color: rgba(255, 204, 128, 0.3); }
+
+/* Tell-a-friend referral card on orders page */
+.oh-refer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, #128C7E 0%, #25D366 100%);
+  color: #fff;
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin: 0 0 18px;
+  text-decoration: none;
+  box-shadow: 0 4px 18px rgba(37, 211, 102, 0.18);
+  transition: transform 0.16s, box-shadow 0.16s;
+}
+.oh-refer:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37, 211, 102, 0.24); }
+.oh-refer-icon { font-size: 36px; line-height: 1; flex-shrink: 0; }
+.oh-refer-body { flex: 1; min-width: 0; }
+.oh-refer-body strong { display: block; font-size: 15px; margin-bottom: 2px; font-weight: 800; }
+.oh-refer-body span { font-size: 12px; opacity: 0.92; line-height: 1.5; }
+.oh-refer-cta {
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.18);
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 700;
+}
+@media (max-width: 560px) {
+  .oh-refer { flex-wrap: wrap; gap: 10px; }
+  .oh-refer-icon { font-size: 28px; }
+  .oh-refer-cta { width: 100%; text-align: center; padding: 8px; }
+}
+
 .oh-summary {
   padding: 12px 18px;
   background: #fafafa;

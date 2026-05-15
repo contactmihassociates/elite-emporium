@@ -7148,20 +7148,32 @@ function initOrdersPage() {
         <div class="oh-stat-val">${tier.label}</div>
         <div class="oh-stat-label">Customer tier · ${orders.length} order${orders.length > 1 ? 's' : ''}</div>
       </div>
-    </div>`;
+    </div>
+    <a href="https://wa.me/?text=${encodeURIComponent(`Hey! I shop at Elite Emporium and the products are great. Check them out: ${window.location.origin}/`)}" target="_blank" rel="noopener" class="oh-refer">
+      <div class="oh-refer-icon">🎁</div>
+      <div class="oh-refer-body">
+        <strong>Tell a friend, both get 5% off</strong>
+        <span>Share the store on WhatsApp — when they place their first order, we'll add a 5% coupon to your next one. (Mention your order ID when you share.)</span>
+      </div>
+      <span class="oh-refer-cta">Share now →</span>
+    </a>`;
   container.insertAdjacentHTML('beforebegin', statsHtml);
 
   container.innerHTML = orders.map(order => {
     const date  = new Date(order.date);
     const dStr  = date.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
     const tStr  = date.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+    // Show 'Leave a review' for items in orders older than 3 days (i.e. delivered)
+    const ordHoursAgo = (Date.now() - date.getTime()) / 3600000;
+    const isDelivered = ordHoursAgo >= 72;
     const itemsHTML = order.items.map(item => `
       <div class="oh-item">
-        <img src="${item.image || 'images/logo.png'}" alt="${item.name}" class="oh-item-img" onerror="this.src='images/logo.png'" />
+        <img src="${item.image || 'images/logo.png'}" alt="${escapeHtml(item.name)}" class="oh-item-img" loading="lazy" onerror="this.src='images/logo.png'" />
         <div class="oh-item-info">
-          <div class="oh-item-name">${item.name}</div>
+          <div class="oh-item-name">${escapeHtml(item.name)}</div>
           <div class="oh-item-meta">Qty: ${item.quantity} × ₹${item.price.toLocaleString('en-IN')} = <strong>₹${(item.price * item.quantity).toLocaleString('en-IN')}</strong></div>
           ${item.selectedColor ? `<div class="oh-item-color">Color: ${item.selectedColor}</div>` : ''}
+          ${isDelivered && item.id ? `<a class="oh-item-review-btn" href="product.html?id=${item.id}#reviewSection" title="Leave a review">⭐ Leave a review</a>` : ''}
         </div>
       </div>`).join('');
 
