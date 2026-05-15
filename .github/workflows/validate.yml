@@ -95,6 +95,31 @@ jobs:
           fi
           echo "logo-96.png size: $SIZE bytes (PASS)"
 
+      - name: All dynamic modals have role="dialog"
+        run: |
+          # Iters 137-140 swept role="dialog" + aria-modal onto 6 dynamic
+          # modals in script.js + 2 static modals in product/index/products
+          # HTML. This gate locks in the invariant: any new <div> with a
+          # class ending in "-modal" must carry role= (most likely role=
+          # dialog or role=alertdialog).
+          FAIL=0
+          if python3 -c "
+import re, sys, pathlib
+txt = pathlib.Path('script.js').read_text(encoding='utf-8')
+# Match <div ... class=\"...-modal\" ...>
+matches = re.findall(r'<div\s+[^>]*class=\"[^\"]*-modal\"[^>]*>', txt, re.DOTALL)
+missing = [m for m in matches if 'role=' not in m]
+sys.exit(len(missing))
+" 2>/dev/null; then
+            :  # 0 missing → pass
+          else
+            N=$?
+            echo "::error::script.js has $N dynamic modal(s) (.*-modal) without role= attribute"
+            FAIL=1
+          fi
+          [ $FAIL -eq 0 ] && echo "Modal role=dialog coverage: PASS"
+          exit $FAIL
+
       - name: All <button> tags have explicit type=
         run: |
           # Iteration 136 — iter 134 caught a real bug: <button class=
