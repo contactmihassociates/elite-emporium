@@ -2874,6 +2874,20 @@ function placeOrder() {
 }
 
 // ── TOAST ─────────────────────────────────────
+/* ── BFCACHE REFRESH ─────────────────────────────────────────
+   When the user navigates back via Back button, mobile browsers
+   sometimes restore the previous page from bfcache. Cart count
+   etc. can be stale. We listen for pageshow with .persisted=true
+   and refresh the dynamic UI bits.
+   ──────────────────────────────────────────────────────────── */
+window.addEventListener('pageshow', e => {
+  if (!e.persisted) return;
+  try {
+    if (typeof updateCartUI === 'function') updateCartUI();
+    if (typeof updateWishlistUI === 'function') updateWishlistUI();
+  } catch {}
+});
+
 /* ── NETWORK-AWARE IMAGE QUALITY ─────────────────────────────
    On slow networks (effective 2g / save-data), cldUrl uses smaller
    widths to save bandwidth. We pre-shrink the per-page max
@@ -4779,8 +4793,17 @@ function initProductDetailPage() {
       pdActions.insertAdjacentElement('beforebegin', qtyRow);
 
       window.__pdQtyChange = function(delta) {
+        const prev = _pdQty;
         _pdQty = Math.max(1, Math.min(10, _pdQty + delta));
-        document.getElementById('pdQtyNum').textContent = _pdQty;
+        const numEl = document.getElementById('pdQtyNum');
+        if (prev !== _pdQty) {
+          // Soft bump animation + haptic
+          numEl.classList.remove('qty-bump');
+          void numEl.offsetWidth;
+          numEl.classList.add('qty-bump');
+          hapticTap();
+        }
+        numEl.textContent = _pdQty;
         document.getElementById('pdQtyDec').disabled = _pdQty <= 1;
         document.getElementById('pdQtyInc').disabled = _pdQty >= 10;
         document.getElementById('pdQtyNote').textContent = _pdQty >= 10 ? 'Max 10' : '';

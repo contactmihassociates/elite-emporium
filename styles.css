@@ -5834,7 +5834,11 @@ kbd {
   font-weight: 700;
   color: var(--text);
   user-select: none;
+  display: inline-block;
 }
+.pd-qty-num.qty-bump { animation: qtyBump 0.22s ease; }
+@keyframes qtyBump { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.20); color: var(--red, #DB3022); } }
+@media (prefers-reduced-motion: reduce) { .pd-qty-num.qty-bump { animation: none; } }
 .pd-qty-max-note {
   font-size: 11px;
   color: var(--text3);
