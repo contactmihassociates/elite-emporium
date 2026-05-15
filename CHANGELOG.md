@@ -86,7 +86,13 @@ A single long session that shipped ~25 batches. Grouped by theme; commit hashes 
 - Duplicate `const setMeta` inside `initProductDetailPage()`.
 - PAN-Aadhaar quote unescape fix in the toolkit page (earlier session).
 
-### Conversion stack — perf + social proof + ETA (latest batch)
+### Growth wave — wishlist sharing, referral, AOV booster
+- **Shareable wishlist deep-link** — `shareWishlist()` upgraded to also generate `wishlist.html?wl=<base64-ids>` URLs. Bottom-sheet share menu offers 3 paths: Send on WhatsApp, Copy link, or native Share. New `importWishlistFromUrl()` runs on wishlist page load: decodes the param, intersects with the live catalogue, prompts merge-or-replace if user already has items, cleans the URL via `replaceState`. Unlocks organic WhatsApp-group referral.
+- **Per-item review CTA on orders** — `'⭐ Leave a review'` chip appears on each item of an order older than 72 hours (i.e. likely delivered). Deep-links to `product.html?id=<X>#reviewSection`. Recovers genuine review density.
+- **Tell-a-friend referral card on orders** — WhatsApp-green gradient card between stats dashboard and order list. 🎁 icon, 'Tell a friend, both get 5% off' headline + body explaining the share + mention-order-ID flow. Click opens WhatsApp with a pre-formatted referral message containing the store URL.
+- **Free-delivery add-ons strip on cart** — when subtotal is below ₹499 (free-delivery threshold), a yellow-dashed strip suggests 4 products priced between ₹50 and (gap + ₹100) — sorted by closest-to-gap, tie-break by review count. One-tap `+ Add` button. Auto-hides when subtotal == 0 or free delivery already unlocked. Responsive (4→3→2 cols).
+
+### Conversion stack — perf + social proof + ETA
 - **Cloudinary responsive srcset** — new `cldUrl(url, width)` + `srcsetFor(url)` helpers splice `f_auto,q_auto,w_<N>` into `/image/upload/` paths. Wired into product cards (sizes=50vw mobile / 33vw tablet / 280px desktop), Just Landed strip, Editor's Picks, FBT thumbnails. Variant swatches now load at 120w (~80% smaller). `swapVariant()` reads `data-fullsrc` so colour swaps restore the full-res main image with a regenerated srcset. Non-Cloudinary URLs pass through unchanged.
 - **PDP live social-proof pills** — 'X viewing now' with red pulsing dot + 'X sold today' green pill, both deterministic per-product (per-hour and per-day respectively, via FNV-1a) so the numbers don't randomly flicker between page-loads. Viewer count drifts ±1 every 15-22s for liveness. Biased by Bestseller badge + review count.
 - **Rating distribution bar chart** — new `.rv-dist-card` at the top of the review list. Big avg ★ score on the left, 5★ → 1★ horizontal bars with count + percentage fill on the right. 600 ms ease-in animation. Mobile collapses to tighter layout.
