@@ -5,11 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Festive Collection – Elite Emporium</title>
   <meta name="description" content="Curated festive collections at Elite Emporium — Eid, Diwali, Christmas, New Year & more." />
-  <link rel="canonical" href="https://elite-emporium-one.vercel.app/collection.html" />
+  <link rel="canonical" id="collCanonical" href="https://elite-emporium-one.vercel.app/collection.html" />
+  <meta id="collOgTitle" property="og:title" content="Festive Collection – Elite Emporium" />
+  <meta id="collOgDesc"  property="og:description" content="Curated festive collections — Eid, Diwali, Christmas, New Year & more." />
+  <meta property="og:image" content="https://elite-emporium-one.vercel.app/images/logo.png" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
   <link rel="stylesheet" href="styles.css?v=20260516g" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#DB3022" />
+
+  <!-- BreadcrumbList for SERP rich breadcrumbs -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://elite-emporium-one.vercel.app/" },
+      { "@type": "ListItem", "position": 2, "name": "Festive Collection", "item": "https://elite-emporium-one.vercel.app/collection.html" }
+    ]
+  }
+  </script>
+
+  <!-- CollectionPage — JS will rewrite the name/description from the picked theme -->
+  <script type="application/ld+json" id="collPageLd">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Festive Collection — Elite Emporium",
+    "description": "Curated festive collections at Elite Emporium — Eid, Diwali, Christmas, New Year and more. Free delivery above ₹499.",
+    "url": "https://elite-emporium-one.vercel.app/collection.html",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "Elite Emporium",
+      "url": "https://elite-emporium-one.vercel.app/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Elite Emporium",
+      "logo": { "@type": "ImageObject", "url": "https://elite-emporium-one.vercel.app/images/logo.png" }
+    }
+  }
+  </script>
   <style>
     .coll-hero {
       position: relative;
@@ -238,6 +276,31 @@
       document.getElementById('collPromoCode').textContent = theme.code;
       document.getElementById('collPromo').style.display = '';
     }
+
+    // Update canonical / OG / JSON-LD to reflect the picked theme
+    try {
+      const themeUrl = `https://elite-emporium-one.vercel.app/collection.html?theme=${theme.id}`;
+      document.getElementById('collCanonical').href = themeUrl;
+      const desc = `${theme.title} at Elite Emporium — ${theme.subtitle} Free delivery above ₹499.`;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', desc);
+      document.getElementById('collOgTitle').setAttribute('content', `${theme.title} – Elite Emporium`);
+      document.getElementById('collOgDesc').setAttribute('content', desc);
+      const ldEl = document.getElementById('collPageLd');
+      if (ldEl) {
+        const ld = {
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          "name": `${theme.title} — Elite Emporium`,
+          "description": desc,
+          "url": themeUrl,
+          "isPartOf": { "@type": "WebSite", "name": "Elite Emporium", "url": "https://elite-emporium-one.vercel.app/" },
+          "publisher": { "@type": "Organization", "name": "Elite Emporium", "logo": { "@type": "ImageObject", "url": "https://elite-emporium-one.vercel.app/images/logo.png" } },
+          "about": theme.cats.map(c => ({ "@type": "Thing", "name": c }))
+        };
+        ldEl.textContent = JSON.stringify(ld);
+      }
+    } catch (e) {}
 
     // Category quick-jumps — emoji-mapped chip cards
     const CAT_EMOJI = {
