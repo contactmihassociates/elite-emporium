@@ -2,6 +2,19 @@
 
 All notable changes are tracked here. Authoritative source is `git log --oneline`.
 
+## 2026-05-15 — Autonomous Optimization Loop, polish pass (iters 73-78)
+
+Five more polish-pass commits while context allowed. Highlights:
+
+- **Passive `touchend` on pull-to-refresh** (iter 74) — the lone non-passive listener in the codebase. Other touch/scroll handlers were already passive.
+- **`window.event` global removed** (iter 75) — hanii-dhanii filterHD now receives the clicked button via `this`. The implicit `window.event` global is deprecated and Firefox can return undefined, which would break the active-state visual on keyboard activation.
+- **`aria-label` on 11 inputs** (iter 76) — coupon code, search inputs without label, PIN checker, review name/text, price range, sort select, order-ID lookup. Placeholders alone aren't accessible names.
+- **`type="button"` on 54 buttons** (iter 77) — defensive: spec default for `<button>` inside a `<form>` is `submit`. None are currently in forms, but any future refactor wrapping these in a form would silently submit. Now explicit everywhere.
+
+(See iter 73 for the prior changelog entry.)
+
+---
+
 ## 2026-05-15 — Autonomous Optimization Loop, third pass (iters 56-72)
 
 The autonomous loop continued. 17 more commits to `master`. Highlights:
