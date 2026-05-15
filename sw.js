@@ -30,6 +30,7 @@ const STATIC_ASSETS = [
   '/images/logo-96.png',
   '/images/logo-192.png',
   '/images/logo-512.png',
+  '/favicon.ico',
 ];
 
 // ── INSTALL: pre-cache static shell ──────────
