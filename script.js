@@ -2174,6 +2174,60 @@ function refreshSummary() {
       }
     }
   }
+
+  // 'Add to reach free delivery' suggestion strip — shows 3 cheap
+  // in-stock products priced just under the gap to free delivery, so
+  // the customer can one-tap-add and unlock free shipping.
+  renderAddOnsToReachFreeDelivery(sub, del);
+}
+
+function renderAddOnsToReachFreeDelivery(sub, del) {
+  const host = document.getElementById('freeDeliveryBar');
+  if (!host) return;
+  let strip = document.getElementById('cartAddOnsStrip');
+  // Hide when cart empty, already-free, or no products loaded
+  if (sub === 0 || del === 0 || !Array.isArray(products) || !products.length) {
+    if (strip) strip.style.display = 'none';
+    return;
+  }
+  const need = CONFIG.minFreeDelivery - sub;
+  // Suggest products priced between ₹50 and (need + ₹100) — small enough
+  // to feel like an easy add, big enough to push subtotal over the line.
+  const inCartIds = new Set(cart.map(i => i.id));
+  const candidates = products
+    .filter(p => p.inStock !== false && p.image && p.price >= 50 && p.price <= need + 100 && !inCartIds.has(p.id))
+    .sort((a, b) => {
+      // Closer to "need" wins; tie-break by review count (more popular)
+      const diff = Math.abs((a.price || 0) - need) - Math.abs((b.price || 0) - need);
+      if (diff !== 0) return diff;
+      return (b.reviews || 0) - (a.reviews || 0);
+    })
+    .slice(0, 4);
+  if (candidates.length < 2) {
+    if (strip) strip.style.display = 'none';
+    return;
+  }
+  if (!strip) {
+    strip = document.createElement('div');
+    strip.id = 'cartAddOnsStrip';
+    strip.className = 'cart-addons-strip';
+    host.insertAdjacentElement('afterend', strip);
+  }
+  strip.style.display = '';
+  strip.innerHTML = `
+    <div class="cao-head">🎯 Add one of these to unlock <strong>FREE delivery</strong> (need ₹${need.toLocaleString('en-IN')} more)</div>
+    <div class="cao-row">
+      ${candidates.map(p => `
+        <div class="cao-card">
+          <a href="product.html?id=${p.id}" class="cao-link">
+            <img src="${cldUrl(p.image, 200)}"${srcsetFor(p.image) ? ` srcset="${srcsetFor(p.image)}"` : ''} alt="${escapeHtml(p.name)}" class="cao-img" loading="lazy" decoding="async" />
+            <div class="cao-name">${escapeHtml(p.name)}</div>
+            <div class="cao-price">₹${p.price.toLocaleString('en-IN')}</div>
+          </a>
+          <button class="cao-add-btn" type="button" onclick="addToCart(${p.id})">+ Add</button>
+        </div>
+      `).join('')}
+    </div>`;
 }
 
 // ── WHATSAPP ORDER ────────────────────────────
