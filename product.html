@@ -8,14 +8,18 @@
   <meta id="ogTitle"       property="og:title"       content="Elite Emporium" />
   <meta id="ogDesc"        property="og:description"  content="Premium Quality Products at Honest Prices" />
   <meta id="ogImage"       property="og:image"        content="" />
+  <meta property="og:image:width"  content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt"    content="Elite Emporium product card" />
   <meta id="ogUrl"         property="og:url"          content="" />
   <meta property="og:type"        content="product" />
   <meta property="og:site_name"   content="Elite Emporium" />
+  <meta name="twitter:card"        content="summary_large_image" />
   <link rel="canonical" id="canonicalLink" href="https://elite-emporium-one.vercel.app/product.html" />
   <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
   <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
-  <link rel="stylesheet" href="styles.css?v=20260515x" />
+  <link rel="stylesheet" href="styles.css?v=20260515y" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#DB3022" />
 </head>
@@ -85,6 +89,22 @@
 </div>
 
 <!-- ── PRODUCT DETAIL ─────────────────────── -->
+<!-- Skeleton (visible only before product data loads) -->
+<div class="pd-skeleton" id="pdSkeleton" aria-hidden="true">
+  <div class="pd-skeleton-grid">
+    <div class="pds-image"></div>
+    <div class="pds-info">
+      <div class="pds-line pds-line-cat"></div>
+      <div class="pds-line pds-line-title"></div>
+      <div class="pds-line pds-line-title short"></div>
+      <div class="pds-line pds-line-rating"></div>
+      <div class="pds-line pds-line-price"></div>
+      <div class="pds-line pds-line-cta"></div>
+      <div class="pds-line pds-line-cta"></div>
+    </div>
+  </div>
+</div>
+
 <div class="pd-page">
   <div class="pd-container">
 
@@ -340,7 +360,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="script.js?v=20260515x"></script>
+<script src="script.js?v=20260515y"></script>
 </body>
 </html>
 

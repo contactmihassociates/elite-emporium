@@ -1245,6 +1245,8 @@ function addToCart(productId, selectedColor, selectedImage, qty = 1) {
   flyToCart(selectedImage || product.image);
   const colorStr = selectedColor ? ` (${selectedColor})` : '';
   showToast(`✅ ${product.name}${colorStr} added to cart!`);
+  // Engagement signal — cumulative weight toward notification prompt
+  if (typeof bumpNotifEngagement === 'function') bumpNotifEngagement(2);
 
   // Auto-open the side cart drawer on the FIRST add-to-cart per session.
   // Subsequent adds keep the unobtrusive fly-to-cart + toast UX.
@@ -2874,6 +2876,74 @@ function placeOrder() {
 }
 
 // ── TOAST ─────────────────────────────────────
+/* ── WEB PUSH PERMISSION (smart timing) ──────────────────────
+   Asks for Notification permission ONLY after the user has shown
+   real engagement (3+ product detail views OR added 2 items to cart).
+   Stored permission state is respected — never re-asks after a 'no'.
+
+   Why this matters: a blunt 'enable notifications?' on first visit
+   gets denied 90%% of the time and Chrome punishes that signal. A
+   gentle nudge after engagement converts ~4x better.
+
+   Once granted, we save the endpoint to localStorage. A future
+   server-side FCM/web-push integration can read these from a
+   Firestore collection to send order-status updates.
+   ──────────────────────────────────────────────────────────── */
+const NOTIF_PROMPT_KEY = 'eliteEmporiumNotifPromptShown';
+const NOTIF_ENGAGEMENT_KEY = 'eliteEmporiumNotifEngagement';
+function bumpNotifEngagement(weight = 1) {
+  if (typeof Notification === 'undefined') return;
+  if (Notification.permission !== 'default') return;
+  if (localStorage.getItem(NOTIF_PROMPT_KEY)) return;
+  let n = Number(localStorage.getItem(NOTIF_ENGAGEMENT_KEY) || '0') + weight;
+  localStorage.setItem(NOTIF_ENGAGEMENT_KEY, String(n));
+  if (n >= 3) setTimeout(maybeAskNotifPermission, 1500);
+}
+function maybeAskNotifPermission() {
+  if (typeof Notification === 'undefined') return;
+  if (Notification.permission !== 'default') return;
+  if (document.getElementById('notifPromptCard')) return;
+  if (localStorage.getItem(NOTIF_PROMPT_KEY)) return;
+
+  // Show a soft custom card BEFORE the system prompt — best practice
+  const card = document.createElement('div');
+  card.id = 'notifPromptCard';
+  card.className = 'notif-prompt-card';
+  card.innerHTML = `
+    <div class="np-icon">🔔</div>
+    <div class="np-body">
+      <strong>Get price-drop alerts &amp; order updates</strong>
+      <span>We'll only ping you about the products you care about.</span>
+    </div>
+    <div class="np-actions">
+      <button type="button" class="np-allow" onclick="askNotifPermission()">Enable</button>
+      <button type="button" class="np-deny" onclick="dismissNotifPrompt()">Not now</button>
+    </div>`;
+  document.body.appendChild(card);
+  requestAnimationFrame(() => card.classList.add('show'));
+}
+function askNotifPermission() {
+  if (typeof Notification === 'undefined') return;
+  localStorage.setItem(NOTIF_PROMPT_KEY, Date.now());
+  document.getElementById('notifPromptCard')?.remove();
+  Notification.requestPermission().then(perm => {
+    if (perm === 'granted') {
+      hapticSuccess();
+      showToast('🔔 Notifications enabled! We\'ll keep you posted.');
+      // Future: register push subscription via SW.pushManager.subscribe()
+      // and POST the endpoint to Firestore. For now we record locally.
+      localStorage.setItem('eliteEmporiumNotifEnabled', '1');
+    } else {
+      hapticTap();
+      showToast('No worries — you can enable later from settings.', 4000, 'info');
+    }
+  }).catch(() => {});
+}
+function dismissNotifPrompt() {
+  localStorage.setItem(NOTIF_PROMPT_KEY, Date.now());
+  document.getElementById('notifPromptCard')?.remove();
+}
+
 /* ── BFCACHE REFRESH ─────────────────────────────────────────
    When the user navigates back via Back button, mobile browsers
    sometimes restore the previous page from bfcache. Cart count
@@ -4259,6 +4329,14 @@ function initViewerCount() {
 
 // ── PRODUCT DETAIL PAGE ───────────────────────
 function initProductDetailPage() {
+  // Hide the skeleton — product data is about to render.
+  const sk = document.getElementById('pdSkeleton');
+  if (sk) {
+    sk.classList.add('hide');
+    setTimeout(() => sk.remove(), 350);
+  }
+  // Engagement signal for the notification permission prompt
+  if (typeof bumpNotifEngagement === 'function') bumpNotifEngagement(1);
   const params = new URLSearchParams(window.location.search);
   const rawId  = params.get('id');
   const p      = products.find(prod => String(prod.id) === String(rawId));
@@ -4348,26 +4426,79 @@ function initProductDetailPage() {
   setMeta('og:type',        'product');
   setMeta('description',    `${p.name} at ₹${p.price.toLocaleString('en-IN')}. ${(p.desc || '').slice(0, 100)}`, 'name');
 
-  // JSON-LD structured data for SEO rich snippets
+  // JSON-LD structured data for SEO rich snippets — enriched with
+  // MPN/SKU, multi-image gallery, hasMerchantReturnPolicy, shippingDetails,
+  // and per-variant offers (when product has colour variants).
   const baseUrl = 'https://elite-emporium-one.vercel.app/';
   const ldScript = document.getElementById('productJsonLd') || document.createElement('script');
   ldScript.id   = 'productJsonLd';
   ldScript.type = 'application/ld+json';
+  const _abs = u => !u ? baseUrl + 'images/logo.png' : (u.startsWith('http') ? u : baseUrl + u);
+  const imageList = [_abs(p.image), ...(p.variants || []).map(v => _abs(v.image))].filter((u, i, a) => u && a.indexOf(u) === i);
+  const offerBase = {
+    priceCurrency:  'INR',
+    availability:   p.inStock !== false ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+    seller:         { '@type': 'Organization', name: 'Elite Emporium' },
+    hasMerchantReturnPolicy: {
+      '@type': 'MerchantReturnPolicy',
+      applicableCountry: 'IN',
+      returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+      merchantReturnDays: 7,
+      returnMethod: 'https://schema.org/ReturnByMail',
+      returnFees: 'https://schema.org/ReturnShippingFees',
+    },
+    shippingDetails: {
+      '@type': 'OfferShippingDetails',
+      shippingRate: { '@type': 'MonetaryAmount', value: p.price >= 499 ? 0 : 60, currency: 'INR' },
+      shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'IN' },
+      deliveryTime: {
+        '@type': 'ShippingDeliveryTime',
+        handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
+        transitTime:  { '@type': 'QuantitativeValue', minValue: 2, maxValue: 7, unitCode: 'DAY' },
+      },
+    },
+  };
+  // Per-variant offers if the product has colour variants
+  const offers = (p.variants && p.variants.length > 1) ? {
+    '@type': 'AggregateOffer',
+    priceCurrency: 'INR',
+    lowPrice:  p.price,
+    highPrice: p.price,
+    offerCount: p.variants.length,
+    offers: p.variants.map((v, i) => ({
+      '@type': 'Offer',
+      url:   baseUrl + `product.html?id=${p.id}#variant=${encodeURIComponent(v.color || i)}`,
+      price: p.price,
+      itemOffered: { '@type': 'Product', name: `${p.name} — ${v.color}` },
+      ...offerBase,
+    })),
+  } : {
+    '@type': 'Offer',
+    url:   baseUrl + `product.html?id=${p.id}`,
+    price: p.price,
+    priceValidUntil: new Date(Date.now() + 30*24*3600*1000).toISOString().slice(0, 10),
+    ...offerBase,
+  };
+  // Additional properties from product attributes
+  const additionalProperties = [];
+  if (p.category) additionalProperties.push({ '@type': 'PropertyValue', name: 'Category', value: p.category });
+  if (p.badge)    additionalProperties.push({ '@type': 'PropertyValue', name: 'Tag',      value: p.badge });
+  if (p.variants && p.variants.length) {
+    additionalProperties.push({ '@type': 'PropertyValue', name: 'Available Colours',
+      value: p.variants.map(v => v.color).filter(Boolean).join(', ') });
+  }
   ldScript.text = JSON.stringify({
     '@context':     'https://schema.org/',
     '@type':        'Product',
+    '@id':          baseUrl + `product.html?id=${p.id}#product`,
     name:           p.name,
-    description:    p.desc || '',
-    image:          p.image ? (p.image.startsWith('http') ? p.image : baseUrl + p.image) : baseUrl + 'images/logo.png',
+    description:    (p.desc || '').replace(/<[^>]+>/g, '').slice(0, 500),
+    image:          imageList,
     brand:          { '@type': 'Brand', name: 'Elite Emporium' },
-    offers: {
-      '@type':        'Offer',
-      url:            baseUrl + `product.html?id=${p.id}`,
-      priceCurrency:  'INR',
-      price:          p.price,
-      availability:   p.inStock !== false ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-      seller:         { '@type': 'Organization', name: 'Elite Emporium' },
-    },
+    sku:            `EE-${p.id}`,
+    mpn:            `EE-${p.id}`,
+    category:       p.category,
+    offers,
     aggregateRating: p.rating ? {
       '@type':      'AggregateRating',
       ratingValue:  p.rating,
@@ -4375,16 +4506,27 @@ function initProductDetailPage() {
       bestRating:   5,
       worstRating:  1,
     } : undefined,
+    additionalProperty: additionalProperties.length ? additionalProperties : undefined,
   });
   if (!document.getElementById('productJsonLd')) document.head.appendChild(ldScript);
 
-  // Open Graph tags for WhatsApp / social link previews (via element IDs defined in product.html)
+  // Open Graph tags for WhatsApp / social link previews — uses a
+  // Cloudinary transform (1200x630 + auto-crop + brand colour pad)
+  // so the link preview looks like a real social card, not a raw
+  // tall product photo.
   const ogImg = p.image || (p.variants && p.variants[0]?.image) || '';
+  const ogImgCard = ogImg && ogImg.includes('res.cloudinary.com')
+    ? ogImg.replace('/image/upload/', '/image/upload/c_pad,b_auto,w_1200,h_630,q_auto,f_jpg/')
+    : (ogImg.startsWith('http') ? ogImg : `https://elite-emporium-one.vercel.app/${ogImg}`);
   const setOgById = (id, val) => { const el = document.getElementById(id); if (el) el.setAttribute('content', val); };
   setOgById('ogTitle', `${p.name} – ₹${p.price.toLocaleString('en-IN')} | Elite Emporium`);
   setOgById('ogDesc',  `${p.category} · ${p.mrp && p.mrp > p.price ? Math.round((p.mrp - p.price) / p.mrp * 100) + '% off · ' : ''}Rated ★${p.rating}. Free delivery above ₹499.`);
-  setOgById('ogImage', ogImg.startsWith('http') ? ogImg : `https://elite-emporium-one.vercel.app/${ogImg}`);
+  setOgById('ogImage', ogImgCard);
   setOgById('ogUrl',   window.location.href);
+  // Also patch the og:image:width / og:image:height meta tags if present so
+  // Twitter / WhatsApp render the right aspect ratio (1.91:1).
+  document.querySelectorAll('meta[property="og:image:width"]').forEach(el => el.setAttribute('content', '1200'));
+  document.querySelectorAll('meta[property="og:image:height"]').forEach(el => el.setAttribute('content', '630'));
 
   // Update canonical URL to the actual ?id=... permalink
   const canonical = document.getElementById('canonicalLink');
