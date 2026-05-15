@@ -1423,6 +1423,33 @@ function escapeHtml(s) {
   }[c]));
 }
 
+/* ── CLOUDINARY RESPONSIVE IMAGE HELPER ─────────────────────────
+   Splices f_auto (auto format → webp/avif),
+           q_auto (auto quality),
+           w_<N>  (responsive width)
+   into a Cloudinary URL. Returns the URL unchanged if it's not a
+   Cloudinary asset (so hardcoded /images/*.png keep working).
+
+   Example:
+     cldUrl('https://res.cloudinary.com/dwygvtjad/image/upload/v123/foo.jpg', 300)
+     → 'https://res.cloudinary.com/dwygvtjad/image/upload/f_auto,q_auto,w_300/v123/foo.jpg'
+
+   srcsetFor(url) returns a ready-to-use srcset string at three widths
+   (300/450/600) covering 1x/1.5x/2x DPR for ~280px-wide product cards.
+   ──────────────────────────────────────────────────────────────── */
+function cldUrl(url, width) {
+  if (!url || typeof url !== 'string') return url || '';
+  if (!url.includes('res.cloudinary.com') || !url.includes('/image/upload/')) return url;
+  // Skip if a transform is already present (avoid double-splicing).
+  if (/\/upload\/[a-z]_[^/]+\//i.test(url)) return url;
+  const w = Number(width) || 400;
+  return url.replace('/image/upload/', `/image/upload/f_auto,q_auto,w_${w}/`);
+}
+function srcsetFor(url) {
+  if (!url || !url.includes('res.cloudinary.com')) return '';
+  return `${cldUrl(url, 300)} 300w, ${cldUrl(url, 450)} 450w, ${cldUrl(url, 600)} 600w`;
+}
+
 function getSubtotal() { return cart.reduce((s, i) => s + i.price * i.quantity, 0); }
 function getItemCount() { return cart.reduce((s, i) => s + i.quantity, 0); }
 function getDelivery()  { const st = getSubtotal(); return st === 0 ? 0 : st < CONFIG.minFreeDelivery ? CONFIG.deliveryCharge : 0; }
@@ -1499,16 +1526,20 @@ function renderProducts(list, containerId) {
 
     // Image area (onerror fallback to emoji placeholder)
     const imgFallback = `this.onerror=null;this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:52px;\\'>📦</span>'`;
+    const cardSizes = '(max-width: 600px) 50vw, (max-width: 1024px) 33vw, 280px';
     let imageHtml;
     if (p.variants && p.variants.length > 1) {
+      const vSrc = p.variants[0].image;
+      const vSrcset = srcsetFor(vSrc);
       imageHtml = `<a href="${detailLink}" class="product-img-link">
         <div class="product-image product-image-photo">
-          <img id="${pid}" src="${p.variants[0].image}" alt="${p.name}" loading="lazy" onerror="${imgFallback}" />
+          <img id="${pid}" src="${cldUrl(vSrc, 450)}"${vSrcset ? ` srcset="${vSrcset}" sizes="${cardSizes}"` : ''} alt="${p.name}" loading="lazy" decoding="async" onerror="${imgFallback}" />
         </div></a>`;
     } else if (p.image) {
+      const iSrcset = srcsetFor(p.image);
       imageHtml = `<a href="${detailLink}" class="product-img-link">
         <div class="product-image product-image-photo">
-          <img id="${pid}" src="${p.image}" alt="${p.name}" loading="lazy" onerror="${imgFallback}" />
+          <img id="${pid}" src="${cldUrl(p.image, 450)}"${iSrcset ? ` srcset="${iSrcset}" sizes="${cardSizes}"` : ''} alt="${p.name}" loading="lazy" decoding="async" onerror="${imgFallback}" />
         </div></a>`;
     } else {
       imageHtml = `<a href="${detailLink}" class="product-img-link">
@@ -1519,10 +1550,11 @@ function renderProducts(list, containerId) {
     let swatchHtml = '';
     if (p.variants && p.variants.length > 1) {
       const swatches = p.variants.map((v, i) =>
-        `<img src="${v.image}"
+        `<img src="${cldUrl(v.image, 120)}"
+              data-fullsrc="${v.image}"
               class="vswatch${i === 0 ? ' vactive' : ''}"
               onclick="swapVariant(this,'${pid}','vlbl_${pid}','${btnId}')"
-              title="${v.color}" loading="lazy" />`
+              title="${v.color}" loading="lazy" decoding="async" />`
       ).join('');
       swatchHtml = `<div class="variant-swatches">
         <span class="vcolor-name">Color: <strong id="vlbl_${pid}">${p.variants[0].color}</strong></span>
@@ -1628,16 +1660,29 @@ function renderProducts(list, containerId) {
 
 // ── SWAP VARIANT IMAGE ────────────────────────
 function swapVariant(swatch, pid, labelId, btnId) {
+  // Prefer the full-resolution original (data-fullsrc) so the swap doesn't
+  // pin the main image to a 120w thumbnail. Falls back to swatch.src for
+  // legacy non-Cloudinary swatches.
+  const fullSrc = swatch.dataset.fullsrc || swatch.src;
   const main = document.getElementById(pid);
-  if (main) { main.style.opacity = '0.7'; main.src = swatch.src; main.onload = () => main.style.opacity = '1'; }
+  if (main) {
+    main.style.opacity = '0.7';
+    // If we have srcset support on the main image, regenerate it for the new variant.
+    if (typeof srcsetFor === 'function') {
+      const newSet = srcsetFor(fullSrc);
+      if (newSet) { main.srcset = newSet; } else { main.removeAttribute('srcset'); }
+    }
+    main.src = (typeof cldUrl === 'function') ? cldUrl(fullSrc, 450) : fullSrc;
+    main.onload = () => main.style.opacity = '1';
+  }
   swatch.closest('.vswatch-row').querySelectorAll('.vswatch').forEach(s => s.classList.remove('vactive'));
   swatch.classList.add('vactive');
   const lbl = document.getElementById(labelId);
   if (lbl) lbl.textContent = swatch.title;
-  // Keep cart button in sync so the right color & image go into WhatsApp message
+  // Keep cart button in sync so the right color & full-res image go into WhatsApp message
   if (btnId) {
     const btn = document.getElementById(btnId);
-    if (btn) { btn.dataset.color = swatch.title; btn.dataset.img = swatch.src; }
+    if (btn) { btn.dataset.color = swatch.title; btn.dataset.img = fullSrc; }
   }
 }
 
@@ -3241,7 +3286,7 @@ function initJustLandedStrip() {
     return `
       <a class="jl-card" href="product.html?id=${p.id}">
         <div class="jl-ribbon">NEW</div>
-        <div class="jl-img"><img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy" /></div>
+        <div class="jl-img"><img src="${cldUrl(p.image, 300)}"${srcsetFor(p.image) ? ` srcset="${srcsetFor(p.image)}" sizes="(max-width: 600px) 40vw, 200px"` : ''} alt="${escapeHtml(p.name)}" loading="lazy" decoding="async" /></div>
         <div class="jl-info">
           <div class="jl-name">${escapeHtml(p.name)}</div>
           <div class="jl-price-row">
@@ -3304,7 +3349,7 @@ function initEditorsPicks() {
         return `
         <a class="ep-card" href="product.html?id=${p.id}">
           <div class="ep-card-num">${String(i + 1).padStart(2, '0')}</div>
-          <div class="ep-card-img"><img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy" /></div>
+          <div class="ep-card-img"><img src="${cldUrl(p.image, 450)}"${srcsetFor(p.image) ? ` srcset="${srcsetFor(p.image)}" sizes="(max-width: 600px) 80vw, 300px"` : ''} alt="${escapeHtml(p.name)}" loading="lazy" decoding="async" /></div>
           <div class="ep-card-body">
             <div class="ep-card-cat">${escapeHtml(p.category || '')}</div>
             <div class="ep-card-name">${escapeHtml(p.name)}</div>
