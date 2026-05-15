@@ -3033,8 +3033,28 @@ function placeOrder() {
     { id: 'custPincode', ok: /^\d{6}$/.test(pincode),  msg: 'Enter a valid 6-digit PIN code' },
   ];
   let hasError = false;
-  validations.forEach(({ id, ok, msg }) => { setFieldError(id, ok ? '' : msg); if (!ok) hasError = true; });
-  if (hasError) { resetBtn(); showToast('⚠️ Please fix the highlighted fields!'); return; }
+  let firstFailedId = null;
+  validations.forEach(({ id, ok, msg }) => {
+    setFieldError(id, ok ? '' : msg);
+    if (!ok) {
+      hasError = true;
+      if (!firstFailedId) firstFailedId = id;
+    }
+  });
+  if (hasError) {
+    resetBtn();
+    showToast('⚠️ Please fix the highlighted fields!');
+    // Scroll + focus the first failed field for keyboard / screen-reader
+    // users — they should land directly on the broken input, not have
+    // to hunt for the red border.
+    const target = firstFailedId && document.getElementById(firstFailedId);
+    if (target) {
+      try { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {}
+      // Slight delay so the scroll animation doesn't fight the focus call
+      setTimeout(() => { try { target.focus({ preventScroll: true }); } catch {} }, 320);
+    }
+    return;
+  }
 
   if (!cart.length) {
     resetBtn(); showToast('⚠️ Your cart is empty!'); return;
