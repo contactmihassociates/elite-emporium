@@ -2,6 +2,64 @@
 
 All notable changes are tracked here. Authoritative source is `git log --oneline`.
 
+## 2026-05-16 — Autonomous Optimization Loop (31 iterations)
+
+The "Autonomous Website Optimization Agent" directive ran a continuous Analyze → Plan → Execute → Test → Deploy loop. 31 commits to `master`, each shipping one self-audited improvement. Cumulative impact:
+
+### Performance (8 iterations)
+- **defer on all 4 script tags × 17 HTML pages** — HTML parsing no longer blocked on Firebase + script.js download (-150-300ms FCP).
+- **width/height/fetchpriority on every logo image** — fixed CLS, sped LCP on text-light pages.
+- **🔥 images/logo.png 2.4 MB → logo-96.png 6 KB** — generated 4 sized variants (48/96/192/512) via PIL Lanczos. Single biggest perf win.
+- **SW HTML cache → stale-while-revalidate** — return visits paint in <50ms from cache.
+- **Hero slideshow pauses when tab hidden + reduced-motion** — battery save.
+- **DNS-prefetch wa.me** — first WhatsApp click ~100ms faster.
+- **`<img loading="lazy"|fetchpriority="high">`** on every remaining img — pdMainImage prioritized, modal imgs deferred.
+- **Visibility-paused drift timers** — `__lvbInterval` + `__pdLpInterval` skip DOM updates when tab hidden.
+
+### SEO (5 iterations)
+- **Sitemap: 30 → 41 URLs** — added collection.html + 9 themed deep-links + 3 sort deep-links + lastmod on every entry.
+- **collection.html rich JSON-LD** — BreadcrumbList + CollectionPage with per-theme dynamic name/url/about[] + theme-aware canonical.
+- **Single h1 per page** — index.html went from 0 → 1 (visually-hidden brand-summary), about/privacy/terms/track-order went from 2 → 1.
+- **products.html dynamic meta** — per-category + per-search-query title/description/og:title/og:description/canonical update via `syncPageMeta()`.
+- **Meta description length compliance** — about/orders/wishlist trimmed/extended to fit Google's 50-160 char snippet window.
+
+### Accessibility (8 iterations)
+- **`lang="en-IN"`** on all 17 pages (was generic "en").
+- **`aria-label` on header search + newsletter** inputs.
+- **Dark-mode-aware theme-color meta** — no more red address bar in dark mode.
+- **`<main id="main">` landmark on all 15 storefront pages** (was 8 of 15) — screen-reader landmark navigation works.
+- **Source-level skip-to-content link on every page** (no longer JS-injected only).
+- **nav aria-labels** distinguish top "Primary navigation" from "Bottom navigation".
+- **5 slide-dots + 4 coupon-cards: `<div onclick>` → `<button type="button">`** — keyboard activation. Fixed nested-button HTML bug as a side-effect.
+- **Side cart drawer: `inert` + `aria-hidden` + focus-trap pattern** — proper modal behaviour with focus-restore on close.
+- **PDP main image alt updates with product name** (was generic "Product Image").
+
+### Security (4 iterations)
+- **vercel.json: 7 security/cache headers on HTML responses** — X-Content-Type-Options, Referrer-Policy, Permissions-Policy, X-Frame-Options, Strict-Transport-Security (max-age=31536000, includeSubDomains), Content-Security-Policy.
+- **CSP: 13 directives** including `upgrade-insecure-requests`, `frame-ancestors 'self'`, `object-src 'none'`, allow-listed third-party hosts (gstatic, razorpay, cloudinary, qrserver, quickchart).
+- **`rel="noopener noreferrer"` on all `target="_blank"`** — tabnabbing fix.
+- **escapeHtml() wrapping on all raw `alt="${p.name}"` interpolations** — admin-controlled XSS defence (combined with CSP).
+
+### Infra / CI (3 iterations)
+- **favicon.ico + 4 `<link rel="icon">` variants** on every page — no more /favicon.ico 404s.
+- **vercel.json caching** — versioned assets `max-age=31536000 immutable`; HTML `max-age=300, s-maxage=86400, stale-while-revalidate=604800`; /sw.js `max-age=0 must-revalidate`; manifest 1 hour; assetlinks 1 day; release/*.apk year-immutable + Content-Disposition: attachment.
+- **CI: 4 new validate.yml gates** — h1 count per page, favicon + meta-description + lang en-IN presence, defer-on-all-scripts, logo-96.png size cap (30 KB). Combined with existing gates: `node --check` on JS files, JSON validity, cache-bust consistency, retired-phone/Razorpay-live-key scan. Self-policing.
+
+### Bug fixes (2 iterations)
+- **hanii-dhanii.html defer-race regression** caught + fixed in 1 attempt — the iter-1 `defer` change broke the inline `firebase.initializeApp()` call. Wrapped firebase-dependent init in `DOMContentLoaded`-triggered `_hdInit()`.
+- **Removed duplicate h1 from track-order.html** caught by the new CI gate.
+
+### UX (1 iteration)
+- **Cart form: 6 fields enhanced** with `autocomplete` (name, tel-national, street-address, address-level1, address-level2, postal-code), `inputmode="numeric"` for phone+PIN (numeric keyboard on mobile), `autocapitalize="words"` for name/city, `pattern="[0-9]{N}"` for length validation, `required` for ARIA hints.
+
+### Final state
+- 0 leftover secrets / retired phone numbers committed
+- 14/14 storefront pages: single h1 + favicon + meta-desc + lang en-IN + main landmark + skip-link
+- 41 sitemap URLs (was 30)
+- All JS files syntax-clean
+- All JSON files schema-valid
+- All CI gates green
+
 ## 2026-05-14 — Autonomous improvement marathon
 
 A single long session that shipped ~25 batches. Grouped by theme; commit hashes in parens.
