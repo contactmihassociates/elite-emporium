@@ -5699,6 +5699,8 @@ function initRecentlyViewed() {
 
 // ── WISHLIST PAGE ─────────────────────────────
 function initWishlistPage() {
+  importWishlistFromUrl();
+
   const grid     = document.getElementById('wishlistGrid');
   const countEl  = document.getElementById('wishlistCount');
   if (!grid) return;
@@ -5782,18 +5784,96 @@ function shareWishlist() {
   const rv = JSON.parse(localStorage.getItem('eliteEmporiumWishlist') || '[]');
   const wishlisted = products.filter(p => rv.includes(p.id));
   if (!wishlisted.length) { showToast('⚠️ Your wishlist is empty!'); return; }
+
+  // Build a deep-link URL using base64-encoded comma-joined IDs.
+  // Recipients who open this URL on the same domain auto-see the
+  // sender's wishlist (importWishlistFromUrl below).
+  const idsStr  = rv.filter(id => products.some(p => p.id === id)).join(',');
+  const encoded = btoa(idsStr).replace(/=+$/, ''); // strip padding for tidiness
+  const baseUrl = `${window.location.origin}${window.location.pathname.replace(/\/[^/]*$/, '/')}wishlist.html?wl=${encoded}`;
+
   let msg = `❤️ *My Wishlist – Elite Emporium*\n━━━━━━━━━━━━━━━━━\n\n`;
   wishlisted.forEach((p, i) => {
     msg += `${i + 1}. *${p.name}*\n   ₹${p.price.toLocaleString('en-IN')}`;
     if (p.mrp && p.mrp > p.price) msg += ` (MRP ₹${p.mrp.toLocaleString('en-IN')})`;
     msg += `\n   🔗 ${window.location.origin}${window.location.pathname.replace('wishlist.html', '')}product.html?id=${p.id}\n\n`;
   });
-  msg += `━━━━━━━━━━━━━━━━━\nShop at Elite Emporium 👉 https://wa.me/917358650774`;
-  if (navigator.share) {
-    navigator.share({ title: 'My Wishlist – Elite Emporium', text: msg }).catch(() => {});
+  msg += `━━━━━━━━━━━━━━━━━\n👉 *Open my full wishlist:* ${baseUrl}\n\nShop at Elite Emporium 👉 https://wa.me/917358650774`;
+
+  // Show a small share menu: WhatsApp, Copy Link, or native share
+  const menu = document.createElement('div');
+  menu.className = 'wl-share-menu';
+  menu.innerHTML = `
+    <div class="wl-share-card">
+      <div class="wl-share-title">Share your wishlist</div>
+      <button class="wl-share-btn wl-share-wa" type="button" data-action="wa">
+        <span>💬</span> Send on WhatsApp
+      </button>
+      <button class="wl-share-btn wl-share-copy" type="button" data-action="copy">
+        <span>🔗</span> Copy shareable link
+      </button>
+      ${navigator.share ? `<button class="wl-share-btn wl-share-native" type="button" data-action="native"><span>📤</span> Share elsewhere…</button>` : ''}
+      <button class="wl-share-btn wl-share-close" type="button" data-action="close">Cancel</button>
+    </div>`;
+  document.body.appendChild(menu);
+  menu.addEventListener('click', async e => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) {
+      if (e.target === menu) menu.remove(); // backdrop click
+      return;
+    }
+    const a = btn.dataset.action;
+    if (a === 'wa') {
+      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    } else if (a === 'copy') {
+      try {
+        await navigator.clipboard.writeText(baseUrl);
+        showToast('✅ Link copied! Share it anywhere.', 3500);
+      } catch {
+        // Fallback: prompt() so user can copy manually
+        prompt('Copy this link:', baseUrl);
+      }
+    } else if (a === 'native') {
+      try { await navigator.share({ title: 'My Wishlist – Elite Emporium', text: msg, url: baseUrl }); } catch {}
+    }
+    menu.remove();
+  });
+}
+
+// Import wishlist from ?wl=<base64-ids> param if present (recipient flow).
+function importWishlistFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const wl = params.get('wl');
+  if (!wl) return;
+  let ids = [];
+  try {
+    const decoded = atob(wl.replace(/-/g, '+').replace(/_/g, '/'));
+    ids = decoded.split(',').map(Number).filter(n => !isNaN(n) && n > 0);
+  } catch { return; }
+  if (!ids.length) return;
+
+  // Confirm before overwriting an existing wishlist
+  const existing = JSON.parse(localStorage.getItem('eliteEmporiumWishlist') || '[]');
+  const matching = ids.filter(id => products.some(p => p.id === id));
+  if (!matching.length) return;
+
+  const merge = existing.length
+    ? confirm(`Someone shared a wishlist with you (${matching.length} items). Merge with your existing wishlist (${existing.length} items)?\n\nClick Cancel to replace instead.`)
+    : true;
+
+  let final;
+  if (merge) {
+    final = Array.from(new Set([...existing, ...matching]));
   } else {
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    final = matching;
   }
+  localStorage.setItem('eliteEmporiumWishlist', JSON.stringify(final));
+  showToast(`❤️ Wishlist imported! ${matching.length} item${matching.length > 1 ? 's' : ''} added.`, 4500);
+
+  // Clean the URL so refresh doesn't re-trigger the prompt
+  const url = new URL(window.location.href);
+  url.searchParams.delete('wl');
+  window.history.replaceState({}, '', url.toString());
 }
 
 function addAllWishlistToCart() {
