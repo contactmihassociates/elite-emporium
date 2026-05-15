@@ -1339,7 +1339,7 @@ function renderSideCart() {
     return `
       <div class="side-cart-item">
         ${item.image
-          ? `<img src="${cldUrl(item.image, 160)}" alt="${escapeHtml(item.name)}" class="side-cart-img" loading="lazy" />`
+          ? `<img src="${cldUrl(item.image, 160)}" alt="${escapeHtml(item.name)}" class="side-cart-img" loading="lazy" decoding="async" />`
           : `<div class="side-cart-img side-cart-img-fallback">🛍️</div>`}
         <div class="side-cart-item-info">
           <div class="side-cart-item-name">${escapeHtml(item.name)}</div>
@@ -1373,7 +1373,7 @@ function renderSideCart() {
             ${wlItems.map(p => `
               <div class="scwl-card">
                 <a href="product.html?id=${p.id}" class="scwl-link">
-                  <img src="${cldUrl(p.image, 160)}" alt="${escapeHtml(p.name)}" class="scwl-img" loading="lazy" />
+                  <img src="${cldUrl(p.image, 160)}" alt="${escapeHtml(p.name)}" class="scwl-img" loading="lazy" decoding="async" />
                   <div class="scwl-name">${escapeHtml(p.name)}</div>
                   <div class="scwl-price">₹${p.price.toLocaleString('en-IN')}</div>
                 </a>
@@ -8732,7 +8732,7 @@ function initOrdersPage() {
     const isDelivered = ordHoursAgo >= 72;
     const itemsHTML = order.items.map(item => `
       <div class="oh-item">
-        <img src="${item.image || 'images/logo.png'}" alt="${escapeHtml(item.name)}" class="oh-item-img" loading="lazy" onerror="this.src='images/logo.png'" />
+        <img src="${item.image || 'images/logo.png'}" alt="${escapeHtml(item.name)}" class="oh-item-img" loading="lazy" decoding="async" onerror="this.src='images/logo.png'" />
         <div class="oh-item-info">
           <div class="oh-item-name">${escapeHtml(item.name)}</div>
           <div class="oh-item-meta">Qty: ${item.quantity} × ₹${item.price.toLocaleString('en-IN')} = <strong>₹${(item.price * item.quantity).toLocaleString('en-IN')}</strong></div>
