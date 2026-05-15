@@ -111,6 +111,24 @@ jobs:
           [ $FAIL -eq 0 ] && echo "social cards + canonical: PASS"
           exit $FAIL
 
+      - name: Skip-link target exists (<main id="main">)
+        run: |
+          # Iteration 67 — caught products.html with href="#main" but no
+          # <main id="main"> to land on. Keyboard users hitting Enter on
+          # the skip-link went nowhere.
+          FAIL=0
+          for f in 404.html about.html cart.html collection.html index.html order-success.html orders.html privacy.html product.html products.html profile.html terms.html track-order.html wishlist.html; do
+            if [ ! -f "$f" ]; then continue; fi
+            if grep -q 'href="#main"' "$f"; then
+              if ! grep -qE '<main[^>]*\bid="main"' "$f"; then
+                echo "::error::$f has skip-link href=\"#main\" but no <main id=\"main\">"
+                FAIL=1
+              fi
+            fi
+          done
+          [ $FAIL -eq 0 ] && echo "skip-link target: PASS"
+          exit $FAIL
+
       - name: Every public HTML has noscript fallback
         run: |
           # Iteration 50 — without JS the storefront is blank. Every
