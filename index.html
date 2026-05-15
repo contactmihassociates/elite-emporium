@@ -1258,9 +1258,17 @@
   }
 
   // Pause on hover (desktop)
+  // Pause on keyboard focus too — WAI-ARIA Carousel pattern requires this so
+  // a Tab-navigating user isn't yanked between slides while focused.
   if (wrap) {
     wrap.addEventListener('mouseenter', function() { clearInterval(autoTimer); });
-    wrap.addEventListener('mouseleave', resetAuto);
+    wrap.addEventListener('mouseleave', function() { if (!_paused) resetAuto(); });
+    wrap.addEventListener('focusin',  function() { clearInterval(autoTimer); });
+    wrap.addEventListener('focusout', function(e) {
+      // Only resume when focus actually leaves the carousel (not jumping
+      // between an arrow and a dot inside it).
+      if (!wrap.contains(e.relatedTarget) && !_paused) resetAuto();
+    });
   }
 
   // Pause when the tab is hidden — saves CPU/battery for background tabs.
