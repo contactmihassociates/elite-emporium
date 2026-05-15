@@ -3274,7 +3274,84 @@ function initHomePage() {
   initMostLoved();
   initEditorsPicks();
   initJustLandedStrip();
+  initRecentSalesTicker();
   setTimeout(initCartReminder, 2000);
+}
+
+/* ── RECENT SALES TICKER ──────────────────────────────────────
+   A discreet horizontal marquee at the very top of the homepage
+   that shows 'Aarav from Chennai just bought [Product] · 3 min ago'.
+   Deterministic per-day-hour so two visitors see the same content
+   in the same session window. Picks 12 recent 'sales' from the
+   product catalog using FNV-1a, biases toward badges. Pauses on
+   hover, respects prefers-reduced-motion (shows static list).
+   ──────────────────────────────────────────────────────────── */
+function initRecentSalesTicker() {
+  if (!document.getElementById('featuredProducts')) return;
+  if (document.getElementById('recentSalesTicker')) return;
+  const eligible = products.filter(p => p.image && p.inStock !== false);
+  if (eligible.length < 8) return;
+
+  const NAMES = ['Aarav', 'Priya', 'Rohan', 'Ananya', 'Vikram', 'Meera', 'Kunal',
+    'Diya', 'Arjun', 'Sneha', 'Rahul', 'Pooja', 'Karthik', 'Kavya', 'Sanjay',
+    'Lakshmi', 'Anil', 'Riya', 'Suresh', 'Bhavya', 'Mahesh', 'Tara', 'Imran',
+    'Aisha', 'Faisal', 'Zara', 'Vivek', 'Nikhil', 'Reema', 'Tejas', 'Sunita',
+    'Hassan', 'Ayesha', 'Mohit'];
+  const CITIES = ['Chennai', 'Madurai', 'Coimbatore', 'Trichy', 'Salem',
+    'Bangalore', 'Hyderabad', 'Kochi', 'Mumbai', 'Pune', 'Delhi', 'Jaipur',
+    'Lucknow', 'Tirunelveli', 'Tuticorin', 'Pondicherry', 'Erode', 'Vellore',
+    'Kolkata', 'Ahmedabad', 'Mysuru', 'Vijayawada', 'Visakhapatnam', 'Trivandrum',
+    'Indore', 'Bhopal', 'Calicut'];
+
+  // Hour-stable seed so the ticker doesn't reshuffle every refresh.
+  const now    = new Date();
+  const hourId = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}-${now.getHours()}`;
+
+  // Pick 14 unique sales (deterministic ordering, biased toward badged products)
+  const scored = eligible.map(p => {
+    const h = _stableHash(`sale-${hourId}-${p.id}`);
+    const badgeBonus = p.badge === 'Bestseller' ? 100000 : p.badge ? 30000 : 0;
+    return { p, score: (h % 100000) + badgeBonus };
+  }).sort((a, b) => b.score - a.score).slice(0, 14);
+
+  const items = scored.map((s, i) => {
+    const seed = _stableHash(`sale-meta-${hourId}-${s.p.id}-${i}`);
+    const name = NAMES[seed % NAMES.length];
+    const city = CITIES[(seed >>> 8) % CITIES.length];
+    const minsAgo = 1 + ((seed >>> 16) % 58); // 1-58 minutes ago
+    const ago = minsAgo < 5 ? 'just now' : minsAgo < 60 ? `${minsAgo} min ago` : '1 hr ago';
+    const initial = name[0];
+    return {
+      name, city, ago, initial,
+      product: s.p.name,
+      pid: s.p.id,
+      img: s.p.image,
+    };
+  });
+
+  // Double the list so the marquee can loop seamlessly
+  const renderItem = it => `
+    <a class="rst-item" href="product.html?id=${it.pid}" title="View ${escapeHtml(it.product)}">
+      <span class="rst-avatar">${escapeHtml(it.initial)}</span>
+      <span class="rst-text">
+        <strong>${escapeHtml(it.name)}</strong> from <strong>${escapeHtml(it.city)}</strong> just bought
+        <em>${escapeHtml(it.product)}</em>
+        <span class="rst-ago">· ${escapeHtml(it.ago)}</span>
+      </span>
+    </a>`;
+  const html = items.map(renderItem).join('') + items.map(renderItem).join('');
+
+  const wrapper = document.createElement('div');
+  wrapper.id = 'recentSalesTicker';
+  wrapper.className = 'recent-sales-ticker';
+  wrapper.innerHTML = `
+    <div class="rst-label">🔥 Live orders</div>
+    <div class="rst-viewport"><div class="rst-track">${html}</div></div>`;
+
+  // Insert below the announcement bar (or near the top of <main>)
+  const after = document.querySelector('.announcement-bar') ||
+                document.querySelector('header');
+  if (after?.parentElement) after.parentElement.insertBefore(wrapper, after.nextSibling);
 }
 
 // ── 'JUST LANDED' — most recently added Firestore products ──

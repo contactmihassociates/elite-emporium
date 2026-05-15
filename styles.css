@@ -2554,6 +2554,88 @@ footer { background:#172337; color:#9b9b9b; padding:40px 4% 18px; }
 }
 
 /* ══════════════════════════════════════════════
+   RECENT SALES TICKER (homepage only, below announcement)
+══════════════════════════════════════════════ */
+.recent-sales-ticker {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(90deg, #1a1a2e 0%, #2c2c4a 100%);
+  color: #fff;
+  font-size: 12.5px;
+  height: 36px;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  position: relative;
+}
+.rst-label {
+  flex-shrink: 0;
+  padding: 0 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  background: rgba(239, 68, 68, 0.18);
+  color: #fda4a4;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+.rst-viewport {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+.rst-track {
+  display: flex;
+  white-space: nowrap;
+  animation: rstTicker 80s linear infinite;
+}
+.rst-track:hover { animation-play-state: paused; }
+.rst-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 22px;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  transition: color 0.2s;
+  border-right: 1px dashed rgba(255, 255, 255, 0.08);
+}
+.rst-item:last-child { border-right: none; }
+.rst-item:hover { color: #fff; }
+.rst-avatar {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #DB3022 0%, #ff6b6b 100%);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.rst-text strong { color: #fff; font-weight: 700; }
+.rst-text em { color: #FFD54F; font-style: normal; font-weight: 600; padding: 0 3px; }
+.rst-ago { color: rgba(255, 255, 255, 0.55); font-size: 11px; margin-left: 6px; }
+@keyframes rstTicker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@media (max-width: 600px) {
+  .recent-sales-ticker { height: 32px; font-size: 11.5px; }
+  .rst-label { padding: 0 10px; font-size: 10px; }
+  .rst-item { padding: 0 14px; gap: 6px; }
+  .rst-avatar { width: 18px; height: 18px; font-size: 9.5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rst-track { animation: none; }
+  .rst-viewport { overflow-x: auto; }
+}
+
+/* ══════════════════════════════════════════════
    IMAGE ZOOM MODAL
 ══════════════════════════════════════════════ */
 .img-modal {
