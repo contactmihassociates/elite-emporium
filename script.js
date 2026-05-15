@@ -6131,7 +6131,6 @@ function openUPIPaymentModal(ctx) {
   const encoded   = encodeURIComponent(safeUpiUrl);
   const primaryQR = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encoded}`;
   const fallback1 = `https://quickchart.io/qr?text=${encoded}&size=240`;
-  const fallback2 = `https://chart.googleapis.com/chart?chs=240x240&cht=qr&chl=${encoded}`;
 
   const upiAppLinks = isMobile
     ? `<a href="${esc(safeUpiUrl)}" class="upi-open-btn" id="upiOpenBtn">
@@ -6202,8 +6201,7 @@ function openUPIPaymentModal(ctx) {
     qrImg.addEventListener('error', () => {
       qrAttempt++;
       if (qrAttempt === 1) qrImg.src = fallback1;
-      else if (qrAttempt === 2) qrImg.src = fallback2;
-      else qrImg.style.display = 'none';
+      else qrImg.style.display = 'none';  // both QR services down — fall back to copy-UPI-ID flow below
     });
   }
 
