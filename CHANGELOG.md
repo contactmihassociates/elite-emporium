@@ -2,14 +2,19 @@
 
 All notable changes are tracked here. Authoritative source is `git log --oneline`.
 
-## 2026-05-15 — Autonomous Optimization Loop, polish pass (iters 73-78)
+## 2026-05-15 — Autonomous Optimization Loop, polish pass (iters 73-83)
 
-Five more polish-pass commits while context allowed. Highlights:
+Polish-pass commits. Highlights:
 
 - **Passive `touchend` on pull-to-refresh** (iter 74) — the lone non-passive listener in the codebase. Other touch/scroll handlers were already passive.
 - **`window.event` global removed** (iter 75) — hanii-dhanii filterHD now receives the clicked button via `this`. The implicit `window.event` global is deprecated and Firefox can return undefined, which would break the active-state visual on keyboard activation.
 - **`aria-label` on 11 inputs** (iter 76) — coupon code, search inputs without label, PIN checker, review name/text, price range, sort select, order-ID lookup. Placeholders alone aren't accessible names.
 - **`type="button"` on 54 buttons** (iter 77) — defensive: spec default for `<button>` inside a `<form>` is `submit`. None are currently in forms, but any future refactor wrapping these in a form would silently submit. Now explicit everywhere.
+- **alert() → showToast()** (iter 79) — the price-alert input's lone `alert()` call replaced with a role=alert toast. script.js is now alert()-free; UI feedback is consistent everywhere.
+- **FAQ accordion via `name="faq"`** (iter 80) — modern browsers (Chrome 120+, Safari 17+, Firefox 121+) auto-close other FAQ items when one opens. No JS needed.
+- **`:focus-visible` on `.sort-select` / `.form-select`** (iter 81) — these had `outline:none` with no compensating focus style outside the JS-driven `.kbd-nav` class. Now show a red-border + soft-glow ring exclusively for keyboard, from first paint.
+- **SW versioned-asset regex tightened** (iter 82) — `url.search.includes('v=')` would false-positive on `?nv=`, `?dev=`. Now `/[?&]v=/` anchors to a real query-param boundary.
+- **Local CI run, all 9 gates pass** (iter 83) — JS syntax, JSON validity, single h1, noscript, social-cards+canonical, skip-link target, WhatsApp number allowlist, single cache-bust version, logo size.
 
 (See iter 73 for the prior changelog entry.)
 
