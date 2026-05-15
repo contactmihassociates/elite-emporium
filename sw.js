@@ -73,7 +73,9 @@ self.addEventListener('fetch', event => {
   // Versioned asset URLs (e.g. script.js?v=...) — always go to network so
   // a deploy is picked up immediately. Cache the response under the
   // bare URL too so offline fallback still works for the previous version.
-  if (url.search.includes('v=')) {
+  // (Anchor v= to a real query-param boundary so params like ?nv=, ?dev=
+  //  don't accidentally trip this branch.)
+  if (/[?&]v=/.test(url.search)) {
     event.respondWith(
       fetch(request).then(resp => {
         if (resp && resp.ok) {
