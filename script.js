@@ -7841,9 +7841,45 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   checkPriceAlerts();
 
-  // Register PWA service worker
+  // Register PWA service worker and watch for new versions.
+  // When a new SW is waiting, show a small refresh banner the user can tap.
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      if (!reg) return;
+      const promptRefresh = () => {
+        // Avoid duplicate banners
+        if (document.getElementById('swUpdateBanner')) return;
+        const b = document.createElement('div');
+        b.id = 'swUpdateBanner';
+        b.className = 'sw-update-banner';
+        b.innerHTML = `
+          <span>🔄 A new version is available.</span>
+          <button onclick="(function(){const r=window.__swRegPending;if(r&&r.waiting){r.waiting.postMessage({type:'SKIP_WAITING'});setTimeout(()=>location.reload(),300);}else{location.reload();}})()">Refresh</button>
+          <button onclick="document.getElementById('swUpdateBanner').remove();" aria-label="Dismiss">✕</button>`;
+        document.body.appendChild(b);
+        requestAnimationFrame(() => b.classList.add('show'));
+      };
+      // If there's already a waiting worker on registration, surface it
+      if (reg.waiting) { window.__swRegPending = reg; promptRefresh(); }
+      reg.addEventListener('updatefound', () => {
+        const installing = reg.installing;
+        if (!installing) return;
+        installing.addEventListener('statechange', () => {
+          if (installing.state === 'installed' && navigator.serviceWorker.controller) {
+            window.__swRegPending = reg;
+            promptRefresh();
+          }
+        });
+      });
+      // Also reload once the new worker takes control
+      let _reloaded = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (_reloaded) return;
+        _reloaded = true;
+        // Don't auto-reload here — the explicit refresh button handles it;
+        // letting controllerchange reload silently is jarring on first load.
+      });
+    }).catch(() => {});
   }
 
   if (document.getElementById('featuredProducts')) initHomePage();

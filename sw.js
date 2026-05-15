@@ -4,7 +4,7 @@
    for pages and API calls.
    ============================================ */
 
-const CACHE_NAME = 'elite-emporium-v6';
+const CACHE_NAME = 'elite-emporium-v7';
 
 const STATIC_ASSETS = [
   '/',
@@ -44,6 +44,11 @@ self.addEventListener('activate', event => {
     )
   );
   self.clients.claim();
+});
+
+// ── MESSAGE: allow the page to trigger an immediate activate ─
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 // ── FETCH: cache-first for static, network-first for nav ──

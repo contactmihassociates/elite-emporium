@@ -86,7 +86,35 @@ A single long session that shipped ~25 batches. Grouped by theme; commit hashes 
 - Duplicate `const setMeta` inside `initProductDetailPage()`.
 - PAN-Aadhaar quote unescape fix in the toolkit page (earlier session).
 
-### Checkout + recommendations wave (latest)
+### App 10x wave — TWA polish + native-feeling features (latest)
+
+CI / automation:
+- **GitHub Actions APK build** (`.github/workflows/build-apk.yml`) — auto-builds TWA APK + AAB on every push touching `manifest.json`/`twa-manifest.json` plus manual `workflow_dispatch`. Sets up JDK 17 + Node 20 + Bubblewrap CLI, generates a debug keystore if no `ANDROID_KEYSTORE_B64` secret, runs `bubblewrap build`, attaches artifacts (30 day retention) AND auto-creates a GitHub Release tagged `app-v<ver>-<run#>`. versionCode auto-increments via `GITHUB_RUN_NUMBER`.
+- **Validate workflow** (`.github/workflows/validate.yml`) — runs on every push: node --check on script.js/sw.js, JSON validity on all manifests, cache-bust consistency warning, scan for committed Razorpay live keys or retired phone numbers.
+- **release/** folder committed with README explaining how to grab artifacts.
+- **.gitignore** updated to allow `release/*.apk` + `release/*.aab` but exclude Bubblewrap build leftovers and keystores.
+
+Audit fixes:
+- Removed second `<div class="flash-sale-banner">` from index.html — was a leftover dup with conflicting `flashHH/flashMM/flashSS` IDs.
+- Added meta description + `noindex,nofollow` to `admin.html` and `hanii-dhanii-admin.html`.
+
+App 10x improvements (all in one session):
+
+1. **Skeleton loaders** — shimmering placeholder cards in product grids while Firestore loads. `injectSkeletons() + initSkeletons()`. Auto-cleared on first real render.
+2. **Voice search** — 🎤 button in header search bar, Web Speech API `en-IN`. Pulsing 🔴 while listening. Skipped silently on unsupported browsers (iOS Safari, Firefox).
+3. **Pull-to-refresh** — touch-device only, red dot grows + rotates while pulling, turns green past 75px threshold, release = page reload. Skipped on cart/checkout/text-input. Reduced-motion safe.
+4. **Haptic feedback** — `hapticTap()`, `hapticSuccess()`, `hapticError()` wrap navigator.vibrate. Wired into every toast (matched to type), voice search lifecycle, dark-mode toggle, address-book save, share button. No-op on iOS/desktop (graceful).
+5. **Tap-to-call shortcut** — '📞 Call +91 73586 50774 directly' line at the bottom of the floating WhatsApp chat card. Uses tel: deep link. Late-mount poll to survive the chat card's own lazy init.
+6. **Address book** — multi-address save/pick on cart form. localStorage `eliteEmporiumAddressBook` array of up to 6 labeled entries (Home / Work / Mom's place / …). Chip-row above the form, tap to fill, × to delete. 'Save another address' button prompts for a label, dedupes by pincode+address prefix.
+7. **Network awareness** — slide-in red banner on `offline`, green on `online`, both with matched haptic ping. Initial state shown if page loads offline.
+8. **Dark mode v2** — auto-detects `prefers-color-scheme` on first visit; live re-syncs when system pref changes (auto mode). Toggle adds 250ms cross-fade across all themed colours. Guards against dup injection.
+9. **PWA install v2** — Android Chrome banner now waits 8s (was 3s); skipped if already standalone. New iOS-specific install nag detects iPhone Safari + non-standalone, shows manual 'Share → Add to Home Screen' banner after 12s with a 7-day dismiss cooldown.
+10. **Native share v2** — `shareProduct()` upgraded with proper navigator.share fallback chain → clipboard `writeText` → `execCommand('copy')` (oldie fallback) → WhatsApp share. Haptic tap+success.
+11. **TWA / PWA runtime detection** — `detectRuntime()` tags `<html data-runtime="twa|pwa|web">` based on display-mode + android-app referrer + `source=twa`. CSS hides floating WhatsApp button + install banners inside the installed app. Safe-area-inset padding on header & bottom-nav for installed mode.
+12. **Branded splash screen** — full-screen `#appShellSplash` (navy → red gradient) on index.html with logo, name, tagline, spinner. Inline CSS+JS so it paints immediately (no FOUC). Fades on window.load, safety-net hide at 1.6s. Reduced-motion safe.
+13. **Service worker v7 + update prompt** — SW cache bumped to v7. New `'SKIP_WAITING'` message handler. Page-side: when a new SW is detected, shows a 🔄 'A new version is available' banner with Refresh/Dismiss buttons. Tapping Refresh posts SKIP_WAITING then reloads.
+
+### Checkout + recommendations wave
 - **/order-success.html** — dedicated post-checkout celebration page with green gradient hero + bouncing ✓ tick, order ID pill, 4-step status timeline with pulsing red current-step dot, ETA line auto-filled from PIN-code zone (uses existing `getDeliveryETA()`), 4 CTAs (WhatsApp, Track, View Orders, Continue Shopping), 3 'while you wait' cards. Confetti fires on load. Wired into all 3 checkout flows (`placeOrder`, `payViaUPI`, `payOnline`) — they redirect to `order-success.html?id=<orderId>` instead of `orders.html`. Added to SW pre-cache; bumped `CACHE_NAME` v5 → v6.
 - **PDP same-day-dispatch countdown** — new line in the green delivery card that ticks every second: `'⚡ Order in the next HH:MM:SS for same-day dispatch'` until 4 PM IST, then `'⏰ Ships tomorrow'`. Turns urgent (orange bg, dark text, subtle pulse) within the last 30 minutes. Reduced-motion safe. Anchored to the real Terms §4 operational policy.
 - **Side-cart wishlist quick-add strip** — when the drawer is open and the user has wishlist items not already in their cart, a 'From your wishlist' grid (2 cols, up to 4 cards) appears below the cart items. One-tap `+ Add` re-renders the drawer in place. Surfaces 'remembered intent' at peak attention.
