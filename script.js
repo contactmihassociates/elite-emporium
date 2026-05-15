@@ -5037,7 +5037,7 @@ function initProductDetailPage() {
   };
   setMeta('og:title',       `${p.name} – Elite Emporium`);
   setMeta('og:description', `${(p.desc || '').slice(0, 120)}… ₹${p.price.toLocaleString('en-IN')} | Free delivery above ₹499`);
-  setMeta('og:image',       p.image || 'images/logo.png');
+  setMeta('og:image',       p.image || 'images/logo-512.png');
   setMeta('og:type',        'product');
   setMeta('description',    `${p.name} at ₹${p.price.toLocaleString('en-IN')}. ${(p.desc || '').slice(0, 100)}`, 'name');
 
@@ -5048,7 +5048,7 @@ function initProductDetailPage() {
   const ldScript = document.getElementById('productJsonLd') || document.createElement('script');
   ldScript.id   = 'productJsonLd';
   ldScript.type = 'application/ld+json';
-  const _abs = u => !u ? baseUrl + 'images/logo.png' : (u.startsWith('http') ? u : baseUrl + u);
+  const _abs = u => !u ? baseUrl + 'images/logo-512.png' : (u.startsWith('http') ? u : baseUrl + u);
   const imageList = [_abs(p.image), ...(p.variants || []).map(v => _abs(v.image))].filter((u, i, a) => u && a.indexOf(u) === i);
   const offerBase = {
     priceCurrency:  'INR',
@@ -6394,7 +6394,7 @@ async function payOnline() {
         currency: 'INR',
         name:     'Elite Emporium',
         description: `Order ${orderId} · ${cart.reduce((s,i)=>s+i.quantity,0)} item(s)`,
-        image:    'https://elite-emporium-one.vercel.app/images/logo.png',
+        image:    'https://elite-emporium-one.vercel.app/images/logo-512.png',
         prefill:  { name, contact: phone, email: get('custEmail') },
         notes: {
           order_id:    orderId,
@@ -8735,7 +8735,7 @@ function initOrdersPage() {
     const isDelivered = ordHoursAgo >= 72;
     const itemsHTML = order.items.map(item => `
       <div class="oh-item">
-        <img src="${item.image || 'images/logo.png'}" alt="${escapeHtml(item.name)}" class="oh-item-img" loading="lazy" decoding="async" onerror="this.src='images/logo.png'" />
+        <img src="${item.image || 'images/logo-96.png'}" alt="${escapeHtml(item.name)}" class="oh-item-img" loading="lazy" decoding="async" onerror="this.src='images/logo-96.png'" />
         <div class="oh-item-info">
           <div class="oh-item-name">${escapeHtml(item.name)}</div>
           <div class="oh-item-meta">Qty: ${item.quantity} × ₹${item.price.toLocaleString('en-IN')} = <strong>₹${(item.price * item.quantity).toLocaleString('en-IN')}</strong></div>
