@@ -155,6 +155,23 @@ jobs:
           fi
           echo "Secret scan passed."
 
+      - name: Universal :focus-visible baseline exists
+        run: |
+          # Iteration 98 — established a universal :focus-visible rule
+          # for button/a/input/select/textarea/summary etc. Regression
+          # check: this rule must continue to exist in styles.css so
+          # keyboard users always see a focus indicator even on classes
+          # that have outline:none with no per-class focus replacement.
+          if ! grep -q 'button:focus-visible' styles.css; then
+            echo "::error::Universal :focus-visible baseline missing from styles.css"
+            exit 1
+          fi
+          if ! grep -q 'input:focus-visible' styles.css; then
+            echo "::error::Universal :focus-visible baseline missing input:focus-visible"
+            exit 1
+          fi
+          echo "Universal :focus-visible baseline: PASS"
+
       - name: WhatsApp number is one of the known business numbers
         run: |
           # Iteration 61 — caught a fabricated number 918708276960 in the
