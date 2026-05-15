@@ -787,7 +787,8 @@ header nav a:hover, header nav a.active { color:white; border-bottom-color:var(-
 .filter-group:last-child { border-bottom:none; }
 .filter-group h4 { font-size:11px; font-weight:700; color:var(--text-light); margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; }
 .filter-option { display:flex; align-items:center; gap:8px; margin-bottom:7px; cursor:pointer; padding:4px 8px; border-radius:var(--radius); transition:var(--transition); }
-.filter-option:hover, .filter-option.active { background:var(--red-light); }
+.filter-option:hover, .filter-option:focus-visible, .filter-option.active { background:var(--red-light); }
+.filter-option:focus-visible { outline: 2px solid var(--red); outline-offset: -2px; }
 .filter-option input { accent-color:var(--red); cursor:pointer; }
 .filter-option label { font-size:13px; color:var(--text-mid); cursor:pointer; display:flex; align-items:center; justify-content:space-between; flex:1; gap:6px; }
 .filter-option.active label { color:var(--red); font-weight:600; }
@@ -1562,7 +1563,9 @@ html[data-runtime="pwa"] .bottom-nav {
 .cart-item-price { font-size:16px; font-weight:700; color:var(--text); }
 .quantity-controls { display:flex; align-items:center; gap:8px; }
 .qty-btn { width:30px; height:30px; border:1.5px solid var(--border); background:white; border-radius:50%; cursor:pointer; font-size:16px; font-weight:700; display:flex; align-items:center; justify-content:center; transition:var(--transition); }
-.qty-btn:hover { background:var(--red); color:white; border-color:var(--red); }
+.qty-btn:hover,
+.qty-btn:focus-visible { background:var(--red); color:white; border-color:var(--red); }
+.qty-btn:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 .qty-value { font-size:15px; font-weight:600; min-width:26px; text-align:center; }
 .remove-btn { background:none; border:none; color:var(--text-light); cursor:pointer; font-size:12px; font-weight:600; padding:4px 8px; transition:var(--transition); flex-shrink:0; font-family:'Poppins',sans-serif; }
 .remove-btn:hover { color:var(--red); }
@@ -1776,7 +1779,9 @@ textarea.form-input { resize:vertical; min-height:72px; }
   transition: transform 0.2s, box-shadow 0.2s;
   line-height: 1;
 }
-.wishlist-btn:hover { transform: scale(1.15); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.wishlist-btn:hover,
+.wishlist-btn:focus-visible { transform: scale(1.15); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.wishlist-btn:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 .wishlist-btn.active { color: var(--red); }
 .wishlist-btn.pop { animation: wishlistPop 0.35s ease; }
 .qv-card-btn {
@@ -2822,7 +2827,9 @@ textarea.form-input { resize:vertical; min-height:72px; }
 .btn-primary:focus-visible { background:var(--yellow-dark); box-shadow:0 4px 12px rgba(255,229,0,0.4); }
 .btn-primary:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 .btn-outline { background:transparent; color:white; padding:11px 28px; border-radius:var(--radius); font-weight:600; font-size:14px; transition:var(--transition); display:inline-flex; align-items:center; gap:7px; border:2px solid rgba(255,255,255,0.5); cursor:pointer; font-family:'Poppins',sans-serif; }
-.btn-outline:hover { border-color:var(--yellow); color:var(--yellow); }
+.btn-outline:hover,
+.btn-outline:focus-visible { border-color:var(--yellow); color:var(--yellow); }
+.btn-outline:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
 
 /* ══════════════════════════════════════════════
    ABOUT SECTION
