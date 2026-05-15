@@ -95,6 +95,22 @@ jobs:
           fi
           echo "logo-96.png size: $SIZE bytes (PASS)"
 
+      - name: Every public HTML has social cards + canonical
+        run: |
+          # Iteration 51 — enforce OG + Twitter card + canonical URL
+          # on every customer-facing page so links shared on WhatsApp/
+          # Twitter/FB always render a rich card.
+          FAIL=0
+          for f in 404.html about.html cart.html collection.html index.html order-success.html orders.html privacy.html product.html products.html profile.html terms.html track-order.html wishlist.html; do
+            if [ ! -f "$f" ]; then continue; fi
+            grep -q 'property="og:image"'      "$f" || { echo "::error::$f missing og:image"; FAIL=1; }
+            grep -q 'property="og:url"'        "$f" || { echo "::error::$f missing og:url"; FAIL=1; }
+            grep -q 'name="twitter:card"'      "$f" || { echo "::error::$f missing twitter:card"; FAIL=1; }
+            grep -q 'rel="canonical"'          "$f" || { echo "::error::$f missing canonical"; FAIL=1; }
+          done
+          [ $FAIL -eq 0 ] && echo "social cards + canonical: PASS"
+          exit $FAIL
+
       - name: Every public HTML has noscript fallback
         run: |
           # Iteration 50 — without JS the storefront is blank. Every
