@@ -570,7 +570,7 @@
       return `
         <div class="product-card" onclick="location.href='product.html?id=${p.id}'">
           <div class="product-img-wrap">
-            ${img ? `<img src="${img}" alt="${p.name}" loading="lazy" class="product-img" />` : `<div class="product-img-placeholder">💎</div>`}
+            ${img ? `<img src="${img}" alt="${p.name}" loading="lazy" decoding="async" class="product-img" />` : `<div class="product-img-placeholder">💎</div>`}
             ${badge}
           </div>
           <div class="product-info">

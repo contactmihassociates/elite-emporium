@@ -373,7 +373,7 @@
           <h2>👀 Recently viewed</h2>
           ${rvNames.map(it => `
             <div class="pf-activity-row">
-              <img src="${(typeof cldUrl === 'function' ? cldUrl(it.image, 100) : it.image)}" alt="" loading="lazy" />
+              <img src="${(typeof cldUrl === 'function' ? cldUrl(it.image, 100) : it.image)}" alt="" loading="lazy" decoding="async" />
               <div class="pf-activity-info">
                 <div class="pf-activity-name">${escAttr(it.name)}</div>
                 <div class="pf-activity-meta">₹${(it.price || 0).toLocaleString('en-IN')}</div>
