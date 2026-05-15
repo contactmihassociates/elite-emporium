@@ -1978,26 +1978,47 @@ function initCartUpsell() {
   if (!section || !strip) return;
 
   const cartIds   = new Set(cart.map(i => i.id));
-  const cartCats  = [...new Set(cart.map(i => i.category))];
-  let candidates  = products.filter(p => !cartIds.has(p.id) && p.inStock !== false);
-  const relevant  = candidates.filter(p => cartCats.includes(p.category));
-  const fallback  = candidates.filter(p => !cartCats.includes(p.category));
-  const picks     = [...relevant, ...fallback].slice(0, 8);
+  const cartCats  = new Set(cart.map(i => i.category));
+  // Estimate the customer's price comfort zone from the cart median.
+  const cartPrices = cart.map(i => i.price).filter(n => Number(n));
+  const median = cartPrices.length
+    ? [...cartPrices].sort((a, b) => a - b)[Math.floor(cartPrices.length / 2)]
+    : 0;
 
-  if (!picks.length) { section.style.display = 'none'; return; }
+  // Weighted scoring: category match (+100), popularity by reviews (+log),
+  // closeness to cart median price (-abs delta), discount > 0 (+8).
+  const scored = products
+    .filter(p => !cartIds.has(p.id) && p.inStock !== false && p.image)
+    .map(p => {
+      let score = 0;
+      if (cartCats.has(p.category)) score += 100;
+      score += Math.log10((p.reviews || 0) + 1) * 12;
+      if (p.rating && p.rating >= 4.3) score += 6;
+      if (p.mrp && p.mrp > p.price) score += 8;
+      if (p.badge === 'Bestseller') score += 12;
+      if (median > 0 && p.price) {
+        score -= Math.abs(p.price - median) / Math.max(median, 100); // 0..1 ish penalty
+      }
+      return { p, score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .map(s => s.p)
+    .slice(0, 8);
+
+  if (!scored.length) { section.style.display = 'none'; return; }
   section.style.display = '';
 
-  strip.innerHTML = picks.map(p => {
+  strip.innerHTML = scored.map(p => {
     const discount = p.mrp && p.mrp > p.price ? Math.round((p.mrp - p.price) / p.mrp * 100) : 0;
     return `<div class="product-card" style="min-width:170px;max-width:170px;flex-shrink:0;">
       <a href="product.html?id=${p.id}" class="product-img-link">
         <div class="product-image product-image-photo">
-          <img src="${p.image}" alt="${p.name}" loading="lazy" />
+          <img src="${cldUrl(p.image, 300)}"${srcsetFor(p.image) ? ` srcset="${srcsetFor(p.image)}"` : ''} sizes="170px" alt="${escapeHtml(p.name)}" loading="lazy" decoding="async" />
         </div>
       </a>
       <div class="product-info">
-        <div class="product-name" style="font-size:12px;"><a href="product.html?id=${p.id}">${p.name.length > 34 ? p.name.slice(0,34)+'…' : p.name}</a></div>
-        <div class="product-rating"><span class="fk-rating-badge">★ ${p.rating}</span></div>
+        <div class="product-name" style="font-size:12px;"><a href="product.html?id=${p.id}">${escapeHtml(p.name.length > 34 ? p.name.slice(0,34)+'…' : p.name)}</a></div>
+        <div class="product-rating"><span class="fk-rating-badge">★ ${p.rating || '4.5'}</span></div>
         <div class="product-footer">
           <div class="product-price-block">
             <div class="product-price">₹${p.price.toLocaleString('en-IN')}</div>
