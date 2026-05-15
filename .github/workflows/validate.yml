@@ -136,3 +136,16 @@ jobs:
             exit 1
           fi
           echo "Secret scan passed."
+
+      - name: WhatsApp number is one of the known business numbers
+        run: |
+          # Iteration 61 — caught a fabricated number 918708276960 in the
+          # noscript fallbacks. Allowlist the two known Elite Emporium
+          # WhatsApp numbers (primary + alt). Anything else is a bug.
+          OTHER=$(grep -rohE "wa\.me/91[0-9]{10}" --include="*.html" --include="*.js" . 2>/dev/null | sort -u | grep -vE "wa\.me/(917358650774|917358719774)" || true)
+          if [ -n "$OTHER" ]; then
+            echo "::error::Unknown WhatsApp number found (not primary nor alt):"
+            echo "$OTHER"
+            exit 1
+          fi
+          echo "WhatsApp number consistency: PASS"
