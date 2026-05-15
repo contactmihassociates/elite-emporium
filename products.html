@@ -424,7 +424,7 @@
 
 <!-- Quick View Modal -->
 <div class="qv-backdrop" id="qvBackdrop" onclick="closeQuickView(event)">
-  <div class="qv-modal" id="qvModal">
+  <div class="qv-modal" id="qvModal" role="dialog" aria-modal="true" aria-labelledby="qvName">
     <button type="button" class="qv-close" onclick="closeQuickView()" aria-label="Close quick view">✕</button>
     <div class="qv-img"><img id="qvImg" src="" alt="" loading="lazy" decoding="async" /></div>
     <div class="qv-body">
