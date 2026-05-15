@@ -1291,7 +1291,12 @@ function renderSideCart() {
   }
 
   const cartItemsHtml = cart.map(item => {
-    const key = (item.cartKey || '').replace(/"/g, '&quot;');
+    // Escape cartKey for HTML attribute context. The old inline-onclick
+    // pattern (onclick="updateQuantity('${key}', ...)") broke if the
+    // cartKey contained ' (e.g. variant color "Pearl's White"). Switching
+    // to a data-key attribute + this.dataset.key access at click time
+    // makes the value safe regardless of quotes/special chars.
+    const escKey = (item.cartKey || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
     const lineTotal = (item.price * item.quantity).toLocaleString('en-IN');
     return `
       <div class="side-cart-item">
@@ -1302,11 +1307,11 @@ function renderSideCart() {
           <div class="side-cart-item-name">${escapeHtml(item.name)}</div>
           ${item.selectedColor ? `<div class="side-cart-item-color">${escapeHtml(item.selectedColor)}</div>` : ''}
           <div class="side-cart-item-qty">
-            <button class="scq-btn" onclick="updateQuantity('${key}', -1);renderSideCart();" aria-label="Decrease quantity">−</button>
+            <button class="scq-btn" data-key="${escKey}" onclick="updateQuantity(this.dataset.key, -1);renderSideCart();" aria-label="Decrease quantity">−</button>
             <span class="scq-val">${item.quantity}</span>
-            <button class="scq-btn" onclick="updateQuantity('${key}', 1);renderSideCart();" aria-label="Increase quantity">+</button>
-            <button class="scq-save" onclick="saveForLater('${key}', ${item.id});" aria-label="Save for later" title="Save for later">🤍</button>
-            <button class="scq-remove" onclick="removeFromCart('${key}');renderSideCart();" aria-label="Remove" title="Remove">🗑️</button>
+            <button class="scq-btn" data-key="${escKey}" onclick="updateQuantity(this.dataset.key, 1);renderSideCart();" aria-label="Increase quantity">+</button>
+            <button class="scq-save" data-key="${escKey}" data-id="${item.id}" onclick="saveForLater(this.dataset.key, this.dataset.id);" aria-label="Save for later" title="Save for later">🤍</button>
+            <button class="scq-remove" data-key="${escKey}" onclick="removeFromCart(this.dataset.key);renderSideCart();" aria-label="Remove" title="Remove">🗑️</button>
           </div>
         </div>
         <div class="side-cart-item-price">₹${lineTotal}</div>
