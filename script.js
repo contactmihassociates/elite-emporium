@@ -5224,7 +5224,7 @@ function initProductDetailPage() {
   const colorPicker = document.getElementById('pdColorPicker');
 
   if (p.variants && p.variants.length > 1) {
-    if (mainImg) mainImg.src = p.variants[0].image;
+    if (mainImg) { mainImg.src = p.variants[0].image; mainImg.alt = p.name + (p.variants[0].color ? ' ' + p.variants[0].color : ''); }
     // Thumbnail strip under main image
     const gallery = document.querySelector('.pd-gallery');
     if (gallery && p.variants.length > 1) {
@@ -5260,7 +5260,7 @@ function initProductDetailPage() {
          </div>`;
     }
   } else {
-    if (mainImg) mainImg.src = p.image || '';
+    if (mainImg) { mainImg.src = p.image || ''; mainImg.alt = p.name; }
     if (colorPicker) colorPicker.style.display = 'none';
   }
 
