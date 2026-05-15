@@ -3491,8 +3491,19 @@ function initHeaderSearch() {
   }
 
   inp.addEventListener('focus', () => { if (!inp.value) showHistory(); else showSuggestions(inp.value); });
+
+  // Debounced input handler — 120ms coalesces fast keystrokes so the
+  // .filter() + DOM-render of 6 suggestion thumbnails doesn't re-run
+  // on every single character. Empty-input path hides immediately
+  // (debouncing the easy path feels broken).
+  let _hdrSearchDebounce;
   inp.addEventListener('input', () => {
-    if (!inp.value) showHistory(); else showSuggestions(inp.value);
+    clearTimeout(_hdrSearchDebounce);
+    if (!inp.value) {
+      showHistory();
+      return;
+    }
+    _hdrSearchDebounce = setTimeout(() => showSuggestions(inp.value), 120);
   });
 
   function highlightMatch(text, term) {
