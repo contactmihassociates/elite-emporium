@@ -155,6 +155,20 @@ jobs:
           fi
           echo "Secret scan passed."
 
+      - name: SW fallback page (offline.html) exists and is well-formed
+        run: |
+          # Iteration 109 — sw.js falls back to /offline.html when a
+          # document request fails with no cached version. If this file
+          # ever gets deleted, offline users see a useless empty response.
+          if [ ! -f "offline.html" ]; then
+            echo "::error::offline.html is missing — SW fallback chain broken"
+            exit 1
+          fi
+          grep -q '<h1>' offline.html || { echo "::error::offline.html missing <h1>"; exit 1; }
+          grep -q 'location.reload' offline.html || { echo "::error::offline.html missing reload button"; exit 1; }
+          grep -q 'wa.me/917358650774' offline.html || { echo "::error::offline.html missing WA fallback link"; exit 1; }
+          echo "offline.html: PASS"
+
       - name: Universal :focus-visible baseline exists
         run: |
           # Iteration 98 — established a universal :focus-visible rule
