@@ -2935,8 +2935,10 @@ footer { background:#172337; color:#9b9b9b; padding:40px 4% 18px; }
   cursor: pointer;
   font-family: 'Poppins', sans-serif;
 }
-.bottom-nav-item.active { color: var(--red); }
-.bottom-nav-item:hover  { color: var(--red); }
+.bottom-nav-item.active        { color: var(--red); }
+.bottom-nav-item:hover,
+.bottom-nav-item:focus-visible { color: var(--red); }
+.bottom-nav-item:focus-visible { outline: 2px solid var(--red); outline-offset: -2px; border-radius: 4px; }
 .bottom-nav-icon  { font-size:21px; line-height:1; }
 .bottom-nav-label { font-size:10px; line-height:1; }
 .bottom-nav-badge { position:absolute; top:5px; right:calc(50% - 20px); background:var(--red); color:white; border-radius:50%; width:16px; height:16px; font-size:9px; font-weight:700; display:none; align-items:center; justify-content:center; }
