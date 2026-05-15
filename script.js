@@ -875,7 +875,51 @@ function updateCartUI(animate) {
   if (typeof updateFaviconBadge === 'function') {
     try { updateFaviconBadge(total); } catch {}
   }
+  // App Badging API — shows cart count on the installed home-screen
+  // icon (Chrome on Android, Edge on Windows, Safari on macOS Sonoma+).
+  // Silent no-op on unsupported browsers.
+  try {
+    if ('setAppBadge' in navigator) {
+      if (total > 0) navigator.setAppBadge(total).catch(() => {});
+      else navigator.clearAppBadge?.().catch(() => {});
+    }
+  } catch {}
+  // Cross-tab cart sync — broadcast the new count so other open
+  // tabs (e.g. a wishlist tab) re-render their cart badge live.
+  try {
+    if (window.__cartChannel) {
+      window.__cartChannel.postMessage({ type: 'cart-update', total, at: Date.now() });
+    }
+  } catch {}
 }
+
+/* ── BROADCASTCHANNEL: cross-tab cart sync ───────────────────
+   When the user has the site open in two tabs and adds an item in
+   one, the other tab's cart badge should update without a refresh.
+   The channel also lets the side cart drawer in tab B reflect tab
+   A's changes. localStorage 'storage' event already fires for the
+   raw write, but BroadcastChannel is faster + more reliable.
+   ──────────────────────────────────────────────────────────── */
+(function initCartChannel() {
+  if (typeof BroadcastChannel === 'undefined') return;
+  try {
+    const ch = new BroadcastChannel('elite-emporium-cart');
+    window.__cartChannel = ch;
+    ch.addEventListener('message', e => {
+      if (!e.data || e.data.type !== 'cart-update') return;
+      // Re-read cart from localStorage (the other tab wrote it)
+      try {
+        cart = JSON.parse(localStorage.getItem('eliteEmporiumCart') || '[]');
+        document.querySelectorAll('.cart-count').forEach(el => {
+          el.textContent = e.data.total;
+          el.style.display = e.data.total > 0 ? 'flex' : 'none';
+        });
+        if (typeof renderCart === 'function' && document.getElementById('cartItems')) renderCart();
+        if (typeof renderSideCart === 'function' && document.getElementById('sideCartDrawer')?.classList.contains('open')) renderSideCart();
+      } catch {}
+    });
+  } catch {}
+})();
 
 // Close side cart on Esc
 document.addEventListener('keydown', e => {
@@ -2949,6 +2993,40 @@ function askNotifPermission() {
 function dismissNotifPrompt() {
   localStorage.setItem(NOTIF_PROMPT_KEY, Date.now());
   document.getElementById('notifPromptCard')?.remove();
+}
+
+/* ── HOVER PREFETCH ──────────────────────────────────────────
+   On hover/touchstart over a product card link, inject a
+   <link rel="prefetch"> for the product detail page. The browser
+   fetches it during idle time so clicking feels instant.
+   ──────────────────────────────────────────────────────────── */
+function initHoverPrefetch() {
+  if (typeof document === 'undefined') return;
+  // Honour save-data and slow networks
+  try {
+    const c = navigator.connection || {};
+    if (c.saveData) return;
+    if (c.effectiveType && /^(slow-2g|2g)$/.test(c.effectiveType)) return;
+  } catch {}
+  const prefetched = new Set();
+  function doPrefetch(href) {
+    if (!href || prefetched.has(href)) return;
+    prefetched.add(href);
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.href = href;
+    link.as = 'document';
+    document.head.appendChild(link);
+  }
+  document.addEventListener('pointerenter', e => {
+    const a = e.target?.closest?.('a[href^="product.html?id="]');
+    if (a) doPrefetch(a.getAttribute('href'));
+  }, true);
+  // Also fire on touchstart for mobile (less reliable but still helps)
+  document.addEventListener('touchstart', e => {
+    const a = e.target?.closest?.('a[href^="product.html?id="]');
+    if (a) doPrefetch(a.getAttribute('href'));
+  }, { passive: true, capture: true });
 }
 
 /* ── KEYBOARD SHORTCUTS ──────────────────────────────────────
@@ -5425,7 +5503,14 @@ function initBottomNavActive() {
       matched = [...items].find(a => (a.getAttribute('href') || '').toLowerCase().includes('products.html'));
     } else if (currentFile === 'track-order.html') {
       matched = [...items].find(a => (a.getAttribute('href') || '').toLowerCase().includes('orders.html'));
-    } else if (['about.html', 'privacy.html', 'terms.html'].includes(currentFile)) {
+    } else if (currentFile === 'profile.html') {
+      // Profile page → no exact tab; highlight Orders since it's the
+      // most closely-related personal-data page
+      matched = [...items].find(a => (a.getAttribute('href') || '').toLowerCase().includes('orders.html'));
+    } else if (currentFile === 'collection.html') {
+      // Festive collections → highlight Products
+      matched = [...items].find(a => (a.getAttribute('href') || '').toLowerCase().includes('products.html'));
+    } else if (['about.html', 'privacy.html', 'terms.html', 'order-success.html'].includes(currentFile)) {
       // No matching tab — leave Home highlighted as a sensible default
       matched = [...items].find(a => (a.getAttribute('href') || '').toLowerCase().includes('index.html'));
     }
@@ -8227,11 +8312,11 @@ function initOrdersPage() {
         <div class="oh-stat-val">${topCat ? topCat[0] : '—'}</div>
         <div class="oh-stat-label">${topCat ? 'Favourite category' : 'No favourite yet'}</div>
       </div>
-      <div class="oh-stat-card oh-tier" style="--tier-color:${tier.color};">
+      <a class="oh-stat-card oh-tier" href="profile.html" style="--tier-color:${tier.color};text-decoration:none;color:inherit;cursor:pointer;" title="View your full profile">
         <div class="oh-stat-icon">${tier.emoji}</div>
         <div class="oh-stat-val">${tier.label}</div>
-        <div class="oh-stat-label">${tier.label} · ${orders.length} order${orders.length > 1 ? 's' : ''} · ${totalItems} items</div>
-      </div>
+        <div class="oh-stat-label">${tier.label} · ${orders.length} order${orders.length > 1 ? 's' : ''} · View profile →</div>
+      </a>
     </div>
     <a href="https://wa.me/?text=${encodeURIComponent(`Hey! I shop at Elite Emporium and the products are great. Check them out: ${window.location.origin}/`)}" target="_blank" rel="noopener" class="oh-refer">
       <div class="oh-refer-icon">🎁</div>
@@ -8322,6 +8407,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initPullToRefresh();        // pull-down-to-reload on touch devices
   initTapToCallShortcut();    // 'Call us' inside the WhatsApp chat card
   initKeyboardShortcuts();    // '/' or Ctrl+K to focus search
+  initHoverPrefetch();        // <link rel="prefetch"> on product card hover
   initLazyImageFade();
   initScrollReveal();
   initBackToTop();

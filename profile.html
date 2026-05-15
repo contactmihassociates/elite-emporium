@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile – Elite Emporium</title>
+  <meta name="description" content="Your Elite Emporium profile — loyalty tier, saved addresses, lifetime savings, recent activity." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="canonical" href="https://elite-emporium-one.vercel.app/profile.html" />
+  <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+  <link rel="stylesheet" href="styles.css?v=20260516d" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#DB3022" />
+  <style>
+    .profile-page { max-width: 860px; margin: 0 auto; padding: 22px 4% 100px; }
+    .profile-hero {
+      background: linear-gradient(135deg, #1a1a2e 0%, #DB3022 100%);
+      color: #fff;
+      border-radius: 22px;
+      padding: 30px 26px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(219, 48, 34, 0.18);
+    }
+    .profile-hero::after {
+      content: '👑';
+      position: absolute;
+      top: -32px; right: -8px;
+      font-size: 170px;
+      opacity: 0.08;
+      transform: rotate(8deg);
+    }
+    .profile-avatar {
+      width: 76px; height: 76px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 3px solid rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+    .profile-greet { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+    .profile-sub  { font-size: 13px; opacity: 0.92; }
+    .profile-tier-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 6px 14px;
+      border-radius: 14px;
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      margin-top: 14px;
+    }
+
+    .pf-card {
+      background: var(--surface, #fff);
+      border: 1px solid var(--border, #e8eaf0);
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+    .pf-card h2 {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pf-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 600px) {
+      .pf-stat-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .pf-stat {
+      background: var(--bg, #f6f7fb);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+    [data-theme="dark"] .pf-stat { background: #0d1117; }
+    .pf-stat-val {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .pf-stat-val.savings { color: #2e7d32; }
+    .pf-stat-label {
+      font-size: 11px;
+      color: var(--text2);
+      margin-top: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .pf-addr-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .pf-addr {
+      background: var(--bg, #f6f7fb);
+      border: 1px solid var(--border, #e8eaf0);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+    [data-theme="dark"] .pf-addr { background: #0d1117; }
+    .pf-addr-label { font-size: 11px; font-weight: 800; color: var(--red); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 2px; }
+    .pf-addr-name  { font-size: 14px; font-weight: 700; }
+    .pf-addr-line  { font-size: 12.5px; color: var(--text2); line-height: 1.5; margin-top: 2px; }
+    .pf-addr-del   { background: transparent; border: none; color: var(--text2); cursor: pointer; font-size: 18px; padding: 0 4px; opacity: 0.5; }
+    .pf-addr-del:hover { opacity: 1; color: var(--red); }
+    .pf-addr-empty { font-size: 13px; color: var(--text2); text-align: center; padding: 18px; }
+
+    .pf-activity-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border, #e8eaf0);
+    }
+    .pf-activity-row:last-child { border-bottom: none; }
+    .pf-activity-row img { width: 44px; height: 44px; object-fit: cover; border-radius: 8px; }
+    .pf-activity-info { flex: 1; min-width: 0; }
+    .pf-activity-name { font-size: 13px; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pf-activity-meta { font-size: 11.5px; color: var(--text2); }
+    .pf-activity-row a { color: var(--red); font-size: 12px; font-weight: 700; text-decoration: none; }
+
+    .pf-quick-actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 480px) { .pf-quick-actions { grid-template-columns: 1fr; } }
+    .pf-action {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg, #f6f7fb);
+      border: 1px solid var(--border, #e8eaf0);
+      border-radius: 12px;
+      padding: 14px;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.15s, transform 0.12s, background 0.15s;
+    }
+    .pf-action:hover { border-color: var(--red); transform: translateY(-1px); }
+    .pf-action-icon { font-size: 22px; flex-shrink: 0; }
+    .pf-action-text { display: flex; flex-direction: column; }
+    .pf-action-text strong { font-size: 13px; font-weight: 800; }
+    .pf-action-text span { font-size: 11px; color: var(--text2); }
+
+    .pf-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text2);
+    }
+    .pf-empty-icon { font-size: 60px; margin-bottom: 14px; }
+    .pf-empty h3 { color: var(--text); font-size: 18px; margin-bottom: 6px; }
+    .pf-empty a {
+      display: inline-block;
+      background: var(--red);
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 22px;
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body><div id="scrollProgress"></div>
+
+<header>
+  <div class="header-main">
+    <a href="index.html" class="logo">
+      <img src="images/logo.png" class="logo-img" alt="Elite Emporium" />
+    </a>
+    <div class="header-search">
+      <form id="headerSearchForm">
+        <input type="text" id="headerSearchInput" placeholder="Search products, brands and more" autocomplete="off" />
+        <button type="submit">🔍</button>
+      </form>
+    </div>
+    <div class="header-actions">
+      <a href="cart.html" class="cart-btn">🛒 Cart <span class="cart-count">0</span></a>
+    </div>
+  </div>
+</header>
+
+<div class="page-header">
+  <h1>👤 My Profile</h1>
+  <p class="breadcrumb"><a href="index.html">Home</a> › My Profile</p>
+</div>
+
+<main class="profile-page" id="main">
+  <div id="profileContent">
+    <div class="pf-empty">
+      <div class="pf-empty-icon">👤</div>
+      <h3>Sign in by placing your first order</h3>
+      <p>Your profile auto-builds from your order history. Place an order via WhatsApp and your tier, savings & addresses will appear here.</p>
+      <a href="products.html">Start Shopping</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-bottom">
+    <span>© 2026 Elite Emporium. All rights reserved.</span>
+    <span><a href="about.html" style="color:inherit;">About</a> · <a href="privacy.html" style="color:inherit;">Privacy</a> · <a href="terms.html" style="color:inherit;">Terms</a></span>
+  </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="script.js?v=20260516d"></script>
+
+<script>
+  /* Render the profile from local data. Falls back to empty state. */
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(renderProfile, 100); // wait for products array
+    setTimeout(renderProfile, 1200); // and again once Firestore products arrived
+  });
+
+  function renderProfile() {
+    const root = document.getElementById('profileContent');
+    if (!root) return;
+    let orders = [];
+    let addresses = [];
+    let recentlyViewed = [];
+    let wishlist = [];
+    try {
+      orders = JSON.parse(localStorage.getItem('eliteEmporiumOrders') || '[]');
+      addresses = JSON.parse(localStorage.getItem('eliteEmporiumAddressBook') || '[]');
+      recentlyViewed = JSON.parse(localStorage.getItem('eliteEmporiumRV') || '[]');
+      wishlist = JSON.parse(localStorage.getItem('eliteEmporiumWishlist') || '[]');
+    } catch {}
+
+    if (!orders.length && !addresses.length && !recentlyViewed.length && !wishlist.length) {
+      return; // keep empty state
+    }
+
+    // Stats
+    const totalSpent = orders.reduce((s, o) => s + (o.total || 0), 0);
+    const totalItems = orders.reduce((s, o) => s + (o.items || []).reduce((x, i) => x + (i.quantity || 1), 0), 0);
+    const productsArr = (typeof products !== 'undefined' && Array.isArray(products)) ? products : [];
+    const totalSaved = orders.reduce((s, o) => {
+      const itemSavings = (o.items || []).reduce((acc, i) => {
+        const live = productsArr.find(p => p.id === i.id);
+        const mrp  = (live && live.mrp) || i.price;
+        return acc + Math.max(0, (mrp - i.price) * (i.quantity || 1));
+      }, 0);
+      return s + itemSavings + (o.discount || 0) + ((o.delivery === 0 && o.subtotal > 0) ? 60 : 0);
+    }, 0);
+    const tier = orders.length >= 10 ? { label: 'Gold', emoji: '🥇' }
+              : orders.length >= 5 ? { label: 'Silver', emoji: '🥈' }
+              : { label: 'Bronze', emoji: '🥉' };
+
+    const firstOrderDate = orders.length ? new Date(orders[orders.length - 1].date) : new Date();
+    const memberSince = firstOrderDate.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+
+    const customerName = orders[0]?.customer?.name || 'Guest';
+    const firstName = customerName.split(' ')[0];
+    const initials = customerName.split(' ').map(s => s[0]).join('').slice(0, 2).toUpperCase();
+
+    // Stats — recent activity
+    const rvNames = recentlyViewed.slice(0, 3);
+
+    root.innerHTML = `
+      <div class="profile-hero">
+        <div class="profile-avatar">${initials || '👤'}</div>
+        <div class="profile-greet">Hi ${firstName}!</div>
+        <div class="profile-sub">Member since ${memberSince} · ${orders.length} order${orders.length === 1 ? '' : 's'}</div>
+        <div class="profile-tier-pill">${tier.emoji} ${tier.label} customer</div>
+      </div>
+
+      <div class="pf-card">
+        <h2>📊 Your stats</h2>
+        <div class="pf-stat-grid">
+          <div class="pf-stat">
+            <div class="pf-stat-val">₹${totalSpent.toLocaleString('en-IN')}</div>
+            <div class="pf-stat-label">Total spent</div>
+          </div>
+          <div class="pf-stat">
+            <div class="pf-stat-val savings">₹${totalSaved.toLocaleString('en-IN')}</div>
+            <div class="pf-stat-label">You've saved</div>
+          </div>
+          <div class="pf-stat">
+            <div class="pf-stat-val">${totalItems}</div>
+            <div class="pf-stat-label">Items bought</div>
+          </div>
+          <div class="pf-stat">
+            <div class="pf-stat-val">${wishlist.length}</div>
+            <div class="pf-stat-label">In wishlist</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pf-card">
+        <h2>📒 Saved addresses</h2>
+        ${addresses.length ? `
+          <div class="pf-addr-grid">
+            ${addresses.map((a, i) => `
+              <div class="pf-addr">
+                <div>
+                  <div class="pf-addr-label">${escAttr(a.label || 'Address')}</div>
+                  <div class="pf-addr-name">${escAttr(a.name || '')}  ·  ${escAttr(a.phone || '')}</div>
+                  <div class="pf-addr-line">${escAttr(a.address || '')}${a.city ? ', ' + escAttr(a.city) : ''}${a.state ? ', ' + escAttr(a.state) : ''} - ${escAttr(a.pincode || '')}</div>
+                </div>
+                <button class="pf-addr-del" type="button" title="Delete" onclick="deleteAddress(${i})">🗑️</button>
+              </div>`).join('')}
+          </div>
+        ` : `
+          <div class="pf-addr-empty">No addresses saved yet. They'll auto-save next time you check out, or hit <a href="cart.html" style="color:var(--red);font-weight:700;">Cart</a> to add one.</div>
+        `}
+      </div>
+
+      ${rvNames.length ? `
+        <div class="pf-card">
+          <h2>👀 Recently viewed</h2>
+          ${rvNames.map(it => `
+            <div class="pf-activity-row">
+              <img src="${(typeof cldUrl === 'function' ? cldUrl(it.image, 100) : it.image)}" alt="" loading="lazy" />
+              <div class="pf-activity-info">
+                <div class="pf-activity-name">${escAttr(it.name)}</div>
+                <div class="pf-activity-meta">₹${(it.price || 0).toLocaleString('en-IN')}</div>
+              </div>
+              <a href="product.html?id=${it.id}">View →</a>
+            </div>`).join('')}
+        </div>
+      ` : ''}
+
+      <div class="pf-card">
+        <h2>🚀 Quick actions</h2>
+        <div class="pf-quick-actions">
+          <a href="orders.html" class="pf-action">
+            <span class="pf-action-icon">📦</span>
+            <span class="pf-action-text"><strong>My orders</strong><span>Track + history</span></span>
+          </a>
+          <a href="wishlist.html" class="pf-action">
+            <span class="pf-action-icon">❤️</span>
+            <span class="pf-action-text"><strong>Wishlist</strong><span>${wishlist.length} item${wishlist.length === 1 ? '' : 's'}</span></span>
+          </a>
+          <a href="track-order.html" class="pf-action">
+            <span class="pf-action-icon">🔎</span>
+            <span class="pf-action-text"><strong>Track order</strong><span>Live status</span></span>
+          </a>
+          <a href="https://wa.me/917358650774" target="_blank" rel="noopener" class="pf-action">
+            <span class="pf-action-icon">💬</span>
+            <span class="pf-action-text"><strong>WhatsApp us</strong><span>Reply in 30 min</span></span>
+          </a>
+        </div>
+      </div>`;
+  }
+
+  function escAttr(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+
+  function deleteAddress(idx) {
+    let book;
+    try { book = JSON.parse(localStorage.getItem('eliteEmporiumAddressBook') || '[]'); } catch { return; }
+    if (!book[idx]) return;
+    if (!confirm(`Delete the "${book[idx].label || 'this'}" address?`)) return;
+    book.splice(idx, 1);
+    localStorage.setItem('eliteEmporiumAddressBook', JSON.stringify(book));
+    renderProfile();
+    if (typeof hapticTap === 'function') hapticTap();
+  }
+</script>
+
+</body>
+</html>

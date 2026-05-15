@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Festive Collection – Elite Emporium</title>
+  <meta name="description" content="Curated festive collections at Elite Emporium — Eid, Diwali, Christmas, New Year & more." />
+  <link rel="canonical" href="https://elite-emporium-one.vercel.app/collection.html" />
+  <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+  <link rel="stylesheet" href="styles.css?v=20260516d" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#DB3022" />
+  <style>
+    .coll-hero {
+      position: relative;
+      padding: 60px 4% 50px;
+      text-align: center;
+      color: #fff;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .coll-hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(135deg, var(--coll-c1, #1A237E) 0%, var(--coll-c2, #C62828) 100%);
+    }
+    .coll-emoji {
+      font-size: 64px;
+      line-height: 1;
+      margin-bottom: 14px;
+      filter: drop-shadow(0 4px 14px rgba(0,0,0,0.25));
+      animation: collFloat 3.6s ease-in-out infinite;
+    }
+    @keyframes collFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @media (prefers-reduced-motion: reduce) { .coll-emoji { animation: none; } }
+    .coll-hero h1 {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    .coll-hero p { font-size: 14px; max-width: 540px; margin: 0 auto; opacity: 0.94; line-height: 1.6; }
+    .coll-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff;
+      color: var(--text);
+      padding: 12px 22px;
+      border-radius: 22px;
+      font-weight: 800;
+      font-size: 13px;
+      text-decoration: none;
+      margin-top: 18px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+      transition: transform 0.15s;
+    }
+    .coll-cta:hover { transform: translateY(-2px); }
+
+    .coll-promo-strip {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px dashed rgba(255, 255, 255, 0.4);
+      border-radius: 14px;
+      max-width: 480px;
+      margin: 22px auto 0;
+      padding: 12px 16px;
+      font-size: 12.5px;
+    }
+    .coll-promo-code {
+      display: inline-block;
+      background: #fff;
+      color: var(--red, #DB3022);
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      font-family: monospace;
+      margin: 0 4px;
+    }
+
+    .coll-page { max-width: 1200px; margin: 0 auto; padding: 22px 4% 80px; }
+    .coll-section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin: 24px 0 12px;
+    }
+    .coll-section-head h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .coll-section-head a {
+      font-size: 12px;
+      color: var(--red);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .coll-cat-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    @media (max-width: 720px) { .coll-cat-strip { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 460px) { .coll-cat-strip { grid-template-columns: repeat(2, 1fr); } }
+    .coll-cat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 12px;
+      text-decoration: none;
+      text-align: center;
+      color: var(--text);
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .coll-cat-card:hover { transform: translateY(-3px); border-color: var(--red); }
+    .coll-cat-card .cci { font-size: 30px; display: block; margin-bottom: 6px; }
+    .coll-cat-card .ccn { font-size: 12.5px; font-weight: 700; }
+    .coll-cat-card .ccc { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+    .coll-empty { text-align: center; padding: 50px 20px; color: var(--text2); }
+  </style>
+</head>
+<body><div id="scrollProgress"></div>
+
+<header>
+  <div class="header-main">
+    <a href="index.html" class="logo">
+      <img src="images/logo.png" class="logo-img" alt="Elite Emporium" />
+    </a>
+    <div class="header-search">
+      <form id="headerSearchForm">
+        <input type="text" id="headerSearchInput" placeholder="Search products, brands and more" autocomplete="off" />
+        <button type="submit">🔍</button>
+      </form>
+    </div>
+    <div class="header-actions">
+      <a href="cart.html" class="cart-btn">🛒 Cart <span class="cart-count">0</span></a>
+    </div>
+  </div>
+</header>
+
+<!-- Festive Hero — populated by JS -->
+<section class="coll-hero" id="collHero" style="--coll-c1:#1A237E;--coll-c2:#C62828;">
+  <div class="coll-emoji" id="collEmoji">✨</div>
+  <h1 id="collTitle">Festive Collection</h1>
+  <p id="collSubtitle">Curated picks for the season — shop early, save more.</p>
+  <a href="products.html?sort=discount" class="coll-cta" id="collCta">Shop Deals →</a>
+  <div class="coll-promo-strip" id="collPromo" style="display:none;">
+    Use code <span class="coll-promo-code" id="collPromoCode">FESTIVE15</span> for an extra 15% off.
+  </div>
+</section>
+
+<main class="coll-page" id="main">
+
+  <!-- Category quick-jumps for this festival -->
+  <div class="coll-section-head">
+    <h2 id="collCatHead">🛍️ Shop the look</h2>
+    <a href="products.html">View All →</a>
+  </div>
+  <div class="coll-cat-strip" id="collCatStrip"></div>
+
+  <!-- Hand-picked products for this festival -->
+  <div class="coll-section-head">
+    <h2>✨ Hand-picked for you</h2>
+    <a href="products.html?sort=popular">More →</a>
+  </div>
+  <div class="products-grid" id="collProductsGrid"></div>
+
+  <!-- Trending right now -->
+  <div class="coll-section-head">
+    <h2>🔥 Trending today</h2>
+    <a href="products.html?sort=popular">More →</a>
+  </div>
+  <div class="products-grid" id="collTrendingGrid"></div>
+
+</main>
+
+<footer>
+  <div class="footer-bottom">
+    <span>© 2026 Elite Emporium. All rights reserved.</span>
+    <span><a href="about.html" style="color:inherit;">About</a> · <a href="privacy.html" style="color:inherit;">Privacy</a> · <a href="terms.html" style="color:inherit;">Terms</a></span>
+  </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="script.js?v=20260516d"></script>
+
+<script>
+  /* Festival metadata — maps theme id → palette, categories, emoji, coupon */
+  const COLL_THEMES = {
+    'eid':         { emoji: '🌙', title: 'Eid Collection',          subtitle: 'Curated Abaya, Hijab, Perfumes & Fashion for the season.',           cats: ['Abaiya','Hijab','Perfumes','Kurta Sets'],  c1: '#1a4ea3', c2: '#0d2657', code: 'ELITE10' },
+    'diwali':      { emoji: '🪔', title: 'Diwali Collection',       subtitle: 'Light up your home — Kitchen, Decor, Gifts & Sweets pairings.',      cats: ['Home & Kitchen','Cosmetics','Watches','Bags'],  c1: '#FFB300', c2: '#E65100', code: 'ELITE10' },
+    'christmas':   { emoji: '🎄', title: 'Christmas Collection',    subtitle: 'Gift sets, watches & elegant fashion — wrapped & ready.',            cats: ['Watches','Cosmetics','Bags','Wallets'],   c1: '#C62828', c2: '#2E7D32', code: 'ELITE10' },
+    'new-year':    { emoji: '🎆', title: 'New Year Collection',     subtitle: 'Start the year in style — fresh fashion & home essentials.',         cats: ['Clothing','Watches','Cosmetics','Footwear'], c1: '#1A237E', c2: '#C62828', code: 'WELCOME' },
+    'pongal':      { emoji: '🌾', title: 'Pongal Collection',       subtitle: 'Harvest festival picks — Tamil Nadu pride from Kayalpattinam.',     cats: ['Home & Kitchen','Sarees','Clothing','Cosmetics'], c1: '#FF9800', c2: '#C62828', code: 'SUMMER15' },
+    'wedding':     { emoji: '💍', title: 'Wedding Collection',      subtitle: 'Sarees, Sherwanis, Watches, Perfumes — everything for the big day.', cats: ['Sarees','Mens Dress','Watches','Perfumes'], c1: '#7B1FA2', c2: '#C62828', code: 'ELITE10' },
+    'summer':      { emoji: '☀️', title: 'Summer Collection',      subtitle: 'Stay cool — sunglasses, light cottons, hair care & cosmetics.',     cats: ['Coolers','Clothing','Hair Care','Cosmetics'], c1: '#FFB300', c2: '#FF7043', code: 'SUMMER15' },
+    'monsoon':     { emoji: '☔', title: 'Monsoon Collection',      subtitle: 'Rain-ready essentials — bags, footwear, abaiya, watches.',           cats: ['Bags','Footwear','Abaiya','Watches'],     c1: '#1565C0', c2: '#37474F', code: 'ELITE10' },
+    'kids':        { emoji: '🎈', title: 'Kids Collection',         subtitle: 'Festive outfits & accessories for the little ones.',                cats: ['Kids Wear','Toys & Games','Footwear'],    c1: '#FBC02D', c2: '#E91E63', code: 'ELITE10' },
+  };
+
+  /* Pick the theme from ?theme= or auto-detect by date */
+  function pickTheme() {
+    const params = new URLSearchParams(window.location.search);
+    const wanted = (params.get('theme') || '').toLowerCase();
+    if (wanted && COLL_THEMES[wanted]) return { id: wanted, ...COLL_THEMES[wanted] };
+    // Auto-detect by date — mirror initFestiveTheming logic
+    const now = new Date();
+    const m = now.getMonth(), d = now.getDate();
+    if (m === 0 && d <= 7)            return { id: 'new-year', ...COLL_THEMES['new-year'] };
+    if (m === 0 && d >= 13 && d <= 16) return { id: 'pongal', ...COLL_THEMES['pongal'] };
+    if (m === 2 || m === 3)             return { id: 'eid', ...COLL_THEMES['eid'] };
+    if ((m === 9 && d >= 15) || (m === 10 && d <= 15)) return { id: 'diwali', ...COLL_THEMES['diwali'] };
+    if (m === 11 && d >= 15)           return { id: 'christmas', ...COLL_THEMES['christmas'] };
+    if (m >= 3 && m <= 5)               return { id: 'summer', ...COLL_THEMES['summer'] };
+    if (m >= 6 && m <= 8)               return { id: 'monsoon', ...COLL_THEMES['monsoon'] };
+    // Default to wedding (year-round in India)
+    return { id: 'wedding', ...COLL_THEMES['wedding'] };
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const theme = pickTheme();
+    document.title = `${theme.title} – Elite Emporium`;
+    const hero = document.getElementById('collHero');
+    hero.style.setProperty('--coll-c1', theme.c1);
+    hero.style.setProperty('--coll-c2', theme.c2);
+    document.getElementById('collEmoji').textContent = theme.emoji;
+    document.getElementById('collTitle').textContent = theme.title;
+    document.getElementById('collSubtitle').textContent = theme.subtitle;
+    document.getElementById('collCta').href = `products.html?category=${encodeURIComponent(theme.cats[0])}`;
+    if (theme.code) {
+      document.getElementById('collPromoCode').textContent = theme.code;
+      document.getElementById('collPromo').style.display = '';
+    }
+
+    // Category quick-jumps — emoji-mapped chip cards
+    const CAT_EMOJI = {
+      'Abaiya': '🕌', 'Hijab': '🧕', 'Sarees': '👘', 'Clothing': '👗',
+      'Mens Dress': '👔', 'Kurta Sets': '🥻', 'Kids Wear': '👶',
+      'Bags': '👜', 'Watches': '⌚', 'Wallets': '👛', 'Coolers': '🕶️',
+      'Perfumes': '🧴', 'Cosmetics': '💄', 'Hair Care': '💆',
+      'Home & Kitchen': '🍳', 'Sports': '🏃', 'Footwear': '👟',
+      'Toys & Games': '🎮',
+    };
+
+    function renderWhenReady() {
+      if (typeof products === 'undefined' || !Array.isArray(products) || !products.length) {
+        setTimeout(renderWhenReady, 400);
+        return;
+      }
+
+      // Category strip
+      const catStrip = document.getElementById('collCatStrip');
+      catStrip.innerHTML = theme.cats.map(c => {
+        const count = products.filter(p => p.category === c).length;
+        return `<a href="products.html?category=${encodeURIComponent(c)}" class="coll-cat-card">
+          <span class="cci">${CAT_EMOJI[c] || '🛍️'}</span>
+          <div class="ccn">${c}</div>
+          <div class="ccc">${count} product${count === 1 ? '' : 's'}</div>
+        </a>`;
+      }).join('');
+
+      // Hand-picked grid: top 8 highest-rated products in the theme's
+      // categories that are in stock and have an image.
+      const handPicked = products
+        .filter(p => theme.cats.includes(p.category) && p.inStock !== false && p.image)
+        .sort((a, b) => (b.rating || 0) * Math.log10((b.reviews || 0) + 1) - (a.rating || 0) * Math.log10((a.reviews || 0) + 1))
+        .slice(0, 8);
+      if (typeof renderProducts === 'function') renderProducts(handPicked, 'collProductsGrid');
+
+      // Trending: top 8 by review count overall
+      const trending = [...products]
+        .filter(p => p.inStock !== false && p.image)
+        .sort((a, b) => (b.reviews || 0) - (a.reviews || 0))
+        .slice(0, 8);
+      if (typeof renderProducts === 'function') renderProducts(trending, 'collTrendingGrid');
+    }
+    setTimeout(renderWhenReady, 300);
+  });
+</script>
+
+</body>
+</html>
