@@ -2869,8 +2869,15 @@ function placeOrder() {
   resetBtn();
 
   launchConfetti();
-  window.open(waUrl, '_blank');
-  showToast('🎉 Order sent! Redirecting to WhatsApp…');
+  // Offline-aware: queue the order if no network so customer doesn't
+  // hit an empty WhatsApp window. Will auto-flush on 'online' event.
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    if (typeof queuePendingOrder === 'function') queuePendingOrder(decodeURIComponent(msg), _orderId);
+    showToast('📡 Saved offline — we\'ll send to WhatsApp when you\'re back online.', 5500, 'info');
+  } else {
+    window.open(waUrl, '_blank');
+    showToast('🎉 Order sent! Redirecting to WhatsApp…');
+  }
 
   setTimeout(() => { window.location.href = `order-success.html?id=${encodeURIComponent(_orderId)}`; }, 2800);
 }
@@ -2989,6 +2996,40 @@ window.addEventListener('online', () => { _imgScale = networkImageScale(); });
    4. Levenshtein distance ≤ 2 on any name word (typo tolerance)
    Returns a score; higher = more relevant.
    ──────────────────────────────────────────────────────────── */
+/* ── PRODUCT ATTRIBUTE AUTO-EXTRACTION ───────────────────────
+   Scans a product's name + description for known keywords and
+   tags it with structured attributes (colours, sizes, materials,
+   gender). Used by the search ranking + filter system.
+
+   This runs once at module load and caches the result on each
+   product. No external API.
+   ──────────────────────────────────────────────────────────── */
+const ATTR_COLOURS = ['black','white','red','blue','green','yellow','pink','purple','orange','brown','grey','gray','beige','maroon','navy','olive','gold','silver','rose','ivory','cream','mustard','teal','peach','sage'];
+const ATTR_SIZES   = ['xs','s','m','l','xl','xxl','xxxl','small','medium','large','free size'];
+const ATTR_MATERIALS = ['cotton','silk','denim','leather','wool','linen','polyester','rayon','chiffon','satin','velvet','nylon','jute','khadi','net','georgette'];
+const ATTR_GENDER  = [['mens', 'Men'], ['men\'s', 'Men'], ['men ', 'Men'], ['womens', 'Women'], ['women\'s', 'Women'], ['ladies', 'Women'], ['kids', 'Kids'], ['boys', 'Kids'], ['girls', 'Kids'], ['unisex', 'Unisex']];
+
+function extractProductAttributes(p) {
+  if (p._attrs) return p._attrs; // memoise
+  const haystack = ((p.name || '') + ' ' + (p.desc || '') + ' ' + (p.category || '')).toLowerCase();
+  const attrs = {};
+  attrs.colours = ATTR_COLOURS.filter(c => new RegExp(`\\b${c}\\b`).test(haystack));
+  if (p.variants && p.variants.length) {
+    p.variants.forEach(v => { if (v.color && !attrs.colours.includes(v.color.toLowerCase())) attrs.colours.push(v.color.toLowerCase()); });
+  }
+  attrs.sizes = ATTR_SIZES.filter(s => new RegExp(`\\b${s}\\b`).test(haystack));
+  attrs.materials = ATTR_MATERIALS.filter(m => haystack.includes(m));
+  attrs.gender = (ATTR_GENDER.find(g => haystack.includes(g[0])) || [null, null])[1];
+  p._attrs = attrs;
+  return attrs;
+}
+
+/* Run extraction after products load — extends fuzzyScore by tagging. */
+function tagAllProductAttributes() {
+  if (!Array.isArray(products)) return;
+  products.forEach(extractProductAttributes);
+}
+
 function _lev(a, b) {
   if (a === b) return 0;
   if (!a.length) return b.length;
@@ -3018,6 +3059,12 @@ function fuzzyScore(p, q) {
   if (cat.includes(ql))  s += 60;
   const words = ql.split(/\s+/).filter(Boolean);
   if (words.length > 1 && words.every(w => name.includes(w))) s += 40;
+  // Attribute-aware matches: "red bag" matches a red-tagged bag even
+  // if "red" isn't in the product name (it might just be a variant).
+  const attrs = extractProductAttributes(p);
+  if (attrs.colours.some(c => ql.includes(c))) s += 25;
+  if (attrs.materials.some(m => ql.includes(m))) s += 20;
+  if (attrs.gender && ql.includes(attrs.gender.toLowerCase())) s += 15;
   // Typo tolerance — for short queries, check against each name word
   if (s === 0 && ql.length >= 3) {
     const nameWords = name.split(/\s+/);
@@ -3032,6 +3079,47 @@ function fuzzyScore(p, q) {
   s += Math.log10((p.reviews || 0) + 1) * 2;
   return s;
 }
+
+/* ── OFFLINE ORDER QUEUE (Background Sync best-effort) ───────
+   When the customer hits Place Order while offline, the order is
+   stashed in localStorage 'eliteEmporiumPendingOrders'. On the
+   next 'online' event we open WhatsApp for each queued order so
+   the customer can confirm + send them in bulk. Also wires
+   navigator.serviceWorker.sync.register if Background Sync is
+   supported (Chrome + Edge + Samsung Browser).
+   ──────────────────────────────────────────────────────────── */
+const PENDING_ORDER_KEY = 'eliteEmporiumPendingOrders';
+function queuePendingOrder(orderMessage, orderId) {
+  try {
+    const list = JSON.parse(localStorage.getItem(PENDING_ORDER_KEY) || '[]');
+    list.push({ orderId, message: orderMessage, queuedAt: Date.now() });
+    localStorage.setItem(PENDING_ORDER_KEY, JSON.stringify(list));
+    // Best-effort Background Sync registration (browser will retry when online)
+    if ('serviceWorker' in navigator && 'sync' in (navigator.serviceWorker.controller?.constructor?.prototype || {})) {
+      navigator.serviceWorker.ready.then(reg => {
+        if (reg.sync) reg.sync.register('elite-emporium-order-sync').catch(() => {});
+      }).catch(() => {});
+    }
+  } catch {}
+}
+function flushPendingOrders() {
+  let list;
+  try { list = JSON.parse(localStorage.getItem(PENDING_ORDER_KEY) || '[]'); } catch { return; }
+  if (!list?.length) return;
+  // Open each as a WhatsApp link (max 3 windows for safety)
+  list.slice(0, 3).forEach(o => {
+    setTimeout(() => {
+      const url = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(o.message)}`;
+      window.open(url, '_blank');
+    }, 400);
+  });
+  localStorage.removeItem(PENDING_ORDER_KEY);
+  showToast(`📤 Sending ${list.length} queued order${list.length > 1 ? 's' : ''}…`, 4000, 'success');
+}
+window.addEventListener('online', () => {
+  // Small delay so the network is stable
+  setTimeout(flushPendingOrders, 1500);
+});
 
 /* ── PWA / TWA RUNTIME DETECTION ─────────────────────────────
    Sets <html data-runtime="..."> to one of: 'web' | 'pwa' | 'twa'.
@@ -8111,6 +8199,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (document.getElementById('productsGrid'))     showSkeletons('productsGrid', 12);
 
   await loadProducts();
+
+  // Tag every product with extracted attributes (colours/sizes/material/gender)
+  // for richer fuzzy-search ranking and future faceted filters.
+  if (typeof tagAllProductAttributes === 'function') tagAllProductAttributes();
 
   checkPriceAlerts();
 
