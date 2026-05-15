@@ -2809,21 +2809,41 @@ function initHeaderSearch() {
     const matches = products.filter(p =>
       p.name.toLowerCase().includes(term) || p.category.toLowerCase().includes(term)
     ).slice(0, 6);
-    if (!matches.length) { dropdown.style.display = 'none'; return; }
     _selectedIdx = -1;
+    if (!matches.length) {
+      // Friendly no-results state with quick recovery links
+      dropdown.innerHTML = `
+        <div class="sh-header"><span>No matches for "<strong>${escapeHtml(q)}</strong>"</span></div>
+        <div class="sh-empty">
+          <div class="sh-empty-icon">🔍</div>
+          <div class="sh-empty-text">Try a different word, or browse a category:</div>
+          <div class="sh-empty-cats">
+            <a href="products.html?category=Bags" class="sh-empty-cat">👜 Bags</a>
+            <a href="products.html?category=Watches" class="sh-empty-cat">⌚ Watches</a>
+            <a href="products.html?category=Perfumes" class="sh-empty-cat">🧴 Perfumes</a>
+            <a href="products.html?category=Clothing" class="sh-empty-cat">👗 Fashion</a>
+            <a href="products.html" class="sh-empty-cat">⭐ All</a>
+          </div>
+        </div>
+        <a class="sh-item sh-search-all" href="https://wa.me/917358650774?text=${encodeURIComponent('Hi! Looking for: ' + q)}" target="_blank" rel="noopener">
+          💬 Ask us on WhatsApp — we might have it
+        </a>`;
+      dropdown.style.display = 'block';
+      return;
+    }
     dropdown.innerHTML = `
-      <div class="sh-header"><span>Suggestions for "<strong>${q}</strong>"</span></div>
+      <div class="sh-header"><span>Suggestions for "<strong>${escapeHtml(q)}</strong>"</span></div>
       ${matches.map(p => `
         <a class="sh-item sh-product-item" href="product.html?id=${p.id}">
-          <img src="${p.image || ''}" alt="${p.name}" class="sh-thumb" onerror="this.style.display='none'" />
+          <img src="${cldUrl(p.image || '', 100)}" alt="${escapeHtml(p.name)}" class="sh-thumb" onerror="this.style.display='none'" loading="lazy" />
           <div class="sh-product-info">
             <div class="sh-product-name">${highlightMatch(p.name, q)}</div>
-            <div class="sh-product-price">₹${p.price.toLocaleString('en-IN')} · <span style="color:var(--red)">${p.category}</span></div>
+            <div class="sh-product-price">₹${p.price.toLocaleString('en-IN')} · <span style="color:var(--red)">${escapeHtml(p.category)}</span></div>
           </div>
           ${p.mrp && p.mrp > p.price ? `<span class="sh-discount">${Math.round((p.mrp - p.price)/p.mrp*100)}% off</span>` : ''}
         </a>`).join('')}
       <a class="sh-item sh-search-all" href="products.html?search=${encodeURIComponent(q)}" onclick="saveSearchTerm('${q.replace(/'/g,"\\'")}')">
-        🔍 See all results for "<strong>${q}</strong>"
+        🔍 See all results for "<strong>${escapeHtml(q)}</strong>"
       </a>`;
     dropdown.style.display = 'block';
   }

@@ -195,6 +195,27 @@ img { display:block; }
 .sh-kbd-active { background: #fef3f2; color: var(--red) !important; }
 .sh-search-all { font-size: 12px; color: var(--red); font-weight: 600; border-top: 1px solid var(--bg); text-decoration: none; padding: 10px 12px; }
 .sh-search-all:hover { background: #fef3f2; }
+.sh-empty {
+  padding: 18px 14px 14px;
+  text-align: center;
+  border-top: 1px dashed var(--border);
+}
+.sh-empty-icon { font-size: 32px; line-height: 1; margin-bottom: 6px; }
+.sh-empty-text { font-size: 12.5px; color: var(--text2); margin-bottom: 10px; }
+.sh-empty-cats { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.sh-empty-cat {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 4px 10px;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+.sh-empty-cat:hover { background: var(--red-light); border-color: var(--red); }
 
 /* ── Scroll Progress Bar ── */
 #scrollProgress {
