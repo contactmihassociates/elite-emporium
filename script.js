@@ -3875,7 +3875,13 @@ function initProductsPage() {
   }
 
   // Faceted filter state — colour + material chips selected on the page
-  let activeFacets = { colour: null, material: null };
+  // Read facet filters from URL params (so deep-links like
+  // /products.html?category=Bags&color=red&material=leather restore
+  // the full filter state on page load)
+  let activeFacets = {
+    colour:   params.get('color')    || null,
+    material: params.get('material') || null,
+  };
 
   function filtered() {
     let list = [...products];
@@ -4071,6 +4077,8 @@ function initProductsPage() {
     if (_priceMax   !== null)       params.set('maxPrice', _priceMax);
     if (minRating   > 0)            params.set('rating',   minRating);
     if (inStockOnly)                params.set('inStock',  '1');
+    if (activeFacets.colour)        params.set('color',    activeFacets.colour);
+    if (activeFacets.material)      params.set('material', activeFacets.material);
     const qs = params.toString();
     const newUrl = window.location.pathname + (qs ? '?' + qs : '');
     history.replaceState(null, '', newUrl);
