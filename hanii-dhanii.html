@@ -443,11 +443,12 @@
 <script src="firebase-config.js" defer></script>
 
 <script>
-  // ── FIREBASE INIT ──────────────────────────
+  // ── FIREBASE INIT (deferred — runs after deferred scripts) ──
+  // The Firebase compat scripts above are loaded with defer, so they
+  // execute after the parser finishes. Inline scripts don't have a
+  // defer mode, so we wait for DOMContentLoaded (which fires AFTER
+  // all deferred scripts run) before touching firebase globals.
   let db;
-  if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
-  db = firebase.firestore();
-
   // ── CART COUNT ─────────────────────────────
   function updateCartCount() {
     const cart = JSON.parse(localStorage.getItem('eliteEmporiumCart') || '[]');
@@ -588,8 +589,23 @@
     if (q) location.href = `products.html?search=${encodeURIComponent(q)}`;
   });
 
-  // ── INIT ──────────────────────────────────
-  loadHDProducts();
+  // ── INIT (runs after deferred Firebase scripts have loaded) ─
+  function _hdInit() {
+    try {
+      if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
+      db = firebase.firestore();
+    } catch (e) {
+      console.error('[hanii-dhanii] Firebase init failed:', e);
+      return;
+    }
+    updateCartCount();
+    loadHDProducts();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _hdInit);
+  } else {
+    _hdInit();
+  }
 </script>
 </body>
 </html>
