@@ -2508,16 +2508,17 @@ function refreshSummary() {
     }
   }
 
-  // Smart coupon suggestion — show the most valuable coupon for the current subtotal
+  // Smart coupon suggestion — show the most valuable ELIGIBLE coupon
+  // for the current subtotal. Coupons whose minOrder isn't met are
+  // SKIPPED so the user never sees an 'Apply' that immediately fails.
   let smartCouponEl = document.getElementById('smartCouponSuggest');
   const canSuggest = !_activeCoupon && cart.length > 0 && !sessionStorage.getItem('smartCouponDismissed');
   if (canSuggest) {
-    // Pick best: highest discount value at this subtotal, ignoring SUMMER15 if sub < 500
     let best = null, bestSave = 0;
     Object.entries(COUPONS).forEach(([code, c]) => {
+      // Skip if cart hasn't hit the coupon's min-order floor.
+      if (c.minOrder && sub < c.minOrder) return;
       const save = c.type === 'percent' ? Math.round(sub * c.value / 100) : Math.min(c.value, sub);
-      // SUMMER15 only suggested at higher carts to feel "earned"
-      if (code === 'SUMMER15' && sub < 500) return;
       if (save > bestSave) { best = { code, c, save }; bestSave = save; }
     });
     if (best && bestSave >= 10) {
