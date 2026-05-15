@@ -191,7 +191,7 @@
           <div class="pin-checker">
             <div class="pin-checker-label">📍 Check delivery to your PIN code</div>
             <div class="pin-checker-row">
-              <input type="text" id="pinCheckerInput" class="pin-checker-input" placeholder="Enter 6-digit PIN code" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" />
+              <input type="text" id="pinCheckerInput" class="pin-checker-input" placeholder="Enter 6-digit PIN code" aria-label="Delivery PIN code" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" />
               <button class="pin-checker-btn" onclick="checkPinDelivery()">Check</button>
             </div>
             <div class="pin-checker-result" id="pinCheckerResult"></div>
@@ -284,8 +284,8 @@
         <span class="star-pick" data-v="5">★</span>
       </div>
     </div>
-    <input type="text" id="reviewName" placeholder="Your name" class="review-input" />
-    <textarea id="reviewText" placeholder="Share your experience with this product…" class="review-input review-textarea" rows="3"></textarea>
+    <input type="text" id="reviewName" placeholder="Your name" aria-label="Your name" class="review-input" />
+    <textarea id="reviewText" placeholder="Share your experience with this product…" aria-label="Your review" class="review-input review-textarea" rows="3"></textarea>
     <button class="review-submit-btn" onclick="submitReview()">📤 Submit Review via WhatsApp</button>
   </div>
 </div>

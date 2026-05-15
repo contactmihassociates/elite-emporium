@@ -147,7 +147,7 @@
     <div class="filter-group">
       <div class="search-bar">
         <span>🔍</span>
-        <input type="text" id="productSearchInput" placeholder="Search products…" />
+        <input type="text" id="productSearchInput" placeholder="Search products…" aria-label="Search within these products" />
       </div>
     </div>
 
@@ -250,9 +250,9 @@
     <div class="filter-group">
       <h4>Price Range</h4>
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
-        <input type="number" id="priceMin" class="price-range-input" placeholder="Min ₹" min="0" />
+        <input type="number" id="priceMin" class="price-range-input" placeholder="Min ₹" aria-label="Minimum price in rupees" min="0" />
         <span style="color:var(--text-light);flex-shrink:0;">–</span>
-        <input type="number" id="priceMax" class="price-range-input" placeholder="Max ₹" min="0" />
+        <input type="number" id="priceMax" class="price-range-input" placeholder="Max ₹" aria-label="Maximum price in rupees" min="0" />
       </div>
       <button class="price-range-btn" onclick="applyPriceFilter()">Apply</button>
       <button class="price-range-clear" onclick="clearPriceFilter()">Clear</button>
@@ -278,7 +278,7 @@
 
     <div class="filter-group">
       <h4>Sort By</h4>
-      <select id="sortSelect" class="form-select" style="width:100%;">
+      <select id="sortSelect" class="form-select" aria-label="Sort products" style="width:100%;">
         <option value="default">Default</option>
         <option value="new">🆕 New Arrivals</option>
         <option value="price-asc">Price: Low to High</option>
@@ -309,7 +309,7 @@
         <button class="view-toggle-btn" id="viewList" onclick="setViewMode('list',this)" title="List view">≡</button>
       </div>
       <button class="filter-toggle-btn" id="filterToggleBtn" onclick="toggleFilters()">🔧 Filters</button>
-      <select id="sortSelectMobile" class="sort-select" style="display:none;">
+      <select id="sortSelectMobile" class="sort-select" aria-label="Sort products" style="display:none;">
         <option value="default">Sort: Default</option>
         <option value="new">🆕 New Arrivals</option>
         <option value="price-asc">Price: Low → High</option>
