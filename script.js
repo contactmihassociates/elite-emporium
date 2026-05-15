@@ -2951,6 +2951,37 @@ function dismissNotifPrompt() {
   document.getElementById('notifPromptCard')?.remove();
 }
 
+/* ── KEYBOARD SHORTCUTS ──────────────────────────────────────
+   • `/` or `Ctrl/Cmd+K`  → focus the header search input
+   • `Esc` when search has focus → blur & clear dropdown
+   Skipped when typing in any input/textarea/contenteditable.
+   ──────────────────────────────────────────────────────────── */
+function initKeyboardShortcuts() {
+  document.addEventListener('keydown', e => {
+    const inField = e.target && (
+      ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)
+      || e.target.isContentEditable
+    );
+    // `/` or Ctrl+K / Cmd+K
+    const focusKey = (e.key === '/' && !inField) || ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K'));
+    if (focusKey) {
+      const inp = document.getElementById('headerSearchInput');
+      if (inp) {
+        e.preventDefault();
+        inp.focus();
+        inp.select?.();
+        hapticTap();
+      }
+      return;
+    }
+    // Esc clears the autocomplete dropdown when search is focused
+    if (e.key === 'Escape') {
+      const dd = document.getElementById('searchHistoryDropdown');
+      if (dd) dd.style.display = 'none';
+    }
+  });
+}
+
 /* ── BFCACHE REFRESH ─────────────────────────────────────────
    When the user navigates back via Back button, mobile browsers
    sometimes restore the previous page from bfcache. Cart count
@@ -3564,9 +3595,21 @@ function initProductsPage() {
     });
   }
 
+  // Faceted filter state — colour + material chips selected on the page
+  let activeFacets = { colour: null, material: null };
+
   function filtered() {
     let list = [...products];
     if (activeCat !== 'All') list = list.filter(p => p.category === activeCat);
+    // Faceted attribute filters
+    if (activeFacets.colour || activeFacets.material) {
+      list = list.filter(p => {
+        const a = (typeof extractProductAttributes === 'function') ? extractProductAttributes(p) : { colours: [], materials: [] };
+        if (activeFacets.colour   && !a.colours.includes(activeFacets.colour))   return false;
+        if (activeFacets.material && !a.materials.includes(activeFacets.material)) return false;
+        return true;
+      });
+    }
     if (searchQuery) {
       // Use fuzzy scoring (typo tolerance + ranked by relevance).
       // Fall back to plain substring match if fuzzyScore unavailable.
@@ -3649,8 +3692,67 @@ function initProductsPage() {
     if (countEl) countEl.textContent = `Showing ${list.length} of ${products.length} products`;
     renderCategoryBanner(activeCat, list.length);
     renderFilterChips();
+    renderFacetChips();
     syncStateToURL();
   }
+
+  // Faceted colour / material chips — built from attributes of products
+  // in the currently active category (so the chips are always relevant).
+  function renderFacetChips() {
+    const wrap = document.getElementById('facetChipsRow');
+    if (!wrap) return;
+    if (typeof extractProductAttributes !== 'function') return;
+    // Pool to harvest attrs from = pre-facet filtered list (category + search,
+    // skipping facets so chips stay representative)
+    const facetsBackup = activeFacets;
+    activeFacets = { colour: null, material: null };
+    const pool = filtered();
+    activeFacets = facetsBackup;
+    if (!pool.length) { wrap.style.display = 'none'; wrap.innerHTML = ''; return; }
+    const colourCounts = {};
+    const materialCounts = {};
+    pool.forEach(p => {
+      const a = extractProductAttributes(p);
+      (a.colours || []).forEach(c => { colourCounts[c] = (colourCounts[c] || 0) + 1; });
+      (a.materials || []).forEach(m => { materialCounts[m] = (materialCounts[m] || 0) + 1; });
+    });
+    const topColours = Object.entries(colourCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const topMaterials = Object.entries(materialCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    if (!topColours.length && !topMaterials.length) { wrap.style.display = 'none'; wrap.innerHTML = ''; return; }
+
+    const SWATCH = { black: '#000', white: '#fff', red: '#DB3022', blue: '#1E88E5', green: '#43A047', yellow: '#FBC02D', pink: '#EC407A', purple: '#8E24AA', orange: '#FB8C00', brown: '#6D4C41', grey: '#9E9E9E', gray: '#9E9E9E', beige: '#F5F5DC', maroon: '#800000', navy: '#1A237E', olive: '#808000', gold: '#FFD700', silver: '#C0C0C0', rose: '#F8BBD0', ivory: '#FFFFF0', cream: '#FFFDD0', mustard: '#FFDB58', teal: '#008080', peach: '#FFCBA4', sage: '#9CAF88' };
+
+    let html = '';
+    if (topColours.length) {
+      html += `<span class="facet-group"><span class="facet-group-label">Colour</span>` +
+        topColours.map(([c]) => {
+          const active = activeFacets.colour === c;
+          const sw = SWATCH[c] || '#999';
+          return `<button class="facet-chip${active ? ' active' : ''}" type="button" onclick="window.__setFacet('colour','${c}')"><span class="fc-swatch" style="background:${sw};"></span>${c}</button>`;
+        }).join('') + '</span>';
+    }
+    if (topMaterials.length) {
+      html += `<span class="facet-group"><span class="facet-group-label">Material</span>` +
+        topMaterials.map(([m]) => {
+          const active = activeFacets.material === m;
+          return `<button class="facet-chip${active ? ' active' : ''}" type="button" onclick="window.__setFacet('material','${m}')">${m}</button>`;
+        }).join('') + '</span>';
+    }
+    if (activeFacets.colour || activeFacets.material) {
+      html += `<button class="facet-clear" type="button" onclick="window.__setFacet('clear')">Clear</button>`;
+    }
+    wrap.innerHTML = html;
+    wrap.style.display = 'flex';
+  }
+
+  // Expose facet setter (used by inline onclicks above)
+  window.__setFacet = function(type, val) {
+    if (type === 'clear') { activeFacets = { colour: null, material: null }; }
+    else if (type === 'colour')   { activeFacets.colour   = activeFacets.colour   === val ? null : val; }
+    else if (type === 'material') { activeFacets.material = activeFacets.material === val ? null : val; }
+    refresh();
+    hapticTap();
+  };
 
   // Persist the full filter state to the URL via replaceState so links are shareable
   function syncStateToURL() {
@@ -6563,10 +6665,38 @@ function initRecentlyViewed() {
   section.style.display = 'block';
   list.innerHTML = rv.map(item => `
     <a href="product.html?id=${item.id}" class="rv-card">
-      <img src="${item.image}" alt="${item.name}" loading="lazy" />
-      <div class="rv-card-name">${item.name}</div>
+      <img src="${cldUrl(item.image, 200)}"${srcsetFor(item.image) ? ` srcset="${srcsetFor(item.image)}"` : ''} alt="${escapeHtml(item.name)}" loading="lazy" decoding="async" />
+      <div class="rv-card-name">${escapeHtml(item.name)}</div>
       <div class="rv-card-price">₹${item.price.toLocaleString('en-IN')}</div>
     </a>`).join('');
+
+  // 'Continue where you left off' floating banner — homepage only,
+  // only on return visits, dismissed for the session once shown.
+  if (!document.getElementById('featuredProducts')) return;
+  if (sessionStorage.getItem('continueShown')) return;
+  if (window.location.pathname.includes('product.html')) return;
+  // Skip if user is currently browsing this product (avoid loop)
+  const top = rv[0];
+  if (!top || !top.id) return;
+  setTimeout(() => {
+    if (document.getElementById('continueBanner')) return;
+    const banner = document.createElement('a');
+    banner.id = 'continueBanner';
+    banner.className = 'continue-banner';
+    banner.href = `product.html?id=${top.id}`;
+    banner.innerHTML = `
+      <img src="${cldUrl(top.image, 160)}" alt="" />
+      <div class="cb-body">
+        <div class="cb-head">👀 Continue where you left off</div>
+        <div class="cb-name">${escapeHtml(top.name)}</div>
+        <div class="cb-price">₹${top.price.toLocaleString('en-IN')}</div>
+      </div>
+      <button class="cb-close" type="button" onclick="event.preventDefault();event.stopPropagation();document.getElementById('continueBanner').remove();sessionStorage.setItem('continueShown','1');" aria-label="Dismiss">✕</button>`;
+    document.body.appendChild(banner);
+    requestAnimationFrame(() => banner.classList.add('show'));
+    // Auto-mark shown after click too
+    banner.addEventListener('click', () => sessionStorage.setItem('continueShown', '1'));
+  }, 4500);
 }
 
 // ── WISHLIST PAGE ─────────────────────────────
@@ -8179,6 +8309,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initVoiceSearch();          // 🎤 mic button next to search input
   initPullToRefresh();        // pull-down-to-reload on touch devices
   initTapToCallShortcut();    // 'Call us' inside the WhatsApp chat card
+  initKeyboardShortcuts();    // '/' or Ctrl+K to focus search
   initLazyImageFade();
   initScrollReveal();
   initBackToTop();

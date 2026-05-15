@@ -971,6 +971,85 @@ header nav a:hover, header nav a.active { color:white; border-bottom-color:var(-
 .sk-line.short { width: 60%; }
 .sk-line-price { width: 40%; height: 16px; margin-top: 2px; }
 .sk-line-btn { width: 100%; height: 28px; margin-top: 4px; border-radius: 8px; }
+/* ── Faceted filter chips (products page colour/material) ── */
+.facet-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 0 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px dashed var(--border, #e8eaf0);
+}
+.facet-group { display: inline-flex; gap: 6px; align-items: center; padding: 4px 0; }
+.facet-group-label { font-size: 11px; color: var(--text2, #6c757d); font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; padding-right: 4px; }
+.facet-chip {
+  background: var(--surface, #fff);
+  color: var(--text, #1a1a2e);
+  border: 1px solid var(--border, #e8eaf0);
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: capitalize;
+  transition: border-color 0.15s, background 0.15s, transform 0.12s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.facet-chip:hover { border-color: var(--red); transform: translateY(-1px); }
+.facet-chip.active { background: var(--red); color: #fff; border-color: var(--red); }
+.facet-chip .fc-swatch {
+  width: 10px; height: 10px; border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.1);
+  display: inline-block;
+}
+.facet-clear {
+  background: transparent;
+  color: var(--red);
+  border: none;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 4px 8px;
+}
+
+/* ── 'Continue where you left off' floating banner ── */
+.continue-banner {
+  position: fixed;
+  bottom: 96px;
+  left: 50%;
+  transform: translate(-50%, 24px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e8eaf0);
+  border-radius: 14px;
+  padding: 10px 12px 10px 10px;
+  text-decoration: none;
+  color: var(--text, #1a1a2e);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.18);
+  z-index: 9998;
+  max-width: calc(100vw - 28px);
+  width: 360px;
+  opacity: 0;
+  transition: transform 0.30s ease, opacity 0.30s ease, box-shadow 0.20s ease;
+}
+.continue-banner.show { transform: translate(-50%, 0); opacity: 1; }
+.continue-banner:hover { box-shadow: 0 18px 46px rgba(0,0,0,0.24); }
+.continue-banner img { width: 54px; height: 54px; object-fit: cover; border-radius: 10px; flex-shrink: 0; }
+.cb-body { flex: 1; min-width: 0; }
+.cb-head { font-size: 11px; font-weight: 700; color: var(--text2, #6c757d); letter-spacing: 0.3px; }
+.cb-name { font-size: 13px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 1px; }
+.cb-price { font-size: 12.5px; font-weight: 700; color: var(--red, #DB3022); margin-top: 1px; }
+.cb-close { background: transparent; border: none; color: var(--text2); font-size: 16px; cursor: pointer; padding: 0 2px; opacity: 0.6; flex-shrink: 0; }
+.cb-close:hover { opacity: 1; }
+@media (max-width: 460px) { .continue-banner { bottom: 80px; width: calc(100vw - 24px); } }
+html[data-runtime="twa"] .continue-banner,
+html[data-runtime="pwa"] .continue-banner { bottom: calc(80px + env(safe-area-inset-bottom, 0)); }
+
 /* ── Notification permission card ── */
 .notif-prompt-card {
   position: fixed;
