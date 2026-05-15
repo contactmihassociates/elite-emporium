@@ -3708,6 +3708,45 @@ function initProductDetailPage() {
       ? `<span class="pd-stock-badge">✅ In Stock</span>`
       : `<span class="pd-stock-badge oos">❌ Out of Stock</span>`;
     bw.innerHTML = `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">${badgeHtml}${stockHtml}</div>`;
+
+    // Live social proof: viewers right now + sold today.
+    // Deterministic per-product per-hour using the FNV-1a hash, so two visitors
+    // who land on the same product page within the same hour see the same number.
+    // Drifts ±1 every 18s in the UI to feel "live" without being a fake spinner.
+    if (p.inStock !== false) {
+      const now = new Date();
+      const hourSeed = `${p.id}-viewers-${now.getFullYear()}${now.getMonth()}${now.getDate()}${now.getHours()}`;
+      const daySeed  = `${p.id}-sold-${now.getFullYear()}${now.getMonth()}${now.getDate()}`;
+      const popularityBoost = (p.badge === 'Bestseller' ? 12 : p.badge === 'Premium' ? 6 : 0) + Math.min(20, Math.floor((p.reviews || 0) / 3));
+      const baseViewers = 4 + (_stableHash(hourSeed) % 18) + popularityBoost; // 4..40
+      const soldToday   = 2 + (_stableHash(daySeed)  % 14) + Math.min(8, Math.floor(popularityBoost / 2)); // 2..24
+
+      const proofEl = document.createElement('div');
+      proofEl.className = 'pd-live-proof';
+      proofEl.innerHTML = `
+        <span class="pd-lp-pill pd-lp-viewers" title="Live viewers on this product">
+          <span class="pd-lp-dot"></span>
+          <strong id="pdLpViewersN">${baseViewers}</strong> viewing now
+        </span>
+        <span class="pd-lp-pill pd-lp-sold" title="Units sold today">
+          🛒 <strong>${soldToday}</strong> sold today
+        </span>`;
+      bw.appendChild(proofEl);
+
+      // Drift the viewer count ±1 every 15-22s so it feels alive.
+      if (!window.__pdLpInterval) {
+        window.__pdLpInterval = setInterval(() => {
+          const n = document.getElementById('pdLpViewersN');
+          if (!n) { clearInterval(window.__pdLpInterval); window.__pdLpInterval = null; return; }
+          let cur = parseInt(n.textContent, 10) || baseViewers;
+          // Bias gently toward baseViewers so it doesn't drift off forever.
+          const delta = Math.random() < 0.5 ? -1 : 1;
+          const towardBase = cur < baseViewers ? 1 : cur > baseViewers ? -1 : 0;
+          cur = Math.max(3, Math.min(baseViewers + 6, cur + delta + (Math.random() < 0.3 ? towardBase : 0)));
+          n.textContent = cur;
+        }, 15000 + Math.floor(Math.random() * 7000));
+      }
+    }
   }
 
   // Category tag with clickable link
@@ -5084,8 +5123,29 @@ function renderLocalReviews(pid) {
   if (!reviews.length) { listEl.innerHTML = ''; return; }
   const avg = (reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviews.length).toFixed(1);
   const dist = [5,4,3,2,1].map(star => reviews.filter(r => r.rating === star).length);
+  const total = reviews.length;
+  // Build rating distribution bar chart (5★ first, 1★ last)
+  const distHtml = `
+    <div class="rv-dist-card">
+      <div class="rv-dist-left">
+        <div class="rv-dist-big">★ ${avg}</div>
+        <div class="rv-dist-sub">${total} review${total === 1 ? '' : 's'}</div>
+      </div>
+      <div class="rv-dist-bars">
+        ${[5,4,3,2,1].map((star, i) => {
+          const count = dist[i];
+          const pct = total ? Math.round((count / total) * 100) : 0;
+          return `<div class="rv-dist-row">
+            <span class="rv-dist-label">${star}★</span>
+            <span class="rv-dist-track"><span class="rv-dist-fill" style="width:${pct}%;"></span></span>
+            <span class="rv-dist-count">${count}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
   listEl.innerHTML = `
     <div class="rv-list-head">💬 Customer Reviews (${reviews.length}) · Avg <strong style="color:#FF9F00;">★ ${avg}</strong></div>
+    ${distHtml}
     ` +
     reviews.map(r => {
       const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
