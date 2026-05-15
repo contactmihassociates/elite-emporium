@@ -1450,6 +1450,53 @@ function srcsetFor(url) {
   return `${cldUrl(url, 300)} 300w, ${cldUrl(url, 450)} 450w, ${cldUrl(url, 600)} 600w`;
 }
 
+/* ── DELIVERY ETA ESTIMATOR ────────────────────────────────────
+   Given a 6-digit Indian PIN code, returns {minDays, maxDays, zone}.
+   Same store base: Kayalpattinam (TN, 628204).
+   Zone-based heuristic (no external API):
+   • Same city/Thoothukudi district (628xxx)   → 1-2 days
+   • Tamil Nadu state (60-64)                  → 2-3 days
+   • South zone (Kerala/Karnataka/AP)          → 3-4 days
+   • West/Central (MH/MP/GJ/RJ)                → 4-6 days
+   • North zone (DL/PB/HR/UP)                  → 5-7 days
+   • East zone (WB/Odisha/Assam/Bihar/NE)      → 5-8 days
+   Falls back to 3-7 days for unknown prefixes. ─────────────── */
+function getDeliveryETA(pin) {
+  if (!/^\d{6}$/.test(String(pin || ''))) return null;
+  const p = String(pin);
+  const pref2 = parseInt(p.slice(0,2), 10);
+  const pref3 = parseInt(p.slice(0,3), 10);
+
+  // Special-case our own district + same city
+  if (p.startsWith('6282')) return { minDays: 1, maxDays: 1, zone: 'Kayalpattinam — same day delivery' };
+  if (pref3 >= 627 && pref3 <= 629) return { minDays: 1, maxDays: 2, zone: 'Thoothukudi district' };
+
+  if (pref2 >= 60 && pref2 <= 64) return { minDays: 2, maxDays: 3, zone: 'Tamil Nadu' };
+  if (pref2 >= 67 && pref2 <= 69) return { minDays: 3, maxDays: 4, zone: 'Kerala' };
+  if (pref2 >= 56 && pref2 <= 59) return { minDays: 3, maxDays: 4, zone: 'Karnataka' };
+  if (pref2 >= 50 && pref2 <= 53) return { minDays: 3, maxDays: 4, zone: 'Andhra Pradesh' };
+  if (pref2 >= 40 && pref2 <= 44) return { minDays: 4, maxDays: 6, zone: 'Maharashtra' };
+  if (pref2 >= 36 && pref2 <= 39) return { minDays: 4, maxDays: 6, zone: 'Gujarat' };
+  if (pref2 >= 45 && pref2 <= 49) return { minDays: 4, maxDays: 6, zone: 'Madhya Pradesh' };
+  if (pref2 >= 30 && pref2 <= 34) return { minDays: 5, maxDays: 7, zone: 'Rajasthan' };
+  if (pref2 >= 11 && pref2 <= 12) return { minDays: 5, maxDays: 7, zone: 'Delhi NCR' };
+  if (pref2 >= 14 && pref2 <= 17) return { minDays: 5, maxDays: 7, zone: 'Punjab / Haryana / Himachal' };
+  if (pref2 >= 20 && pref2 <= 28) return { minDays: 5, maxDays: 7, zone: 'Uttar Pradesh' };
+  if (pref2 >= 70 && pref2 <= 74) return { minDays: 5, maxDays: 8, zone: 'West Bengal' };
+  if (pref2 >= 75 && pref2 <= 77) return { minDays: 5, maxDays: 8, zone: 'Odisha' };
+  if (pref2 >= 78 && pref2 <= 85) return { minDays: 5, maxDays: 8, zone: 'Northeast / Bihar' };
+  if (pref2 >= 90 && pref2 <= 95) return { minDays: 6, maxDays: 9, zone: 'Northeast India' };
+  return { minDays: 3, maxDays: 7, zone: 'India' };
+}
+
+function formatDeliveryDate(daysFromNow) {
+  const d = new Date();
+  // Skip same-day-cutoff: if it's after 4 PM IST, add 1 day to account for next-day dispatch.
+  const cutoffPassed = d.getHours() >= 16;
+  d.setDate(d.getDate() + daysFromNow + (cutoffPassed ? 1 : 0));
+  return d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
 function getSubtotal() { return cart.reduce((s, i) => s + i.price * i.quantity, 0); }
 function getItemCount() { return cart.reduce((s, i) => s + i.quantity, 0); }
 function getDelivery()  { const st = getSubtotal(); return st === 0 ? 0 : st < CONFIG.minFreeDelivery ? CONFIG.deliveryCharge : 0; }
@@ -3746,6 +3793,67 @@ function initProductDetailPage() {
           n.textContent = cur;
         }, 15000 + Math.floor(Math.random() * 7000));
       }
+    }
+
+    // ── Delivery ETA card with PIN check ─────────────────────────
+    // Pre-fills from the last-saved PIN (cart form auto-saves) so a
+    // returning customer sees their date immediately. Pressing Check
+    // updates instantly.
+    if (p.inStock !== false) {
+      const savedPin = (() => {
+        try {
+          const lastOrder = JSON.parse(localStorage.getItem('eliteEmporiumCustomer') || '{}');
+          return lastOrder.pincode || '';
+        } catch { return ''; }
+      })();
+      const etaCard = document.createElement('div');
+      etaCard.className = 'pd-eta-card';
+      etaCard.innerHTML = `
+        <div class="pd-eta-head">
+          <span class="pd-eta-icon">🚚</span>
+          <strong>Delivery</strong>
+          <span class="pd-eta-free">${p.price >= 499 ? 'FREE shipping' : 'FREE over ₹499'}</span>
+        </div>
+        <div class="pd-eta-row">
+          <input type="text" inputmode="numeric" maxlength="6" id="pdEtaPin" placeholder="Enter PIN code" value="${savedPin}" aria-label="Enter PIN code" />
+          <button type="button" id="pdEtaCheckBtn">Check</button>
+        </div>
+        <div class="pd-eta-result" id="pdEtaResult" aria-live="polite"></div>`;
+      bw.appendChild(etaCard);
+
+      const renderEta = (pin) => {
+        const result = document.getElementById('pdEtaResult');
+        if (!result) return;
+        const eta = getDeliveryETA(pin);
+        if (!eta) {
+          result.innerHTML = pin
+            ? `<span class="pd-eta-err">⚠️ Please enter a valid 6-digit PIN.</span>`
+            : `<span class="pd-eta-default">📦 Typically 3-7 business days · same-day dispatch before 4 PM</span>`;
+          return;
+        }
+        if (eta.minDays === eta.maxDays && eta.minDays === 1) {
+          result.innerHTML = `✅ <strong>${eta.zone}</strong> · Get it as soon as <strong>${formatDeliveryDate(1)}</strong>`;
+        } else {
+          const earliest = formatDeliveryDate(eta.minDays);
+          const latest   = formatDeliveryDate(eta.maxDays);
+          result.innerHTML = `✅ <strong>${eta.zone}</strong> · Delivers <strong>${earliest}</strong> – <strong>${latest}</strong>`;
+        }
+      };
+
+      // Show default state, then auto-check if savedPin is valid
+      renderEta(savedPin);
+
+      // Wire up the button + Enter key
+      const btn = document.getElementById('pdEtaCheckBtn');
+      const inp = document.getElementById('pdEtaPin');
+      btn?.addEventListener('click', () => renderEta(inp.value.trim()));
+      inp?.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); renderEta(inp.value.trim()); } });
+      inp?.addEventListener('input', () => {
+        // Auto-check the moment they reach 6 digits
+        const v = inp.value.replace(/\D/g, '').slice(0, 6);
+        if (v !== inp.value) inp.value = v;
+        if (v.length === 6) renderEta(v);
+      });
     }
   }
 
