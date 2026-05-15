@@ -845,7 +845,7 @@ function openCompareModal() {
   modal.innerHTML = `<div class="cmp-modal">
     <div class="cmp-modal-header">
       <h3>⚖️ Product Comparison</h3>
-      <button class="cmp-modal-close" onclick="closeCompareModal()">✕</button>
+      <button type="button" class="cmp-modal-close" onclick="closeCompareModal()">✕</button>
     </div>
     <div class="cmp-modal-body">
       <table class="cmp-table"><thead>${headerRow}</thead><tbody>${bodyRows}</tbody></table>
@@ -1177,7 +1177,7 @@ function toggleAlertPanel() {
   panel.id = 'alertPanel';
   panel.className = 'alert-panel';
   panel.innerHTML = `
-    <div class="alert-panel-head">🔔 Price Alerts <button onclick="document.getElementById('alertPanel').remove()" class="alert-panel-close">✕</button></div>
+    <div class="alert-panel-head">🔔 Price Alerts <button type="button" onclick="document.getElementById('alertPanel').remove()" class="alert-panel-close">✕</button></div>
     ${alerts.length === 0
       ? '<div class="alert-panel-empty">No price alerts set.</div>'
       : alerts.map(a => {
@@ -1185,7 +1185,7 @@ function toggleAlertPanel() {
           return `<div class="alert-panel-item">
             <div class="api-name">${a.productName.slice(0,32)}…</div>
             <div class="api-meta">Alert: <strong>₹${a.targetPrice.toLocaleString('en-IN')}</strong> · Now: ₹${(prod ? prod.price : '?').toLocaleString?.('en-IN') ?? prod?.price}</div>
-            <button class="api-remove" onclick="removePriceAlert(${a.id});updateAlertBell();this.closest('.alert-panel-item').remove();">✕</button>
+            <button type="button" class="api-remove" onclick="removePriceAlert(${a.id});updateAlertBell();this.closest('.alert-panel-item').remove();">✕</button>
           </div>`;
         }).join('')
     }`;
@@ -1352,11 +1352,11 @@ function renderSideCart() {
           <div class="side-cart-item-name">${escapeHtml(item.name)}</div>
           ${item.selectedColor ? `<div class="side-cart-item-color">${escapeHtml(item.selectedColor)}</div>` : ''}
           <div class="side-cart-item-qty">
-            <button class="scq-btn" data-key="${escKey}" onclick="updateQuantity(this.dataset.key, -1);renderSideCart();" aria-label="Decrease quantity">−</button>
+            <button type="button" class="scq-btn" data-key="${escKey}" onclick="updateQuantity(this.dataset.key, -1);renderSideCart();" aria-label="Decrease quantity">−</button>
             <span class="scq-val">${item.quantity}</span>
-            <button class="scq-btn" data-key="${escKey}" onclick="updateQuantity(this.dataset.key, 1);renderSideCart();" aria-label="Increase quantity">+</button>
-            <button class="scq-save" data-key="${escKey}" data-id="${item.id}" onclick="saveForLater(this.dataset.key, this.dataset.id);" aria-label="Save for later" title="Save for later">🤍</button>
-            <button class="scq-remove" data-key="${escKey}" onclick="removeFromCart(this.dataset.key);renderSideCart();" aria-label="Remove" title="Remove">🗑️</button>
+            <button type="button" class="scq-btn" data-key="${escKey}" onclick="updateQuantity(this.dataset.key, 1);renderSideCart();" aria-label="Increase quantity">+</button>
+            <button type="button" class="scq-save" data-key="${escKey}" data-id="${item.id}" onclick="saveForLater(this.dataset.key, this.dataset.id);" aria-label="Save for later" title="Save for later">🤍</button>
+            <button type="button" class="scq-remove" data-key="${escKey}" onclick="removeFromCart(this.dataset.key);renderSideCart();" aria-label="Remove" title="Remove">🗑️</button>
           </div>
         </div>
         <div class="side-cart-item-price">₹${lineTotal}</div>
@@ -1405,7 +1405,7 @@ function renderSideCart() {
       <strong>₹${sub.toLocaleString('en-IN')}</strong>
     </div>
     <a href="cart.html" class="side-cart-checkout">Checkout →</a>
-    <button class="side-cart-continue" onclick="closeSideCart()">Continue shopping</button>`;
+    <button type="button" class="side-cart-continue" onclick="closeSideCart()">Continue shopping</button>`;
 }
 
 // Refresh drawer contents whenever cart changes (saveCart calls updateCartUI)
@@ -1528,9 +1528,9 @@ function addToCart(productId, selectedColor, selectedImage, qty = 1) {
       const ctrl = document.createElement('div');
       ctrl.className = 'card-qty-ctrl';
       ctrl.id = 'qtyctrl_' + productId;
-      ctrl.innerHTML = `<button class="card-qty-btn" onclick="event.preventDefault();cardQtyChange(${productId},-1)">−</button>
+      ctrl.innerHTML = `<button type="button" class="card-qty-btn" onclick="event.preventDefault();cardQtyChange(${productId},-1)">−</button>
         <span class="card-qty-num">${qty}</span>
-        <button class="card-qty-btn add" onclick="event.preventDefault();cardQtyChange(${productId},1)">+</button>`;
+        <button type="button" class="card-qty-btn add" onclick="event.preventDefault();cardQtyChange(${productId},1)">+</button>`;
       cardActionRow.replaceWith(ctrl);
     }
   }
@@ -1556,7 +1556,7 @@ function cardQtyChange(productId, delta) {
           : `addToCart(${productId})`;
         const row = document.createElement('div');
         row.className = 'card-action-row';
-        row.innerHTML = `<button class="add-to-cart" id="${btnId}" data-pid="${productId}" data-color="${defaultColor}" data-img="${defaultImg}" onclick="${addToCartCall}">🛒 Add</button>`;
+        row.innerHTML = `<button type="button" class="add-to-cart" id="${btnId}" data-pid="${productId}" data-color="${defaultColor}" data-img="${defaultImg}" onclick="${addToCartCall}">🛒 Add</button>`;
         ctrl.replaceWith(row);
       }
     }
@@ -1622,8 +1622,8 @@ function showUndoToast(message, onUndo, duration = 5000) {
   };
   toast.innerHTML = `
     <span class="toast-msg">${message}</span>
-    <button class="toast-undo-btn" style="background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);color:white;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;cursor:pointer;margin-left:8px;font-family:inherit;">Undo</button>
-    <button class="toast-close" onclick="this.parentElement.remove()">✕</button>`;
+    <button type="button" class="toast-undo-btn" style="background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);color:white;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;cursor:pointer;margin-left:8px;font-family:inherit;">Undo</button>
+    <button type="button" class="toast-close" onclick="this.parentElement.remove()">✕</button>`;
   toast.querySelector('.toast-undo-btn').onclick = () => { onUndo(); dismiss(); };
   stack.appendChild(toast);
   timer = setTimeout(dismiss, duration);
@@ -1892,7 +1892,7 @@ function renderProducts(list, containerId) {
       <h3>No products found</h3>
       <p>We couldn't find anything matching your filters. Try a different search or browse a category:</p>
       <div class="no-results-chips">${catChips}</div>
-      <button onclick="clearAllFilters()" class="no-results-clear">Clear All Filters</button>
+      <button type="button" onclick="clearAllFilters()" class="no-results-clear">Clear All Filters</button>
     </div>`;
     return;
   }
@@ -1966,16 +1966,16 @@ function renderProducts(list, containerId) {
       ${p.badge ? `<span class="product-badge ${badgeClass}">${p.badge}</span>` : ''}
       ${isOos ? `<div class="oos-overlay"><div class="oos-ribbon">Out of Stock</div></div>` : ''}
       ${isLowStock ? `<div class="card-low-stock">⚡ Only ${lowStockN} left!</div>` : ''}
-      <button class="wishlist-btn${wishlisted ? ' active' : ''}"
+      <button type="button" class="wishlist-btn${wishlisted ? ' active' : ''}"
         onclick="event.preventDefault();toggleWishlist(${p.id},this)"
         title="${wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}">${wishlisted ? '❤️' : '🤍'}</button>
-      <button class="qv-card-btn" onclick="event.preventDefault();openQuickView(${p.id})" title="Quick View">👁️</button>
+      <button type="button" class="qv-card-btn" onclick="event.preventDefault();openQuickView(${p.id})" title="Quick View">👁️</button>
       <a class="card-share-btn"
         href="https://wa.me/?text=${encodeURIComponent(`Check out this product on Elite Emporium:\n\n*${p.name}*\n₹${p.price.toLocaleString('en-IN')}\n\nhttps://elite-emporium-one.vercel.app/product.html?id=${p.id}`)}"
         target="_blank" rel="noopener"
         onclick="event.stopPropagation();"
         title="Share on WhatsApp" aria-label="Share on WhatsApp">💬</a>
-      <button class="compare-btn${compareList.includes(p.id) ? ' active' : ''}"
+      <button type="button" class="compare-btn${compareList.includes(p.id) ? ' active' : ''}"
         data-cmpid="${p.id}"
         onclick="event.preventDefault();toggleCompare(${p.id},this)"
         title="Compare">⚖️</button>
@@ -2005,13 +2005,13 @@ function renderProducts(list, containerId) {
                 const cartItem = cart.find(i => i.id === p.id);
                 if (cartItem) {
                   return `<div class="card-qty-ctrl" id="qtyctrl_${p.id}">
-                    <button class="card-qty-btn" onclick="event.preventDefault();cardQtyChange(${p.id},-1)">−</button>
+                    <button type="button" class="card-qty-btn" onclick="event.preventDefault();cardQtyChange(${p.id},-1)">−</button>
                     <span class="card-qty-num">${cartItem.quantity}</span>
-                    <button class="card-qty-btn add" onclick="event.preventDefault();cardQtyChange(${p.id},1)">+</button>
+                    <button type="button" class="card-qty-btn add" onclick="event.preventDefault();cardQtyChange(${p.id},1)">+</button>
                   </div>`;
                 }
                 return `<div class="card-action-row">
-                  <button class="add-to-cart"
+                  <button type="button" class="add-to-cart"
                     id="${btnId}"
                     data-pid="${p.id}"
                     data-color="${defaultColor}"
@@ -2352,15 +2352,15 @@ function renderCart() {
         <div class="cart-item-price">₹${(item.price * item.quantity).toLocaleString('en-IN')}</div>
       </div>
       <div class="quantity-controls">
-        <button class="qty-btn" data-key="${escKey}" onclick="updateQuantity(this.dataset.key, -1)">−</button>
+        <button type="button" class="qty-btn" data-key="${escKey}" onclick="updateQuantity(this.dataset.key, -1)">−</button>
         <span class="qty-value">${item.quantity}</span>
-        <button class="qty-btn" data-key="${escKey}" onclick="updateQuantity(this.dataset.key, 1)">+</button>
+        <button type="button" class="qty-btn" data-key="${escKey}" onclick="updateQuantity(this.dataset.key, 1)">+</button>
       </div>
       <div class="cart-item-secondary-actions">
-        <button class="save-for-later-btn" data-key="${escKey}" data-pid="${item.id}"
+        <button type="button" class="save-for-later-btn" data-key="${escKey}" data-pid="${item.id}"
           onclick="saveForLater(this.dataset.key, this.dataset.pid)"
           title="Save for later">🤍 Save for Later</button>
-        <button class="remove-btn" data-key="${escKey}" onclick="removeFromCart(this.dataset.key)" title="Remove">🗑️ Remove</button>
+        <button type="button" class="remove-btn" data-key="${escKey}" onclick="removeFromCart(this.dataset.key)" title="Remove">🗑️ Remove</button>
       </div>
     </div>
   `;
@@ -2425,7 +2425,7 @@ function initCartUpsell() {
             <div class="product-price">₹${p.price.toLocaleString('en-IN')}</div>
             ${discount ? `<span class="product-save">${discount}% off</span>` : ''}
           </div>
-          <button class="add-to-cart" onclick="addToCart(${p.id});this.textContent='✓ Added';this.style.background='var(--green)';setTimeout(()=>{this.textContent='🛒 Add';this.style.background='';},1500)">🛒 Add</button>
+          <button type="button" class="add-to-cart" onclick="addToCart(${p.id});this.textContent='✓ Added';this.style.background='var(--green)';setTimeout(()=>{this.textContent='🛒 Add';this.style.background='';},1500)">🛒 Add</button>
         </div>
       </div>
     </div>`;
@@ -2812,7 +2812,7 @@ function openPriceAlertModal(p) {
     <div class="pa-modal">
       <div class="pa-modal-head">
         <span>🔔 Set Price Drop Alert</span>
-        <button class="pa-close" onclick="this.closest('.pa-backdrop').remove()">✕</button>
+        <button type="button" class="pa-close" onclick="this.closest('.pa-backdrop').remove()">✕</button>
       </div>
       <p class="pa-desc">${p.name.slice(0,50)}${p.name.length > 50 ? '…' : ''}</p>
       <div class="pa-current">Current price: <strong>₹${p.price.toLocaleString('en-IN')}</strong></div>
@@ -2823,8 +2823,8 @@ function openPriceAlertModal(p) {
                min="1" max="${p.price - 1}" placeholder="Target price" />
       </div>
       <div class="pa-actions">
-        ${existing ? `<button class="pa-remove" onclick="removePriceAlert(${p.id});this.closest('.pa-backdrop').remove();showToast('Alert removed.');document.querySelector('.btn-price-alert').innerHTML='🔔 Set Price Drop Alert';document.querySelector('.btn-price-alert').classList.remove('active');">Remove Alert</button>` : ''}
-        <button class="pa-save" onclick="
+        ${existing ? `<button type="button" class="pa-remove" onclick="removePriceAlert(${p.id});this.closest('.pa-backdrop').remove();showToast('Alert removed.');document.querySelector('.btn-price-alert').innerHTML='🔔 Set Price Drop Alert';document.querySelector('.btn-price-alert').classList.remove('active');">Remove Alert</button>` : ''}
+        <button type="button" class="pa-save" onclick="
           const v=parseInt(document.getElementById('paTargetPrice').value);
           if(!v||v<=0){showToast('⚠️ Enter a valid price.',2800,'error');return;}
           savePriceAlert(${p.id},v,'${p.name.replace(/'/g,"\\'")}',${p.price});
@@ -4472,7 +4472,7 @@ function injectProductsPageRecentStrip() {
   section.innerHTML = `
     <div class="pp-recent-head">
       <h3>👁️ Recently Viewed</h3>
-      <button class="pp-recent-clear" onclick="clearRecentlyViewed()">Clear</button>
+      <button type="button" class="pp-recent-clear" onclick="clearRecentlyViewed()">Clear</button>
     </div>
     <div class="pp-recent-strip">
       ${rv.map(item => `
@@ -4893,7 +4893,7 @@ function initDealOfDay() {
       </div>
       <div class="deal-desc">${deal.desc || ''}</div>
       <div class="deal-actions">
-        <button class="add-to-cart" onclick="addToCart(${deal.id})">🛒 Add to Cart</button>
+        <button type="button" class="add-to-cart" onclick="addToCart(${deal.id})">🛒 Add to Cart</button>
         <a class="deal-view-btn" href="product.html?id=${deal.id}">View Details →</a>
       </div>
     </div>`;
@@ -5551,9 +5551,9 @@ function initProductDetailPage() {
       qtyRow.innerHTML =
         `<span class="pd-qty-label">Qty:</span>
          <div class="pd-qty-ctrl">
-           <button class="pd-qty-btn" id="pdQtyDec" onclick="__pdQtyChange(-1)" aria-label="Decrease quantity">−</button>
+           <button type="button" class="pd-qty-btn" id="pdQtyDec" onclick="__pdQtyChange(-1)" aria-label="Decrease quantity">−</button>
            <span class="pd-qty-num" id="pdQtyNum">1</span>
-           <button class="pd-qty-btn" id="pdQtyInc" onclick="__pdQtyChange(1)" aria-label="Increase quantity">+</button>
+           <button type="button" class="pd-qty-btn" id="pdQtyInc" onclick="__pdQtyChange(1)" aria-label="Increase quantity">+</button>
          </div>
          <span class="pd-qty-max-note" id="pdQtyNote"></span>`;
       pdActions.insertAdjacentElement('beforebegin', qtyRow);
@@ -5700,7 +5700,7 @@ function initProductDetailPage() {
     couponChip.className = 'pd-coupon-chip';
     couponChip.innerHTML = `
       <span class="pd-coupon-chip-text">💡 Use code <strong>ELITE10</strong> for 10% off at checkout</span>
-      <button class="pd-coupon-copy" onclick="navigator.clipboard.writeText('ELITE10').then(()=>{this.textContent='✅ Copied!';setTimeout(()=>this.textContent='Copy',2000)}).catch(()=>{})" title="Copy code">Copy</button>`;
+      <button type="button" class="pd-coupon-copy" onclick="navigator.clipboard.writeText('ELITE10').then(()=>{this.textContent='✅ Copied!';setTimeout(()=>this.textContent='Copy',2000)}).catch(()=>{})" title="Copy code">Copy</button>`;
     const savings = priceEl.closest('.pd-info');
     if (savings) {
       const mrpEl = priceEl.nextElementSibling;
@@ -5955,7 +5955,7 @@ function initWhatsAppChatCard() {
           <div id="waChatTitle" class="wa-chat-head-name">Elite Emporium</div>
           <div class="wa-chat-head-status"><span class="wa-status-dot"></span>Online · typically replies in 30 min</div>
         </div>
-        <button class="wa-chat-close" aria-label="Close">✕</button>
+        <button type="button" class="wa-chat-close" aria-label="Close">✕</button>
       </div>
       <div class="wa-chat-body">
         <div class="wa-chat-bubble">
@@ -5963,12 +5963,12 @@ function initWhatsAppChatCard() {
           <strong>the owner replies personally</strong>, usually within 30 minutes.
         </div>
         <div class="wa-chat-prompts">
-          <button class="wa-prompt-chip" data-msg="Hi! I have a quick question about a product.">❓ Quick question</button>
-          <button class="wa-prompt-chip" data-msg="Hi! Can you help me track my order?">📦 Track my order</button>
-          <button class="wa-prompt-chip" data-msg="Hi! I&apos;d like to place a bulk order. Can we discuss pricing?">🏢 Bulk order</button>
-          <button class="wa-prompt-chip" data-msg="Hi! I have a custom request &mdash; is it possible?">✨ Custom request</button>
-          <button class="wa-prompt-chip" data-msg="Hi! I need a GST invoice for an order.">🧾 GST invoice</button>
-          <button class="wa-prompt-chip" data-msg="Hi! What&apos;s your return policy?">🔄 Returns</button>
+          <button type="button" class="wa-prompt-chip" data-msg="Hi! I have a quick question about a product.">❓ Quick question</button>
+          <button type="button" class="wa-prompt-chip" data-msg="Hi! Can you help me track my order?">📦 Track my order</button>
+          <button type="button" class="wa-prompt-chip" data-msg="Hi! I&apos;d like to place a bulk order. Can we discuss pricing?">🏢 Bulk order</button>
+          <button type="button" class="wa-prompt-chip" data-msg="Hi! I have a custom request &mdash; is it possible?">✨ Custom request</button>
+          <button type="button" class="wa-prompt-chip" data-msg="Hi! I need a GST invoice for an order.">🧾 GST invoice</button>
+          <button type="button" class="wa-prompt-chip" data-msg="Hi! What&apos;s your return policy?">🔄 Returns</button>
         </div>
         <a class="wa-chat-open-btn" id="waChatOpenBtn" target="_blank" rel="noopener">💬 Open WhatsApp Chat →</a>
         <div class="wa-chat-alt">Primary: +91 7358650774 &middot; Alt: +91 7358719774</div>
@@ -6878,7 +6878,7 @@ function initFBT(product) {
         <div class="fbt-total">Bundle Price: <strong>₹${total.toLocaleString('en-IN')}</strong></div>
         <div class="fbt-save">🎁 Save ₹${discount.toLocaleString('en-IN')} on this bundle (-${bundleDiscPct}%)</div>
       </div>
-      <button class="fbt-add-btn" onclick="addBundleToCart([${bundle.map(p=>p.id).join(',')}])">🛒 Add All to Cart</button>
+      <button type="button" class="fbt-add-btn" onclick="addBundleToCart([${bundle.map(p=>p.id).join(',')}])">🛒 Add All to Cart</button>
     </div>`;
   section.style.display = 'block';
 }
@@ -7075,8 +7075,8 @@ function openImageModal(src) {
   if (!document.getElementById('imgModalPrev') && _imgModalGallery.length > 1) {
     const inner = modal.querySelector('.img-modal-inner') || modal;
     inner.insertAdjacentHTML('beforeend', `
-      <button id="imgModalPrev" class="img-modal-nav prev" onclick="imgModalStep(-1)" aria-label="Previous">‹</button>
-      <button id="imgModalNext" class="img-modal-nav next" onclick="imgModalStep(1)" aria-label="Next">›</button>
+      <button type="button" id="imgModalPrev" class="img-modal-nav prev" onclick="imgModalStep(-1)" aria-label="Previous">‹</button>
+      <button type="button" id="imgModalNext" class="img-modal-nav next" onclick="imgModalStep(1)" aria-label="Next">›</button>
       <div id="imgModalCounter" class="img-modal-counter"></div>
     `);
   }
@@ -7229,7 +7229,7 @@ function initWishlistPage() {
         ${oosCount > 0 ? `<span class="wl-value-oos">⚠️ ${oosCount} out of stock</span>` : ''}
       </div>
     </div>
-    <button class="wl-move-all-btn" onclick="addAllWishlistToCart()">🛒 Add All to Cart</button>`;
+    <button type="button" class="wl-move-all-btn" onclick="addAllWishlistToCart()">🛒 Add All to Cart</button>`;
   grid.parentElement.insertBefore(valueBar, grid);
 
   // Sort dropdown
@@ -7651,7 +7651,7 @@ function initExitIntent() {
     modal.className = 'exit-intent-backdrop';
     modal.innerHTML = `
       <div class="exit-intent-modal" role="dialog" aria-labelledby="eiTitle" aria-modal="true">
-        <button class="exit-intent-close" aria-label="Close">✕</button>
+        <button type="button" class="exit-intent-close" aria-label="Close">✕</button>
         <div class="exit-intent-emoji">👋</div>
         <h2 id="eiTitle">Wait! Don't leave yet…</h2>
         <p>You have <strong>${itemCount} item${itemCount > 1 ? 's' : ''}</strong> worth <strong>₹${sub.toLocaleString('en-IN')}</strong> in your cart.</p>
@@ -7748,7 +7748,7 @@ function initFestiveTheming() {
   banner.style.background = `linear-gradient(135deg, ${theme.tint}, ${shadeColor(theme.tint, -15)})`;
   banner.innerHTML = `
     <a href="${shopHref}" class="fb-text fb-link"><strong>${theme.label}</strong> &middot; <span>${theme.subtitle}</span> <span class="fb-cta">Shop Now →</span></a>
-    <button class="fb-close" onclick="dismissFestive('${theme.id}')" aria-label="Dismiss">✕</button>`;
+    <button type="button" class="fb-close" onclick="dismissFestive('${theme.id}')" aria-label="Dismiss">✕</button>`;
   // Insert as the very first element of body so it sits above the header
   document.body.insertBefore(banner, document.body.firstChild);
   applyFestiveTint(theme.tint);
@@ -7798,7 +7798,7 @@ function initFirstVisitModal() {
     modal.className = 'fv-backdrop';
     modal.innerHTML = `
       <div class="fv-modal" role="dialog" aria-labelledby="fvTitle" aria-modal="true">
-        <button class="fv-close" aria-label="Close">✕</button>
+        <button type="button" class="fv-close" aria-label="Close">✕</button>
         <div class="fv-confetti">🎉</div>
         <h2 id="fvTitle">Welcome to Elite Emporium!</h2>
         <p>Use code <strong>WELCOME</strong> to get <b>5% off your first order</b>.</p>
@@ -7908,7 +7908,7 @@ function initCartReminder() {
       </div>
     </div>
     <a href="cart.html" class="cart-reminder-btn">Checkout →</a>
-    <button class="cart-reminder-close" onclick="dismissCartReminder()" title="Dismiss">✕</button>`;
+    <button type="button" class="cart-reminder-close" onclick="dismissCartReminder()" title="Dismiss">✕</button>`;
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add('show'));
 }
@@ -7957,7 +7957,7 @@ window.addEventListener('beforeinstallprompt', e => {
         <strong>Install Elite Emporium on iPhone</strong>
         <span>Tap the <b>Share</b> button at the bottom of Safari → <b>"Add to Home Screen"</b>.</span>
       </div>
-      <button class="pwa-install-dismiss" onclick="document.getElementById('iosInstallBanner').remove();localStorage.setItem('eliteEmporiumIosInstallDismissed',Date.now());" title="Dismiss">✕</button>`;
+      <button type="button" class="pwa-install-dismiss" onclick="document.getElementById('iosInstallBanner').remove();localStorage.setItem('eliteEmporiumIosInstallDismissed',Date.now());" title="Dismiss">✕</button>`;
     document.body.appendChild(banner);
     requestAnimationFrame(() => banner.classList.add('show'));
   }, 12000);
@@ -7974,8 +7974,8 @@ function showInstallBanner() {
       <strong>Install Elite Emporium</strong>
       <span>Add to your home screen for faster access & offline browsing</span>
     </div>
-    <button class="pwa-install-btn" onclick="triggerPwaInstall()">Install</button>
-    <button class="pwa-install-dismiss" onclick="dismissInstallBanner()" title="Dismiss">✕</button>`;
+    <button type="button" class="pwa-install-btn" onclick="triggerPwaInstall()">Install</button>
+    <button type="button" class="pwa-install-dismiss" onclick="dismissInstallBanner()" title="Dismiss">✕</button>`;
   document.body.appendChild(banner);
   requestAnimationFrame(() => banner.classList.add('show'));
 }
@@ -8186,7 +8186,7 @@ function openShortcutHelp() {
     <div class="kbd-help-modal">
       <div class="kbd-help-head">
         <h3>⌨️ Keyboard Shortcuts</h3>
-        <button class="kbd-help-close" onclick="document.getElementById('kbdHelpModal').style.display='none'">✕</button>
+        <button type="button" class="kbd-help-close" onclick="document.getElementById('kbdHelpModal').style.display='none'">✕</button>
       </div>
       <div class="kbd-help-body">
         <div class="kbd-row"><kbd>/</kbd><span>Focus search bar</span></div>
@@ -8562,7 +8562,7 @@ function printGSTInvoice(orderId) {
     <p style="margin-top:4px;">Thank you for shopping with Elite Emporium! 🙏</p>
   </div>
   <div style="text-align:center;margin-top:20px;">
-    <button onclick="window.print()" style="background:#DB3022;color:white;border:none;padding:10px 28px;border-radius:6px;font-size:14px;cursor:pointer;font-family:Arial,sans-serif;">🖨️ Print Invoice</button>
+    <button type="button" onclick="window.print()" style="background:#DB3022;color:white;border:none;padding:10px 28px;border-radius:6px;font-size:14px;cursor:pointer;font-family:Arial,sans-serif;">🖨️ Print Invoice</button>
   </div>
   </body></html>`);
   win.document.close();
@@ -8788,9 +8788,9 @@ function initOrdersPage() {
         <div class="oh-card-footer">
           <div class="oh-address">📍 ${order.customer.address}, ${order.customer.city}, ${order.customer.state} – ${order.customer.pincode}</div>
           <div class="oh-footer-actions">
-            <button class="oh-invoice-btn" onclick="printGSTInvoice('${order.id}')">🧾 GST Invoice</button>
+            <button type="button" class="oh-invoice-btn" onclick="printGSTInvoice('${order.id}')">🧾 GST Invoice</button>
             <a class="oh-track-btn" href="track-order.html?id=${order.id}">🔎 Track</a>
-            <button class="oh-reorder-now-btn" onclick="reorderNow('${order.id}')" title="Add these items back to your cart">🔁 Order Again</button>
+            <button type="button" class="oh-reorder-now-btn" onclick="reorderNow('${order.id}')" title="Add these items back to your cart">🔁 Order Again</button>
             <a class="oh-reorder-btn" href="https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent('Hi! I want to reorder my order ' + order.id + ' placed on ' + dStr)}" target="_blank" rel="noopener">💬 WhatsApp</a>
           </div>
         </div>
@@ -8854,8 +8854,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         b.className = 'sw-update-banner';
         b.innerHTML = `
           <span>🔄 A new version is available.</span>
-          <button onclick="(function(){const r=window.__swRegPending;if(r&&r.waiting){r.waiting.postMessage({type:'SKIP_WAITING'});setTimeout(()=>location.reload(),300);}else{location.reload();}})()">Refresh</button>
-          <button onclick="document.getElementById('swUpdateBanner').remove();" aria-label="Dismiss">✕</button>`;
+          <button type="button" onclick="(function(){const r=window.__swRegPending;if(r&&r.waiting){r.waiting.postMessage({type:'SKIP_WAITING'});setTimeout(()=>location.reload(),300);}else{location.reload();}})()">Refresh</button>
+          <button type="button" onclick="document.getElementById('swUpdateBanner').remove();" aria-label="Dismiss">✕</button>`;
         document.body.appendChild(b);
         requestAnimationFrame(() => b.classList.add('show'));
       };
