@@ -1973,7 +1973,7 @@ function renderProducts(list, containerId) {
         title="${wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}">${wishlisted ? '❤️' : '🤍'}</button>
       <button type="button" class="qv-card-btn" onclick="event.preventDefault();openQuickView(${p.id})" title="Quick View">👁️</button>
       <a class="card-share-btn"
-        href="https://wa.me/?text=${encodeURIComponent(`Check out this product on Elite Emporium:\n\n*${p.name}*\n₹${p.price.toLocaleString('en-IN')}\n\nhttps://elite-emporium-one.vercel.app/product.html?id=${p.id}`)}"
+        href="https://wa.me/?text=${encodeURIComponent(`Check out this product on Elite Emporium:\n\n*${p.name}*\n₹${p.price.toLocaleString('en-IN')}\n\nhttps://eliteemporium.co.in/product.html?id=${p.id}`)}"
         target="_blank" rel="noopener"
         onclick="event.stopPropagation();"
         title="Share on WhatsApp" aria-label="Share on WhatsApp">💬</a>
@@ -2723,7 +2723,7 @@ function buildWhatsAppMessage(details) {
   const now     = new Date();
   const date    = now.toLocaleDateString('en-IN',  { day:'2-digit', month:'2-digit', year:'numeric' });
   const time    = now.toLocaleTimeString('en-IN',  { hour:'2-digit', minute:'2-digit' });
-  const baseUrl = 'https://elite-emporium-one.vercel.app/';
+  const baseUrl = 'https://eliteemporium.co.in/';
 
   let msg = `🛍️ *NEW ORDER — ELITE EMPORIUM*\n`;
   msg    += `━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
@@ -5053,7 +5053,7 @@ function initProductDetailPage() {
   // JSON-LD structured data for SEO rich snippets — enriched with
   // MPN/SKU, multi-image gallery, hasMerchantReturnPolicy, shippingDetails,
   // and per-variant offers (when product has colour variants).
-  const baseUrl = 'https://elite-emporium-one.vercel.app/';
+  const baseUrl = 'https://eliteemporium.co.in/';
   const ldScript = document.getElementById('productJsonLd') || document.createElement('script');
   ldScript.id   = 'productJsonLd';
   ldScript.type = 'application/ld+json';
@@ -5141,7 +5141,7 @@ function initProductDetailPage() {
   const ogImg = p.image || (p.variants && p.variants[0]?.image) || '';
   const ogImgCard = ogImg && ogImg.includes('res.cloudinary.com')
     ? ogImg.replace('/image/upload/', '/image/upload/c_pad,b_auto,w_1200,h_630,q_auto,f_jpg/')
-    : (ogImg.startsWith('http') ? ogImg : `https://elite-emporium-one.vercel.app/${ogImg}`);
+    : (ogImg.startsWith('http') ? ogImg : `https://eliteemporium.co.in/${ogImg}`);
   const setOgById = (id, val) => { const el = document.getElementById(id); if (el) el.setAttribute('content', val); };
   setOgById('ogTitle', `${p.name} – ₹${p.price.toLocaleString('en-IN')} | Elite Emporium`);
   setOgById('ogDesc',  `${p.category} · ${p.mrp && p.mrp > p.price ? Math.round((p.mrp - p.price) / p.mrp * 100) + '% off · ' : ''}Rated ★${p.rating}. Free delivery above ₹499.`);
@@ -5164,9 +5164,9 @@ function initProductDetailPage() {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     'itemListElement': [
-      { '@type': 'ListItem', position: 1, name: 'Home',         item: 'https://elite-emporium-one.vercel.app/' },
-      { '@type': 'ListItem', position: 2, name: 'All Products', item: 'https://elite-emporium-one.vercel.app/products.html' },
-      { '@type': 'ListItem', position: 3, name: p.category,     item: `https://elite-emporium-one.vercel.app/products.html?category=${encodeURIComponent(p.category)}` },
+      { '@type': 'ListItem', position: 1, name: 'Home',         item: 'https://eliteemporium.co.in/' },
+      { '@type': 'ListItem', position: 2, name: 'All Products', item: 'https://eliteemporium.co.in/products.html' },
+      { '@type': 'ListItem', position: 3, name: p.category,     item: `https://eliteemporium.co.in/products.html?category=${encodeURIComponent(p.category)}` },
       { '@type': 'ListItem', position: 4, name: p.name,         item: window.location.href },
     ],
   });
@@ -6273,7 +6273,7 @@ function openUPIPaymentModal(ctx) {
     }
 
     // Build the WhatsApp confirmation message
-    const baseUrl = 'https://elite-emporium-one.vercel.app/';
+    const baseUrl = 'https://eliteemporium.co.in/';
     let msg = `✅ *UPI PAYMENT — ELITE EMPORIUM*\n`;
     msg    += `━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
     msg    += `🆔 Order: *${ctx.orderId}*\n`;
@@ -6403,7 +6403,7 @@ async function payOnline() {
         currency: 'INR',
         name:     'Elite Emporium',
         description: `Order ${orderId} · ${cart.reduce((s,i)=>s+i.quantity,0)} item(s)`,
-        image:    'https://elite-emporium-one.vercel.app/images/logo-512.png',
+        image:    'https://eliteemporium.co.in/images/logo-512.png',
         prefill:  { name, contact: phone, email: get('custEmail') },
         notes: {
           order_id:    orderId,

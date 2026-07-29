@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Festive Collection – Elite Emporium</title>
   <meta name="description" content="Curated festive collections at Elite Emporium — Eid, Diwali, Christmas, New Year & more." />
-  <link rel="canonical" id="collCanonical" href="https://elite-emporium-one.vercel.app/collection.html" />
+  <link rel="canonical" id="collCanonical" href="https://eliteemporium.co.in/collection.html" />
   <meta id="collOgTitle" property="og:title" content="Festive Collection – Elite Emporium" />
   <meta id="collOgDesc"  property="og:description" content="Curated festive collections — Eid, Diwali, Christmas, New Year & more." />
-  <meta property="og:image" content="https://elite-emporium-one.vercel.app/images/logo-512.png" />
+  <meta property="og:image" content="https://eliteemporium.co.in/images/logo-512.png" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
@@ -37,8 +37,8 @@
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://elite-emporium-one.vercel.app/" },
-      { "@type": "ListItem", "position": 2, "name": "Festive Collection", "item": "https://elite-emporium-one.vercel.app/collection.html" }
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://eliteemporium.co.in/" },
+      { "@type": "ListItem", "position": 2, "name": "Festive Collection", "item": "https://eliteemporium.co.in/collection.html" }
     ]
   }
   </script>
@@ -50,16 +50,16 @@
     "@type": "CollectionPage",
     "name": "Festive Collection — Elite Emporium",
     "description": "Curated festive collections at Elite Emporium — Eid, Diwali, Christmas, New Year and more. Free delivery above ₹499.",
-    "url": "https://elite-emporium-one.vercel.app/collection.html",
+    "url": "https://eliteemporium.co.in/collection.html",
     "isPartOf": {
       "@type": "WebSite",
       "name": "Elite Emporium",
-      "url": "https://elite-emporium-one.vercel.app/"
+      "url": "https://eliteemporium.co.in/"
     },
     "publisher": {
       "@type": "Organization",
       "name": "Elite Emporium",
-      "logo": { "@type": "ImageObject", "url": "https://elite-emporium-one.vercel.app/images/logo-512.png" }
+      "logo": { "@type": "ImageObject", "url": "https://eliteemporium.co.in/images/logo-512.png" }
     }
   }
   </script>
@@ -178,7 +178,7 @@
   </style>
 
   <!-- Social cards + canonical (auto-injected iter 51) -->
-  <meta property="og:url" content="https://elite-emporium-one.vercel.app/collection.html" />
+  <meta property="og:url" content="https://eliteemporium.co.in/collection.html" />
   <meta property="og:image:width" content="512" />
   <meta property="og:image:height" content="512" />
   <meta property="og:image:alt" content="Elite Emporium logo" />
@@ -186,7 +186,7 @@
   <meta property="og:site_name" content="Elite Emporium" />
   <meta name="twitter:title" content="Festive Collection – Elite Emporium" />
   <meta name="twitter:description" content="Curated festive collections at Elite Emporium — Eid, Diwali, Christmas, New Year & more." />
-  <meta name="twitter:image" content="https://elite-emporium-one.vercel.app/images/logo-512.png" />
+  <meta name="twitter:image" content="https://eliteemporium.co.in/images/logo-512.png" />
 </head>
 <body>
 <noscript>
@@ -313,7 +313,7 @@
 
     // Update canonical / OG / JSON-LD to reflect the picked theme
     try {
-      const themeUrl = `https://elite-emporium-one.vercel.app/collection.html?theme=${theme.id}`;
+      const themeUrl = `https://eliteemporium.co.in/collection.html?theme=${theme.id}`;
       document.getElementById('collCanonical').href = themeUrl;
       const desc = `${theme.title} at Elite Emporium — ${theme.subtitle} Free delivery above ₹499.`;
       const metaDesc = document.querySelector('meta[name="description"]');
@@ -328,8 +328,8 @@
           "name": `${theme.title} — Elite Emporium`,
           "description": desc,
           "url": themeUrl,
-          "isPartOf": { "@type": "WebSite", "name": "Elite Emporium", "url": "https://elite-emporium-one.vercel.app/" },
-          "publisher": { "@type": "Organization", "name": "Elite Emporium", "logo": { "@type": "ImageObject", "url": "https://elite-emporium-one.vercel.app/images/logo-512.png" } },
+          "isPartOf": { "@type": "WebSite", "name": "Elite Emporium", "url": "https://eliteemporium.co.in/" },
+          "publisher": { "@type": "Organization", "name": "Elite Emporium", "logo": { "@type": "ImageObject", "url": "https://eliteemporium.co.in/images/logo-512.png" } },
           "about": theme.cats.map(c => ({ "@type": "Thing", "name": c }))
         };
         ldEl.textContent = JSON.stringify(ld);

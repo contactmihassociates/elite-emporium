@@ -38,7 +38,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://checkout.razorpay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://res.cloudinary.com https://elite-emporium-one.vercel.app https://api.qrserver.com https://quickchart.io; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.cloudinary.com https://api.razorpay.com; font-src 'self' data: https://fonts.gstatic.com; manifest-src 'self'; frame-src https://*.razorpay.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https://wa.me https://api.whatsapp.com; object-src 'none'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://checkout.razorpay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://res.cloudinary.com https://eliteemporium.co.in https://api.qrserver.com https://quickchart.io; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.cloudinary.com https://api.razorpay.com; font-src 'self' data: https://fonts.gstatic.com; manifest-src 'self'; frame-src https://*.razorpay.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https://wa.me https://api.whatsapp.com; object-src 'none'; upgrade-insecure-requests"
         }
       ]
     },
@@ -125,6 +125,18 @@
     {
       "source": "/index.html",
       "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "elite-emporium-one.vercel.app" }],
+      "destination": "https://eliteemporium.co.in/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.eliteemporium.co.in" }],
+      "destination": "https://eliteemporium.co.in/:path*",
       "permanent": true
     }
   ]

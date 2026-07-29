@@ -4,4 +4,4 @@ Disallow: /admin.html
 Disallow: /hanii-dhanii-admin.html
 Disallow: /firebase-config.js
 
-Sitemap: https://elite-emporium-one.vercel.app/sitemap.xml
+Sitemap: https://eliteemporium.co.in/sitemap.xml
